@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle"
+    >
+    <solid android:color="@color/custom_seekbar_detail_process" />
+    <size
+        android:width="@dimen/custom_seekbar_thumb_width"
+        android:height="@dimen/custom_seekbar_thumb_height" />
+    <corners android:radius="@dimen/custom_seekbar_thumb_height" />
+    <padding
+        android:bottom="@dimen/custom_seekbar_thumb_pad_t_b"
+        android:left="@dimen/custom_seekbar_thumb_pad_l_r"
+        android:right="@dimen/custom_seekbar_thumb_pad_l_r"
+        android:top="@dimen/custom_seekbar_thumb_pad_t_b" />
+
+</shape>

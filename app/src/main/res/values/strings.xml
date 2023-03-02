@@ -1,0 +1,24 @@
+<resources>
+    <string name="app_name">My Music</string>
+
+    <!-- notification channel  -->
+    <string name="channel_name">Channel Play Music</string>
+    <string name="channel_description">This channel uses to notification music when app play music</string>
+
+    <string name="nav_home">Home</string>
+    <string name="nav_playlist">Playlist</string>
+    <string name="nav_album">Album</string>
+    <string name="nav_topic">Topic</string>
+    <string name="nav_about_us">About us</string>
+    <string name="nav_rate">Rate</string>
+    <string name="nav_app_info">App information</string>
+    <string name="nav_setting">Setting</string>
+
+    <string name="top_home">Home</string>
+    <string name="top_playlist">Playlist</string>
+    <string name="top_album">Album</string>
+    <string name="top_topic">Topic</string>
+
+    <string name="navigation_drawer_open">Open Navigation Drawer</string>
+    <string name="navigation_drawer_close">Close Navigation Drawer</string>
+</resources>

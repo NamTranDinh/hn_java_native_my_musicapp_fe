@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@android:id/background"
+        android:height="@dimen/custom_seekbar_height"
+        android:gravity="center">
+        <!-- custom_seekbar_height 2dp -->
+        <shape android:shape="rectangle">
+            <corners android:radius="@dimen/custom_seekbar_height" />
+            <solid android:color="@color/custom_seekbar_detail_background" />
+        </shape>
+    </item>
+    <item
+        android:id="@android:id/progress"
+        android:height="@dimen/custom_seekbar_height"
+        android:gravity="center">
+        <clip>
+            <shape android:shape="rectangle">
+                <corners android:radius="@dimen/custom_seekbar_height" />
+                <solid android:color="@color/custom_seekbar_detail_process" />
+            </shape>
+        </clip>
+    </item>
+</layer-list>

@@ -1,0 +1,59 @@
+plugins {
+    id 'com.android.application'
+}
+
+android {
+    namespace 'com.aptech.mymusic'
+    compileSdk 33
+
+    defaultConfig {
+        applicationId "com.aptech.mymusic"
+        minSdk 24
+        targetSdk 33
+        versionCode 1
+        versionName "1.0"
+
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+}
+
+dependencies {
+
+    implementation 'androidx.appcompat:appcompat:1.6.1'
+    implementation 'com.google.android.material:material:1.8.0'
+    implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
+
+    implementation 'com.github.MCT-LIB:components-ui:0.1.4'
+
+    // call api
+    implementation 'com.squareup.retrofit2:retrofit:2.9.0'
+    // convert json -> obj
+    implementation 'com.squareup.retrofit2:converter-gson:2.9.0'
+    // load img online
+    implementation 'com.github.bumptech.glide:glide:4.14.2'
+    annotationProcessor 'com.github.bumptech.glide:compiler:4.14.2'
+    // blur image
+    implementation 'jp.wasabeef:picasso-transformations:2.2.1'
+    // cre indicator cho slide image
+    implementation 'me.relex:circleindicator:2.1.6'
+    // img to circle
+    implementation 'de.hdodenhof:circleimageview:3.1.0'
+
+    // Sticky Header for recyclerview
+    // implementation 'com.timehop.stickyheadersrecyclerview:library:0.4.3@aar'
+
+    testImplementation 'junit:junit:4.13.2'
+    androidTestImplementation 'androidx.test.ext:junit:1.1.5'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
+}

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/top_home"
+        android:icon="@drawable/ic_home"
+        android:title="@string/top_home" />
+    <item
+        android:id="@+id/top_playlist"
+        android:icon="@drawable/ic_playlist"
+        android:title="@string/top_playlist" />
+    <item
+        android:id="@+id/top_album"
+        android:icon="@drawable/ic_album"
+        android:title="@string/top_album" />
+    <item
+        android:id="@+id/top_topic"
+        android:icon="@drawable/ic_topic"
+        android:title="@string/top_topic" />
+</menu>
