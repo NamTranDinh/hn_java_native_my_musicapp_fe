@@ -34,7 +34,7 @@ public interface DataService {
 
     class Holder {
 
-        public static final String BASE_API = "http://192.168.1.8:8088/api/";
+        public static final String BASE_API = "http://192.168.21.106:8088/api/";
         private static final DataService INSTANCE = getClient().create(DataService.class);
 
         @NonNull
