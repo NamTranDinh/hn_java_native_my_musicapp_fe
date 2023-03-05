@@ -24,7 +24,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/custom_action_bar_size"
                 android:background="?attr/colorPrimary"
-                android:paddingTop="@dimen/status_bar_size"
                 app:title="@string/app_name" />
         </com.google.android.material.appbar.AppBarLayout>
 
@@ -51,7 +50,6 @@
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:layout_gravity="start"
-
         app:headerLayout="@layout/layout_header_navigation"
         app:itemIconTint="?attr/colorPrimary"
         app:menu="@menu/menu_left_navigation" />
