@@ -2,55 +2,81 @@ package com.aptech.mymusic.domain.entity;
 
 import androidx.annotation.NonNull;
 
-import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-public class SongModel extends CardModel {
+public class SongModel implements CardModel {
 
-    @SerializedName("album_ids")
-    @Expose
-    private String albumId;
-    @SerializedName("category_ids")
-    @Expose
-    private String categoryId;
-    @SerializedName("playlist_ids")
-    @Expose
-    private String playlistId;
-    @SerializedName("singer_name")
-    @Expose
+    @SerializedName("id")
+    private Integer id;
+    @SerializedName("albumIds")
+    private String albumIds;
+    @SerializedName("categoryIds")
+    private String categoryIds;
+    @SerializedName("playlistIds")
+    private String playlistIds;
+    @SerializedName("name")
+    private String name;
+    @SerializedName("image")
+    private String image;
+    @SerializedName("singerName")
     private String singerName;
     @SerializedName("audio")
-    @Expose
     private String audio;
     @SerializedName("likes")
-    @Expose
-    private String likes;
+    private Integer likes;
     @SerializedName("status")
-    @Expose
-    private String status;
+    private Integer status;
+    @SerializedName("imageUrl")
+    private String imageUrl;
+    @SerializedName("audioUrl")
+    private String audioUrl;
 
-    public String getAlbumId() {
-        return albumId;
+    public Integer getId() {
+        return id;
     }
 
-    public void setAlbumId(String albumId) {
-        this.albumId = albumId;
+    public void setId(Integer id) {
+        this.id = id;
     }
 
-    public String getCategoryId() {
-        return categoryId;
+    public String getAlbumIds() {
+        return albumIds;
     }
 
-    public void setCategoryId(String categoryId) {
-        this.categoryId = categoryId;
+    public void setAlbumIds(String albumIds) {
+        this.albumIds = albumIds;
     }
 
-    public String getPlaylistId() {
-        return playlistId;
+    public String getCategoryIds() {
+        return categoryIds;
     }
 
-    public void setPlaylistId(String playlistId) {
-        this.playlistId = playlistId;
+    public void setCategoryIds(String categoryIds) {
+        this.categoryIds = categoryIds;
+    }
+
+    public String getPlaylistIds() {
+        return playlistIds;
+    }
+
+    public void setPlaylistIds(String playlistIds) {
+        this.playlistIds = playlistIds;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getImage() {
+        return image;
+    }
+
+    public void setImage(String image) {
+        this.image = image;
     }
 
     public String getSingerName() {
@@ -69,34 +95,54 @@ public class SongModel extends CardModel {
         this.audio = audio;
     }
 
-    public String getLikes() {
+    public Integer getLikes() {
         return likes;
     }
 
-    public void setLikes(String likes) {
+    public void setLikes(Integer likes) {
         this.likes = likes;
     }
 
-    public String getStatus() {
+    public Integer getStatus() {
         return status;
     }
 
-    public void setStatus(String status) {
+    public void setStatus(Integer status) {
         this.status = status;
+    }
+
+    public String getImageUrl() {
+        return imageUrl;
+    }
+
+    public void setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
+    }
+
+    public String getAudioUrl() {
+        return audioUrl;
+    }
+
+    public void setAudioUrl(String audioUrl) {
+        this.audioUrl = audioUrl;
     }
 
     @NonNull
     @Override
     public String toString() {
         return "SongModel{" +
-                "id='" + getId() + '\'' +
-                "albumId='" + albumId + '\'' +
-                ", categoryId='" + categoryId + '\'' +
-                ", playlistId='" + playlistId + '\'' +
+                "id=" + id +
+                ", albumIds='" + albumIds + '\'' +
+                ", categoryIds='" + categoryIds + '\'' +
+                ", playlistIds='" + playlistIds + '\'' +
+                ", name='" + name + '\'' +
+                ", image='" + image + '\'' +
                 ", singerName='" + singerName + '\'' +
                 ", audio='" + audio + '\'' +
-                ", likes='" + likes + '\'' +
-                ", status='" + status + '\'' +
+                ", likes=" + likes +
+                ", status=" + status +
+                ", imageUrl='" + imageUrl + '\'' +
+                ", audioUrl='" + audioUrl + '\'' +
                 '}';
     }
 }

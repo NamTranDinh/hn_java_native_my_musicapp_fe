@@ -2,77 +2,86 @@ package com.aptech.mymusic.domain.entity;
 
 import androidx.annotation.NonNull;
 
-import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-public class AdsModel extends BaseModel {
+public class AdsModel implements CardModel {
 
-    @SerializedName("adsContent")
-    @Expose
-    private String adsContent;
-    @SerializedName("adsImg")
-    @Expose
-    private String adsImg;
-    @SerializedName("songId")
-    @Expose
-    private String songId;
-    @SerializedName("songName")
-    @Expose
-    private String songName;
-    @SerializedName("songImg")
-    @Expose
-    private String songImg;
+    @SerializedName("id")
+    private Integer id;
+    @SerializedName("song")
+    private SongModel song;
+    @SerializedName("content")
+    private String content;
+    @SerializedName("image")
+    private String image;
+    @SerializedName("status")
+    private Integer status;
+    @SerializedName("imageUrl")
+    private String imageUrl;
 
-    public String getAdsContent() {
-        return adsContent;
+    public Integer getId() {
+        return id;
     }
 
-    public void setAdsContent(String adsContent) {
-        this.adsContent = adsContent;
+    public void setId(Integer id) {
+        this.id = id;
     }
 
-    public String getAdsImg() {
-        return adsImg;
+    public SongModel getSong() {
+        return song;
     }
 
-    public void setAdsImg(String adsImg) {
-        this.adsImg = adsImg;
+    public void setSong(SongModel song) {
+        this.song = song;
     }
 
-    public String getSongId() {
-        return songId;
+    public String getContent() {
+        return content;
     }
 
-    public void setSongId(String songId) {
-        this.songId = songId;
+    public void setContent(String content) {
+        this.content = content;
     }
 
-    public String getSongName() {
-        return songName;
+    public String getImage() {
+        return image;
     }
 
-    public void setSongName(String songName) {
-        this.songName = songName;
+    public void setImage(String image) {
+        this.image = image;
     }
 
-    public String getSongImg() {
-        return songImg;
+    public Integer getStatus() {
+        return status;
     }
 
-    public void setSongImg(String songImg) {
-        this.songImg = songImg;
+    public void setStatus(Integer status) {
+        this.status = status;
+    }
+
+    @Override
+    public String getName() {
+        return song != null ? song.getName() : null;
+    }
+
+    public String getImageUrl() {
+        return imageUrl;
+    }
+
+    public void setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
     }
 
     @NonNull
     @Override
     public String toString() {
         return "AdsModel{" +
-                "adsId='" + getId() + '\'' +
-                ", adsContent='" + adsContent + '\'' +
-                ", adsImg='" + adsImg + '\'' +
-                ", songId='" + songId + '\'' +
-                ", songName='" + songName + '\'' +
-                ", songImg='" + songImg + '\'' +
+                "id=" + id +
+                ", song=" + song +
+                ", content='" + content + '\'' +
+                ", image='" + image + '\'' +
+                ", status=" + status +
+                ", imageUrl='" + imageUrl + '\'' +
                 '}';
     }
 }

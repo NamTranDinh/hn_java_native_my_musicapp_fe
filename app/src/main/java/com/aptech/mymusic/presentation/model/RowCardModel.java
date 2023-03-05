@@ -1,4 +1,6 @@
-package com.aptech.mymusic.domain.entity;
+package com.aptech.mymusic.presentation.model;
+
+import com.aptech.mymusic.domain.entity.CardModel;
 
 import java.util.List;
 
