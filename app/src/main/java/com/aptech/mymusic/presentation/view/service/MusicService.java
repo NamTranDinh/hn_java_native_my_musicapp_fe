@@ -35,6 +35,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.BitmapShader;
 import android.graphics.Canvas;
 import android.graphics.Paint;
@@ -139,10 +140,8 @@ public class MusicService extends Service {
                 .setSound(getSound(), AudioManager.STREAM_NOTIFICATION)
                 .build();
         loadImage(song.getImageUrl(), image -> {
-            if (image != null) {
-                remoteCollapsed.setImageViewBitmap(R.id.img_song_notification, image);
-                remoteExpanded.setImageViewBitmap(R.id.img_song_notification, image);
-            }
+            remoteCollapsed.setImageViewBitmap(R.id.img_song_notification, image);
+            remoteExpanded.setImageViewBitmap(R.id.img_song_notification, image);
             NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
             notificationManager.notify(NOTIFY_ID, notification);
             startForeground(NOTIFY_ID, notification);
@@ -171,6 +170,7 @@ public class MusicService extends Service {
         RemoteViews remoteViews = new RemoteViews(getPackageName(), R.layout.layout_music_play_notification_collapsed);
 
         remoteViews.setOnClickPendingIntent(R.id.img_next, getPendingIntent(this, NEXT_SONG));
+
         if (isPlaying) {
             remoteViews.setImageViewResource(R.id.img_play_pause, R.drawable.ic_pause);
             remoteViews.setOnClickPendingIntent(R.id.img_play_pause, getPendingIntent(this, PAUSE_SONG));
@@ -230,7 +230,7 @@ public class MusicService extends Service {
                 .listener(new RequestListener<Bitmap>() {
                     @Override
                     public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Bitmap> target, boolean isFirstResource) {
-                        onDone.accept(null);
+                        onDone.accept(BitmapFactory.decodeResource(getResources(), R.mipmap.app_launcher_foreground));
                         return false;
                     }
 
@@ -270,7 +270,7 @@ public class MusicService extends Service {
         canvas.drawRoundRect(rectF, cornerRadius, cornerRadius, paint);
 
         // Recycle the original bitmap to free up memory
-        bitmap.recycle();
+        // bitmap.recycle();
 
         // Return the bitmap with rounded corners
         return output;
@@ -278,6 +278,7 @@ public class MusicService extends Service {
 
     public static class LocalService {
 
+        private static final String TAG = "LocalService";
         private static final String PREF_NAME = "music_service_pref";
 
         private WeakReference<MusicService> mService;
@@ -461,7 +462,7 @@ public class MusicService extends Service {
                 case NORMAL:
                 case SHUFFLE:
                     if (index == mListSongTemp.size() - 1 && isAutoNext) {
-                        stopService();
+                        pauseSong();
                         break;
                     }
                     playSong(index != mListSongTemp.size() - 1 ? index + 1 : 0);
@@ -491,12 +492,12 @@ public class MusicService extends Service {
             mListSongTemp = new ArrayList<>(mListSongOrigin);
             if (mMode == SHUFFLE) {
                 mMode = NORMAL;
-                Toast.makeText(mService.get(), "Chế độ phát bình thường", Toast.LENGTH_SHORT).show();
+                Toast.makeText(mService.get(), "Normal play mode", Toast.LENGTH_SHORT).show();
             } else {
                 mMode = SHUFFLE;
                 shuffleSong(mListSongTemp);
                 swapSong(0, mListSongTemp.indexOf(mSong));
-                Toast.makeText(mService.get(), "Chế độ phát ngẫu nhiên", Toast.LENGTH_SHORT).show();
+                Toast.makeText(mService.get(), "Random play mode", Toast.LENGTH_SHORT).show();
             }
             saveData(KEY_LAST_MODE, mMode.name());
             updatePlayList();
@@ -507,15 +508,15 @@ public class MusicService extends Service {
                 case NORMAL:
                 case SHUFFLE:
                     mMode = REPEAT;
-                    Toast.makeText(mService.get(), "Danh sách phát hiện tại đang lặp lại", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(mService.get(), "Current playlist is repeating", Toast.LENGTH_SHORT).show();
                     break;
                 case REPEAT:
                     mMode = REPEAT_ONE;
-                    Toast.makeText(mService.get(), "Chế độ phát lặp lại 1 bài hát", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(mService.get(), "One-song looping mode", Toast.LENGTH_SHORT).show();
                     break;
                 case REPEAT_ONE:
                     mMode = NORMAL;
-                    Toast.makeText(mService.get(), "Chế độ phát bình thường", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(mService.get(), "Normal play mode", Toast.LENGTH_SHORT).show();
                     break;
             }
             saveData(KEY_LAST_MODE, mMode.name());
@@ -561,15 +562,11 @@ public class MusicService extends Service {
             mMediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
             try {
                 mMediaPlayer.setDataSource(mSong.getAudioUrl());
-                Log.e("ddd", "songInit: prepare " + mSong.getName());
+                Log.e(TAG, "songInit: prepare " + mSong.getName());
                 mMediaPlayer.setOnPreparedListener(mediaPlayer -> {
-                    Log.e("ddd", "songInit: success " + mSong.getName());
+                    Log.e(TAG, "songInit: success " + mSong.getName());
                     playSong();
-                    mediaPlayer.setOnCompletionListener(mp -> {
-                        Log.e("ddd", "songInit: complete " + mSong.getName());
-                        nextSong(true);
-                        updateView();
-                    });
+                    mediaPlayer.setOnCompletionListener(mp -> nextSong(true));
                 });
                 mMediaPlayer.prepareAsync();
             } catch (IOException e) {
