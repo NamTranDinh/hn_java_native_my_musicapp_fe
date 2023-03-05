@@ -26,6 +26,11 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <receiver android:name=".presentation.view.broadcast.MusicReceiver" />
+
+        <service android:name=".presentation.view.service.MusicService" />
+
     </application>
 
 </manifest>

@@ -127,6 +127,32 @@ public class SongModel implements CardModel {
         this.audioUrl = audioUrl;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof SongModel)) return false;
+
+        SongModel songModel = (SongModel) o;
+
+        if (!getId().equals(songModel.getId())) return false;
+        if (!getName().equals(songModel.getName())) return false;
+        if (getImage() != null ? !getImage().equals(songModel.getImage()) : songModel.getImage() != null)
+            return false;
+        if (getSingerName() != null ? !getSingerName().equals(songModel.getSingerName()) : songModel.getSingerName() != null)
+            return false;
+        return getAudio() != null ? getAudio().equals(songModel.getAudio()) : songModel.getAudio() == null;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = getId().hashCode();
+        result = 31 * result + getName().hashCode();
+        result = 31 * result + (getImage() != null ? getImage().hashCode() : 0);
+        result = 31 * result + (getSingerName() != null ? getSingerName().hashCode() : 0);
+        result = 31 * result + (getAudio() != null ? getAudio().hashCode() : 0);
+        return result;
+    }
+
     @NonNull
     @Override
     public String toString() {

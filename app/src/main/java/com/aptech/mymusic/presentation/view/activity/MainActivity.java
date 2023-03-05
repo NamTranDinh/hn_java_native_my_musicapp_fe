@@ -1,5 +1,10 @@
 package com.aptech.mymusic.presentation.view.activity;
 
+import static com.aptech.mymusic.presentation.view.service.MusicInteract.KEY_LIST_SONG_OBJECT;
+import static com.aptech.mymusic.presentation.view.service.MusicInteract.KEY_MUSIC_ACTION;
+import static com.aptech.mymusic.presentation.view.service.MusicInteract.KEY_SONG_OBJECT;
+
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.Toast;
@@ -7,7 +12,11 @@ import android.widget.Toast;
 import com.aptech.mymusic.R;
 import com.aptech.mymusic.di.DataInjection;
 import com.aptech.mymusic.domain.entity.AdsModel;
+import com.aptech.mymusic.domain.entity.SongModel;
 import com.aptech.mymusic.presentation.view.fragment.MainFragment;
+import com.aptech.mymusic.presentation.view.service.MusicInteract;
+import com.aptech.mymusic.presentation.view.service.MusicService;
+import com.aptech.mymusic.utils.JsonHelper;
 import com.mct.components.baseui.BaseActivity;
 
 import java.util.List;
