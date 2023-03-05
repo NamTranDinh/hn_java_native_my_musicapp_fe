@@ -2,6 +2,7 @@ package com.aptech.mymusic.data.sever;
 
 import androidx.annotation.NonNull;
 
+import com.aptech.mymusic.config.ServerConfig;
 import com.aptech.mymusic.domain.entity.AdsModel;
 import com.aptech.mymusic.domain.entity.AlbumModel;
 import com.aptech.mymusic.domain.entity.CategoryModel;
@@ -34,7 +35,6 @@ public interface DataService {
 
     class Holder {
 
-        public static final String BASE_API = "http://192.168.21.106:8088/api/";
         private static final DataService INSTANCE = getClient().create(DataService.class);
 
         @NonNull
@@ -49,7 +49,7 @@ public interface DataService {
             Gson gson = new GsonBuilder().setLenient().create();
 
             return new Retrofit.Builder()
-                    .baseUrl(Holder.BASE_API)
+                    .baseUrl(ServerConfig.BASE_API)
                     .client(okHttpClient)
                     .addConverterFactory(GsonConverterFactory.create(gson))
                     .build();
