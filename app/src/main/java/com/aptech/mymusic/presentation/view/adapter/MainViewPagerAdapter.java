@@ -1,5 +1,7 @@
 package com.aptech.mymusic.presentation.view.adapter;
 
+import android.os.Bundle;
+
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
@@ -11,7 +13,6 @@ import com.aptech.mymusic.presentation.view.fragment.mainpager.PlaylistFragment;
 import com.aptech.mymusic.presentation.view.fragment.mainpager.TopicFragment;
 
 public class MainViewPagerAdapter extends FragmentStateAdapter {
-
 
     public MainViewPagerAdapter(@NonNull FragmentActivity fragmentActivity) {
         super(fragmentActivity);

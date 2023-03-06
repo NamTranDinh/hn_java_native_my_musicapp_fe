@@ -14,4 +14,16 @@
         <attr name="flingVelocity" format="integer" />
         <attr name="minDistRequestDisallowParent" format="dimension" />
     </declare-styleable>
+
+    <declare-styleable name="CircularAvatarUser">
+        <attr name="backgroundImage" format="reference" />
+        <attr name="paddingVertical" format="dimension" />
+        <attr name="paddingHorizontal" format="dimension" />
+        <attr name="paddingLeft" format="dimension" />
+        <attr name="paddingRight" format="dimension" />
+
+        <!--        <attr name="iconPremium" format="reference|string" />-->
+        <!--        <attr name="isPremium" format="boolean" />-->
+        <!--        <attr name="iconPreColor" format="color" />-->
+    </declare-styleable>
 </resources>

@@ -12,7 +12,7 @@
 
         <androidx.fragment.app.FragmentContainerView
             android:id="@+id/fragment_banner"
-            android:name="com.snnc_993.mymusic.fragment.BannerFragment"
+            android:name="com.aptech.mymusic.presentation.view.fragment.mainpager.BannerFragment"
             android:layout_width="match_parent"
             android:layout_height="@dimen/home_banner_height" />
 

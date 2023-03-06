@@ -21,4 +21,5 @@
 
     <string name="navigation_drawer_open">Open Navigation Drawer</string>
     <string name="navigation_drawer_close">Close Navigation Drawer</string>
+    <string name="toolbar_txt_search_hint">Search for songs, artists, albums.</string>
 </resources>
