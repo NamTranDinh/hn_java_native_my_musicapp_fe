@@ -5,6 +5,8 @@
     <string name="channel_name">Channel Play Music</string>
     <string name="channel_description">This channel uses to notification music when app play music</string>
 
+    <string name="menu_timer">Timer</string>
+
     <string name="nav_home">Home</string>
     <string name="nav_playlist">Playlist</string>
     <string name="nav_album">Album</string>
@@ -22,4 +24,10 @@
     <string name="navigation_drawer_open">Open Navigation Drawer</string>
     <string name="navigation_drawer_close">Close Navigation Drawer</string>
     <string name="toolbar_txt_search_hint">Search for songs, artists, albums.</string>
+
+    <string name="text_similar_songs">Similar songs</string>
+    <string name="text_playlist">PLAYLIST</string>
+    <string name="text_randomly_play">Randomly Play</string>
+    <string name="text_empty_song">There are currently no songs available. Please come back later.</string>
+    <string name="text_login">LOGIN</string>
 </resources>

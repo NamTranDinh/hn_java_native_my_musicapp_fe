@@ -3,7 +3,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    tools:background="#aaaaaa">
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -16,7 +17,7 @@
             android:layout_height="260dp"
             android:layout_centerInParent="true"
             android:layout_marginTop="50dp"
-            tools:src="@drawable/test_bg" />
+            tools:src="#eeeeee" />
     </RelativeLayout>
 
     <LinearLayout
@@ -24,13 +25,13 @@
         android:layout_width="match_parent"
         android:layout_height="64dp"
         android:layout_alignParentBottom="true"
-        android:orientation="horizontal"
-        android:weightSum="10">
+        android:baselineAligned="false"
+        android:orientation="horizontal">
 
-        <RelativeLayout
+        <FrameLayout
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_weight="5">
+            android:layout_weight="1">
 
             <ImageView
                 android:id="@+id/img_likes"
@@ -38,40 +39,35 @@
                 android:layout_height="match_parent"
                 android:padding="@dimen/media_player_pad"
                 android:src="@drawable/ic_likes"
-                app:tint="@color/white" />
-        </RelativeLayout>
+                app:tint="@color/white"
+                tools:ignore="ContentDescription" />
+        </FrameLayout>
 
-        <RelativeLayout
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="5">
+        <LinearLayout
+            android:id="@+id/ll_playlist"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            tools:ignore="UseCompoundDrawables">
 
-            <LinearLayout
-                android:id="@+id/ll_playlist"
+            <TextView
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentEnd="true">
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:paddingHorizontal="12dp"
+                android:text="@string/text_playlist"
+                android:textColor="@color/white"
+                android:textSize="12sp" />
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:gravity="center"
-                    android:text="DANH SÁCH PHÁT"
-                    android:textColor="@color/white"
-                    android:textSize="12sp" />
+            <ImageView
+                android:id="@+id/img_playlists"
+                android:layout_width="64dp"
+                android:layout_height="match_parent"
+                android:padding="@dimen/media_player_pad"
+                android:src="@drawable/ic_playlist_2"
+                app:tint="@color/white"
+                tools:ignore="ContentDescription" />
 
-
-                <ImageView
-                    android:id="@+id/img_playlists"
-                    android:layout_width="64dp"
-                    android:layout_height="match_parent"
-                    android:padding="@dimen/media_player_pad"
-                    android:src="@drawable/ic_playlist_2"
-                    app:tint="@color/white" />
-
-            </LinearLayout>
-
-        </RelativeLayout>
+        </LinearLayout>
 
     </LinearLayout>
 

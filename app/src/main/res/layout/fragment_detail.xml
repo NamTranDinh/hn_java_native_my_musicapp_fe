@@ -14,7 +14,8 @@
         android:id="@+id/img_background"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:scaleType="centerCrop" />
+        android:scaleType="centerCrop"
+        tools:ignore="ContentDescription" />
 
     <View
         android:id="@+id/overlay"
@@ -31,7 +32,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@android:color/transparent"
-            android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
+            app:elevation="0dp">
 
             <com.google.android.material.appbar.CollapsingToolbarLayout
                 android:id="@+id/collapsingToolbarLayout"
@@ -53,7 +54,8 @@
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:scaleType="centerCrop"
-                        android:src="@drawable/bg_header_layout" />
+                        android:src="@drawable/bg_header_layout"
+                        tools:ignore="ContentDescription" />
 
                     <View
                         android:layout_width="match_parent"
@@ -83,7 +85,8 @@
                             android:id="@+id/img_thumb"
                             android:layout_width="150dp"
                             android:layout_height="150dp"
-                            tools:background="@drawable/test_card_thumb" />
+                            tools:background="@drawable/test_card_thumb"
+                            tools:ignore="ContentDescription" />
                     </androidx.cardview.widget.CardView>
 
                     <TextView
@@ -119,14 +122,13 @@
                         android:layout_centerHorizontal="true"
                         android:layout_gravity="bottom"
                         android:padding="10dp"
-                        android:text="Phát Ngẫu Nhiên" />
+                        android:text="@string/text_randomly_play" />
                 </RelativeLayout>
 
                 <androidx.appcompat.widget.Toolbar
                     android:id="@+id/toolbar"
                     android:layout_width="match_parent"
                     android:layout_height="@dimen/custom_action_bar_size"
-                    android:paddingTop="@dimen/status_bar_size"
                     android:theme="@style/ThemeOverlay.AppCompat.Light"
                     app:layout_collapseMode="pin">
 
@@ -137,8 +139,9 @@
                         android:layout_gravity="center_vertical"
                         android:layout_marginEnd="12dp"
                         android:paddingTop="3dp"
-                        android:src="@drawable/ic_arrow_back"
-                        app:tint="@color/white" />
+                        android:src="@drawable/ic_back"
+                        app:tint="@color/white"
+                        tools:ignore="ContentDescription" />
 
                     <TextView
                         android:id="@+id/tv_title_toolbar"
@@ -169,13 +172,15 @@
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
                 android:padding="50sp"
-                android:text="Hiện tại tạm thời chưa có bài hát. Vui lòng quay lại sau."
+                android:text="@string/text_empty_song"
                 android:textAlignment="center"
                 android:textColor="@color/white"
                 android:textSize="15sp"
                 android:textStyle="bold"
                 android:visibility="gone" />
+
         </RelativeLayout>
 
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
+
 </RelativeLayout>

@@ -1,18 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources xmlns:tools="http://schemas.android.com/tools">
+<resources>
     <!-- Base application theme. -->
     <style name="Theme.MyMusic" parent="Theme.MaterialComponents.Light.NoActionBar">
         <!-- Primary brand color. -->
-        <item name="colorPrimary">@color/blue_100</item>
-        <item name="colorPrimaryVariant">@color/blue_100</item>
+        <item name="colorPrimary">#03a9f4</item>
+        <item name="colorPrimaryDark">#0288d1</item>
         <item name="colorOnPrimary">@color/white</item>
-        <!-- Secondary brand color. -->
-        <item name="colorSecondary">@color/teal_200</item>
-        <item name="colorSecondaryVariant">@color/teal_700</item>
-        <item name="colorOnSecondary">@color/black</item>
         <!-- Status bar color. -->
-        <item name="android:statusBarColor">?attr/colorPrimaryVariant</item>
-        <!-- Customize your theme here. -->
-        <item name="android:windowTranslucentStatus">true</item>
+        <item name="android:statusBarColor">?attr/colorPrimaryDark</item>
     </style>
+
+    <style name="AppToolbar" parent="Widget.AppCompat.Toolbar">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">?attr/actionBarSize</item>
+        <item name="titleTextColor">@color/toolbar_color</item>
+        <item name="subtitleTextColor">@color/toolbar_color</item>
+        <item name="android:background">?android:attr/colorPrimary</item>
+    </style>
+
+    <style name="AppToolbar.NavBack">
+        <item name="navigationIcon">@drawable/ic_back</item>
+        <item name="contentInsetStartWithNavigation">0dp</item>
+        <item name="navigationContentDescription">@string/content_desc_back</item>
+    </style>
+
 </resources>
