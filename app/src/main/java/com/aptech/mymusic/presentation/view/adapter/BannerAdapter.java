@@ -48,8 +48,8 @@ public class BannerAdapter extends PagerAdapter {
 
         AdsModel ads = mAdsModelList.get(position);
 
-        Glide.with(context).load(ads.getImageUrl()).into(imgBackground);
-        Glide.with(context).load(ads.getImage()).into(imgSongIcon);
+        Glide.with(context).load(ads.getImageUrl()).placeholder(R.drawable.ic_logo).into(imgBackground);
+        Glide.with(context).load(ads.getImage()).placeholder(R.drawable.ic_logo).into(imgSongIcon);
         titleBanner.setText(ads.getSong().getName());
         contentBanner.setText(ads.getContent());
 

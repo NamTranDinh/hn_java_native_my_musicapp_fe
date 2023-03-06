@@ -39,6 +39,7 @@ public class TopicAdapter extends RecyclerView.Adapter<TopicAdapter.TopicViewHol
         if (topic == null) {
             return;
         }
+        Glide.with(context).load(topic.getImageUrl()).placeholder(R.drawable.ic_logo).into(holder.imgThumb);
         Glide.with(context).load(topic.getImageUrl()).into(holder.imgThumb);
         holder.tvName.setText(topic.getName());
     }
