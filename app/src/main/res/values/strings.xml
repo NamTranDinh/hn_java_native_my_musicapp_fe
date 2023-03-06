@@ -4,6 +4,7 @@
     <!-- notification channel  -->
     <string name="channel_name">Channel Play Music</string>
     <string name="channel_description">This channel uses to notification music when app play music</string>
+    <string name="content_desc_back">Back</string>
 
     <string name="menu_timer">Timer</string>
 
