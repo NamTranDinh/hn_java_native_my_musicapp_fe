@@ -39,18 +39,18 @@ public class HomePresenter extends BasePresenter {
         });
     }
 
-    public void getDataPlaylistTop100(Callback.GetDataPlayListTop100CallBack callBack) {
+    public void getDataPlaylistTop100(Callback.GetDataPlayListCallBack callBack) {
         DataInjection.provideRepository().getPlaylistRepository().getRandPlaylist().enqueue(new retrofit2.Callback<List<PlaylistModel>>() {
             @Override
             public void onResponse(@NonNull Call<List<PlaylistModel>> call, @NonNull Response<List<PlaylistModel>> response) {
                 if (response.body() != null) {
-                    callBack.getDataTop100Success(response.body());
+                    callBack.getDataPlaylistSuccess(response.body());
                 }
             }
 
             @Override
             public void onFailure(@NonNull Call<List<PlaylistModel>> call, @NonNull Throwable t) {
-                callBack.getDataTop100Failure(t.getMessage());
+                callBack.getDataPlaylistFailure(t.getMessage());
             }
         });
     }

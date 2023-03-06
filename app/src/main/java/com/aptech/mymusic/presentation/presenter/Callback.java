@@ -5,6 +5,7 @@ import com.aptech.mymusic.domain.entity.AlbumModel;
 import com.aptech.mymusic.domain.entity.CategoryModel;
 import com.aptech.mymusic.domain.entity.PlaylistModel;
 import com.aptech.mymusic.domain.entity.SongModel;
+import com.aptech.mymusic.domain.entity.TopicModel;
 
 import java.util.List;
 
@@ -22,10 +23,10 @@ public abstract class Callback {
         void getDataAlbumFailure(String error);
     }
 
-    public interface GetDataPlayListTop100CallBack {
-        void getDataTop100Success(List<PlaylistModel> data);
+    public interface GetDataPlayListCallBack {
+        void getDataPlaylistSuccess(List<PlaylistModel> data);
 
-        void getDataTop100Failure(String error);
+        void getDataPlaylistFailure(String error);
     }
 
     public interface GetDataCategoryFavorCallBack {
@@ -38,6 +39,11 @@ public abstract class Callback {
         void getDataReleaseMusicSuccess(List<SongModel> data);
 
         void getDataReleaseMusicFailure(String error);
+    }
+    public interface GetDataTopicCallBack {
+        void getDataTopicSuccess(List<TopicModel> data);
+
+        void getDataTopicFailure(String error);
     }
 
 }

@@ -17,7 +17,7 @@
     <dimen name="item_card_width">120dp</dimen>
 
     <dimen name="home_banner_height">188dp</dimen>
-    <dimen name="item_topic_height">88dp</dimen>
+    <dimen name="item_topic_height">160dp</dimen>
 
     <!-- config media player   -->
     <dimen name="media_player_pad">20dp</dimen>

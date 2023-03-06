@@ -1,7 +1,6 @@
 package com.aptech.mymusic.presentation.view.fragment.mainpager;
 
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -25,7 +24,7 @@ import com.mct.components.baseui.BaseFragment;
 import java.util.ArrayList;
 import java.util.List;
 
-public class HomeFragment extends BaseFragment implements Callback.GetDataPlayListTop100CallBack, Callback.GetDataNewReleaseMusicCallBack, Callback.GetDataAlbumCallBack, Callback.GetDataCategoryFavorCallBack {
+public class HomeFragment extends BaseFragment implements Callback.GetDataPlayListCallBack, Callback.GetDataNewReleaseMusicCallBack, Callback.GetDataAlbumCallBack, Callback.GetDataCategoryFavorCallBack {
 
     private View view;
     private RecyclerView rcvRowCard;
@@ -73,12 +72,12 @@ public class HomeFragment extends BaseFragment implements Callback.GetDataPlayLi
     }
 
     @Override
-    public void getDataTop100Success(List<PlaylistModel> data) {
+    public void getDataPlaylistSuccess(List<PlaylistModel> data) {
         adapter.addCarModel(new RowCardModel("Top 100", new ArrayList<>(data)));
     }
 
     @Override
-    public void getDataTop100Failure(String error) {
+    public void getDataPlaylistFailure(String error) {
 
     }
 

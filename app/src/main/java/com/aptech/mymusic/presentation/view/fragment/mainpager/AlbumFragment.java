@@ -7,25 +7,58 @@ import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
+import com.aptech.mymusic.R;
+import com.aptech.mymusic.domain.entity.AlbumModel;
+import com.aptech.mymusic.presentation.presenter.AlbumPresenter;
+import com.aptech.mymusic.presentation.presenter.Callback;
+import com.aptech.mymusic.presentation.view.activity.MainActivity;
+import com.aptech.mymusic.presentation.view.adapter.CardAdapter;
 import com.mct.components.baseui.BaseFragment;
 
-public class AlbumFragment extends BaseFragment {
+import java.util.ArrayList;
+import java.util.List;
 
+public class AlbumFragment extends BaseFragment implements Callback.GetDataAlbumCallBack {
+    private AlbumPresenter albumPresenter;
+    private RecyclerView rcvCard;
     private View view;
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        return super.onCreateView(inflater, container, savedInstanceState);
+        view = inflater.inflate(R.layout.fragment_album, container, false);
+        return view;
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
+        rcvCard = view.findViewById(R.id.rcv_card);
+        albumPresenter = new AlbumPresenter(this);
+        albumPresenter.getDataAlbum(this);
+    }
+
+    private void setData(List<AlbumModel> list){
+        CardAdapter adapter = new CardAdapter(getContext(), new ArrayList<>(list), false);
+        rcvCard.setAdapter(adapter);
+
+        GridLayoutManager manager = new GridLayoutManager(getContext(), MainActivity.TWO_ITEM_CARD);
+        rcvCard.setLayoutManager(manager);
     }
 
     @Override
     public void onDestroyView() {
         super.onDestroyView();
+    }
+
+    @Override
+    public void getDataAlbumSuccess(List<AlbumModel> data) {
+        setData(data);
+    }
+
+    @Override
+    public void getDataAlbumFailure(String error) {
+
     }
 }

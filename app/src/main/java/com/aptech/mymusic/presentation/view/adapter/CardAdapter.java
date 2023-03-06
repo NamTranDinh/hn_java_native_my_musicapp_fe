@@ -57,7 +57,7 @@ public class CardAdapter extends RecyclerView.Adapter<CardAdapter.CardItemViewHo
             // margin top cho item
             layoutParams.topMargin = margin;
             // Độ dài tối đa của 1 cell in grid layout
-            int itemLength = (MainActivity.WIDTH_DEVICE - (margin * (1 + MainActivity.TOTAL_ITEM_CARD))) / MainActivity.TOTAL_ITEM_CARD;
+            int itemLength = (MainActivity.WIDTH_DEVICE - (margin * (1 + MainActivity.TWO_ITEM_CARD))) / MainActivity.TWO_ITEM_CARD;
             layoutParams.width = itemLength;
             holder.imgThumb.getLayoutParams().height = itemLength;
         }
@@ -73,9 +73,6 @@ public class CardAdapter extends RecyclerView.Adapter<CardAdapter.CardItemViewHo
             holder.subTitleCard.setText(((SongModel) card).getSingerName());
             holder.subTitleCard.setVisibility(View.VISIBLE);
         }
-
-        // set view click listener
-
     }
 
     @Override

@@ -1,38 +1,18 @@
 package com.aptech.mymusic.presentation.view.activity;
 
-import static com.aptech.mymusic.presentation.view.service.MusicInteract.KEY_LIST_SONG_OBJECT;
-import static com.aptech.mymusic.presentation.view.service.MusicInteract.KEY_MUSIC_ACTION;
-import static com.aptech.mymusic.presentation.view.service.MusicInteract.KEY_SONG_OBJECT;
-
-import android.content.Intent;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
-
 import com.aptech.mymusic.R;
-import com.aptech.mymusic.di.DataInjection;
-import com.aptech.mymusic.domain.entity.AdsModel;
-import com.aptech.mymusic.domain.entity.SongModel;
 import com.aptech.mymusic.presentation.view.fragment.MainFragment;
-import com.aptech.mymusic.presentation.view.service.MusicInteract;
-import com.aptech.mymusic.presentation.view.service.MusicService;
-import com.aptech.mymusic.utils.JsonHelper;
 import com.mct.components.baseui.BaseActivity;
-import com.mct.components.utils.ToastUtils;
-
-import java.util.List;
-
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
 
 public class MainActivity extends BaseActivity {
     public static int HEIGHT_DEVICE;
     public static int WIDTH_DEVICE;
-    public static final int TOTAL_ITEM_CARD = 2;
+    public static final int TWO_ITEM_CARD = 2;
+    public static final int ONE_ITEM_CARD = 1;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

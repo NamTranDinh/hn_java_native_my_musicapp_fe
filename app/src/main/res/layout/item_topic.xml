@@ -15,7 +15,7 @@
 
         <ImageView
             android:id="@+id/img_thumb"
-            android:scaleType="fitXY"
+            android:scaleType="centerCrop"
             android:layout_width="match_parent"
             android:layout_height="@dimen/item_topic_height"
             android:src="@drawable/bg_header_layout"/>
@@ -25,6 +25,8 @@
         android:id="@+id/tv_name"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:paddingTop="2dp"
+        android:visibility="gone"
         android:text="@string/app_name"
         android:textColor="@color/black"
         android:layout_below="@id/card_view_ic"
