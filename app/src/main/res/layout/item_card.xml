@@ -1,66 +1,65 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content">
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/rl_item_card"
+    android:layout_width="@dimen/item_card_width"
+    android:layout_height="wrap_content"
+    android:layout_marginEnd="@dimen/space_view">
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/card_view_ic"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:cardCornerRadius="@dimen/ic_radius">
+
+        <ImageView
+            android:id="@+id/img_thumb"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/item_card_width"
+            android:src="@drawable/ic_logo"
+            tools:ignore="ContentDescription" />
+    </androidx.cardview.widget.CardView>
 
     <RelativeLayout
-        android:id="@+id/rl_item_card"
-        android:layout_width="@dimen/item_card_width"
+        android:id="@+id/rl_play_card"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="@dimen/space_view">
+        android:layout_alignEnd="@id/card_view_ic"
+        android:layout_alignBottom="@id/card_view_ic"
+        android:elevation="2dp"
+        android:padding="8dp">
 
-        <androidx.cardview.widget.CardView
-            android:id="@+id/card_view_ic"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:cardCornerRadius="@dimen/ic_radius">
-
-            <ImageView
-                android:id="@+id/img_thumb"
-                android:layout_width="match_parent"
-                android:layout_height="@dimen/item_card_width"
-                android:src="@drawable/ic_logo" />
-        </androidx.cardview.widget.CardView>
-
-        <RelativeLayout
-            android:id="@+id/rl_play_card"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignEnd="@id/card_view_ic"
-            android:layout_alignBottom="@id/card_view_ic"
-            android:elevation="2dp"
-            android:padding="8dp">
-
-            <ImageView
-                android:layout_width="20dp"
-                android:layout_height="20dp"
-                android:scaleType="centerCrop"
-                android:src="@drawable/ic_play_card" />
-        </RelativeLayout>
-
-
-        <TextView
-            android:id="@+id/tv_title_card"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/card_view_ic"
-            android:layout_marginTop="8dp"
-            android:breakStrategy="simple"
-            android:maxLines="2"
-            android:text="Đỉnh cao EDM "
-            android:textColor="@color/black"
-            android:textSize="14sp" />
-
-        <TextView
-            android:id="@+id/tv_sub_title_card"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/tv_title_card"
-            android:maxLines="1"
-            android:textColor="@color/black_50"
-            android:textSize="14sp"
-            android:visibility="gone" />
+        <ImageView
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:scaleType="centerCrop"
+            android:src="@drawable/ic_play_card"
+            tools:ignore="ContentDescription" />
     </RelativeLayout>
 
+    <TextView
+        android:id="@+id/tv_title_card"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/card_view_ic"
+        android:layout_marginTop="8dp"
+        android:ellipsize="end"
+        android:maxLines="1"
+        android:textColor="@color/black"
+        android:textSize="14sp"
+        tools:text="Title" />
+
+    <TextView
+        android:id="@+id/tv_sub_title_card"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/tv_title_card"
+        android:ellipsize="end"
+        android:maxLines="1"
+        android:textColor="@color/black_50"
+        android:textSize="12sp"
+        android:visibility="gone"
+        tools:text="Description"
+        tools:visibility="visible" />
 </RelativeLayout>

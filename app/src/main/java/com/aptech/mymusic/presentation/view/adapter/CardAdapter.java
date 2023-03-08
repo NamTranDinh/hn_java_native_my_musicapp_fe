@@ -45,7 +45,7 @@ public class CardAdapter extends RecyclerView.Adapter<CardAdapter.CardItemViewHo
         if (card == null) {
             return;
         }
-        RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams) holder.itemCard.getLayoutParams();
+        ViewGroup.MarginLayoutParams layoutParams = (ViewGroup.MarginLayoutParams) holder.itemCard.getLayoutParams();
         int margin = (int) context.getResources().getDimension(R.dimen.space_view);
 
         if (isLinearLayoutManager) {

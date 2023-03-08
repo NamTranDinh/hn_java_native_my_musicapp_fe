@@ -27,12 +27,12 @@ import java.util.Objects;
 import me.relex.circleindicator.CircleIndicator;
 
 public class BannerFragment extends BaseFragment implements Callback.GetDataBannerCallBack {
+
+    private static final int TIME_SLIDE_CHANGE = 3000;
     private ViewPager mViewPager;
     private CircleIndicator mCircleIndicator;
     private Runnable runnable;
-    private Handler handler;
     private List<AdsModel> adsModelList;
-    private static final int TIME_SLIDE_CHANGE = 5000;
 
     private HomePresenter homePresenter;
 
@@ -55,6 +55,18 @@ public class BannerFragment extends BaseFragment implements Callback.GetDataBann
     }
 
     @Override
+    public void onResume() {
+        super.onResume();
+        autoRun();
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        stopRun();
+    }
+
+    @Override
     public void onDestroy() {
         super.onDestroy();
         homePresenter.release();
@@ -65,7 +77,6 @@ public class BannerFragment extends BaseFragment implements Callback.GetDataBann
         BannerAdapter mBannerAdapter = new BannerAdapter(getActivity(), adsModelList);
         mViewPager.setAdapter(mBannerAdapter);
         mCircleIndicator.setViewPager(mViewPager);
-        autoRun();
     }
 
     @SuppressLint("ClickableViewAccessibility")
@@ -75,9 +86,11 @@ public class BannerFragment extends BaseFragment implements Callback.GetDataBann
         View.OnTouchListener touchListener = (v, motionEvent) -> {
             if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
                 v.getParent().requestDisallowInterceptTouchEvent(true);
+                stopRun();
             }
             if (motionEvent.getAction() == MotionEvent.ACTION_UP) {
                 v.getParent().requestDisallowInterceptTouchEvent(false);
+                autoRun();
             }
             return false;
         };
@@ -85,16 +98,22 @@ public class BannerFragment extends BaseFragment implements Callback.GetDataBann
     }
 
     private void autoRun() {
-        handler = new Handler();
-        runnable = () -> {
-            int currentItem = mViewPager.getCurrentItem() + 1;
-            if (currentItem >= Objects.requireNonNull(mViewPager.getAdapter()).getCount()) {
-                currentItem = 0;
-            }
-            mViewPager.setCurrentItem(currentItem, true);
-            handler.postDelayed(runnable, BannerFragment.TIME_SLIDE_CHANGE);
-        };
-        handler.postDelayed(runnable, BannerFragment.TIME_SLIDE_CHANGE);
+        if (runnable == null) {
+            runnable = () -> {
+                int currentItem = mViewPager.getCurrentItem() + 1;
+                if (currentItem >= Objects.requireNonNull(mViewPager.getAdapter()).getCount()) {
+                    currentItem = 0;
+                }
+                mViewPager.setCurrentItem(currentItem, true);
+                mViewPager.postDelayed(runnable, BannerFragment.TIME_SLIDE_CHANGE);
+            };
+        }
+        mViewPager.removeCallbacks(runnable);
+        mViewPager.postDelayed(runnable, BannerFragment.TIME_SLIDE_CHANGE);
+    }
+
+    private void stopRun() {
+        mViewPager.removeCallbacks(runnable);
     }
 
     @Override

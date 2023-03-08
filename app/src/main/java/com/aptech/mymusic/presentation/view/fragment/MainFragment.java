@@ -41,8 +41,8 @@ public class MainFragment extends BaseFragment implements View.OnClickListener {
         super.onViewCreated(view, savedInstanceState);
         initUi(view);
         initAction();
-        MainViewPagerAdapter mHomeViewPagerAdapter = new MainViewPagerAdapter(requireActivity());
-        mViewPager2.setAdapter(mHomeViewPagerAdapter);
+        mViewPager2.setAdapter(new MainViewPagerAdapter(requireActivity()));
+        mViewPager2.setOffscreenPageLimit(4);
         mNavigationView.getMenu().findItem(R.id.nav_home).setChecked(true);
     }
 
@@ -57,7 +57,7 @@ public class MainFragment extends BaseFragment implements View.OnClickListener {
 
     private void initAction() {
         mNavigationView.setNavigationItemSelectedListener(this::onItemSelected);
-
+        mTopNavView.setOnItemSelectedListener(this::onItemSelected);
         mViewPager2.registerOnPageChangeCallback(new OnPageChangeCallback() {
             @Override
             public void onPageSelected(int position) {
