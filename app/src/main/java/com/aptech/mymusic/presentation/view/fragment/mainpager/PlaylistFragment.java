@@ -17,25 +17,28 @@ import com.aptech.mymusic.presentation.presenter.Callback;
 import com.aptech.mymusic.presentation.presenter.PlaylistPresenter;
 import com.aptech.mymusic.presentation.view.activity.MainActivity;
 import com.aptech.mymusic.presentation.view.adapter.CardAdapter;
-import com.mct.components.baseui.BaseFragment;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class PlaylistFragment extends BaseFragment implements Callback.GetDataPlayListCallBack {
+public class PlaylistFragment extends BaseTabFragment implements Callback.GetDataPlayListCallBack {
 
-    private View view;
     private RecyclerView rcvCard;
-
     private PlaylistPresenter playlistPresenter;
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        playlistPresenter = new PlaylistPresenter(this);
+    }
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        view = inflater.inflate(R.layout.fragment_playlist, container, false);
-        return view;
+        return inflater.inflate(R.layout.fragment_playlist, container, false);
     }
 
-    private void setAdapter(List<CardModel> cardModelList){
+    private void setAdapter(List<CardModel> cardModelList) {
         CardAdapter adapter = new CardAdapter(getContext(), cardModelList, false);
         rcvCard.setAdapter(adapter);
 
@@ -47,13 +50,14 @@ public class PlaylistFragment extends BaseFragment implements Callback.GetDataPl
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         rcvCard = view.findViewById(R.id.rcv_card);
-        playlistPresenter = new PlaylistPresenter(this);
         playlistPresenter.getDataAllPlaylist(this);
     }
 
     @Override
-    public void onDestroyView() {
-        super.onDestroyView();
+    public void onDestroy() {
+        super.onDestroy();
+        playlistPresenter.release();
+        playlistPresenter = null;
     }
 
     @Override
@@ -64,5 +68,11 @@ public class PlaylistFragment extends BaseFragment implements Callback.GetDataPl
     @Override
     public void getDataPlaylistFailure(String error) {
 
+    }
+
+    @NonNull
+    @Override
+    protected RecyclerView getScrollView() {
+        return rcvCard;
     }
 }

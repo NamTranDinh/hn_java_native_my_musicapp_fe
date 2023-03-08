@@ -3,71 +3,79 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/drawer_layout"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:fitsSystemWindows="true">
+    android:layout_height="match_parent">
 
-    <LinearLayout
+    <androidx.coordinatorlayout.widget.CoordinatorLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical">
+        android:layout_height="match_parent">
 
         <com.google.android.material.appbar.AppBarLayout
             android:id="@+id/app_bar_layout"
             android:layout_width="match_parent"
-            android:layout_height="@dimen/toolbar_height"
-            android:background="@color/white"
-            android:gravity="center_vertical"
-            android:orientation="vertical"
-            app:elevation="0dp">
+            android:layout_height="wrap_content"
+            app:liftOnScroll="true"
+            app:liftOnScrollTargetViewId="@id/view_pager2">
 
-            <androidx.appcompat.widget.Toolbar
-                android:id="@+id/toolbar"
+            <androidx.appcompat.widget.LinearLayoutCompat
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginEnd="12dp"
-                android:backgroundTint="@color/white">
+                android:background="@color/white"
+                android:orientation="vertical">
 
-                <com.aptech.mymusic.presentation.view.common.CircularAvatarUser
-                    android:id="@+id/cv_avatar_user"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    app:backgroundImage="@drawable/test_card_thumb"
-                    android:paddingEnd="8dp" />
-
-                <EditText
-                    android:id="@+id/edt_tb_search"
+                <androidx.appcompat.widget.Toolbar
+                    android:id="@+id/toolbar"
                     android:layout_width="match_parent"
-                    android:layout_height="30dp"
-                    android:autofillHints=""
-                    android:background="@drawable/custom_radius_10_black_thin"
-                    android:drawableStart="@drawable/ic_search"
-                    android:drawablePadding="8dp"
-                    android:hint="@string/toolbar_txt_search_hint"
-                    android:inputType="textAutoComplete"
-                    android:paddingHorizontal="12dp"
-                    android:textSize="12sp" />
+                    android:layout_height="wrap_content"
+                    android:background="@color/white">
 
-            </androidx.appcompat.widget.Toolbar>
+                    <de.hdodenhof.circleimageview.CircleImageView
+                        android:id="@+id/civ_avatar_user"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:layout_marginEnd="12dp"
+                        android:src="@drawable/test_card_thumb" />
+
+                    <EditText
+                        android:id="@+id/edt_tb_search"
+                        android:layout_width="match_parent"
+                        android:layout_height="30dp"
+                        android:layout_marginEnd="16dp"
+                        android:autofillHints=""
+                        android:background="@drawable/custom_radius_10_black_thin"
+                        android:drawableStart="@drawable/ic_search"
+                        android:drawablePadding="8dp"
+                        android:hint="@string/toolbar_txt_search_hint"
+                        android:inputType="textAutoComplete"
+                        android:paddingHorizontal="12dp"
+                        android:textSize="12sp" />
+
+                </androidx.appcompat.widget.Toolbar>
+
+                <com.google.android.material.bottomnavigation.BottomNavigationView
+                    android:id="@+id/top_nav"
+                    android:layout_width="match_parent"
+                    android:layout_height="56dp"
+                    android:background="@drawable/custom_shadow_bottom"
+                    app:elevation="0dp"
+                    app:itemIconSize="20dp"
+                    app:itemIconTint="@color/custom_color_top_nav"
+                    app:itemPaddingTop="10dp"
+                    app:itemTextColor="@color/custom_color_top_nav"
+                    app:labelVisibilityMode="labeled"
+                    app:menu="@menu/menu_home_top_tab" />
+
+            </androidx.appcompat.widget.LinearLayoutCompat>
+
         </com.google.android.material.appbar.AppBarLayout>
 
-        <com.google.android.material.bottomnavigation.BottomNavigationView
-            android:id="@+id/top_nav"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@drawable/custom_shadow_bottom"
-            app:elevation="0dp"
-            app:itemIconSize="20sp"
-            app:itemIconTint="@color/custom_color_top_nav"
-            app:itemTextColor="@color/custom_color_top_nav"
-            app:labelVisibilityMode="labeled"
-            app:menu="@menu/menu_home_top_tab" />
-
+        <!-- Your scrolling content -->
         <androidx.viewpager2.widget.ViewPager2
             android:id="@+id/view_pager2"
             android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+            android:layout_height="wrap_content"
+            app:layout_behavior="@string/appbar_scrolling_view_behavior" />
 
-    </LinearLayout>
+    </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
     <com.google.android.material.navigation.NavigationView
         android:id="@+id/navigation_view"
@@ -77,6 +85,5 @@
         app:headerLayout="@layout/layout_header_navigation"
         app:itemIconTint="?attr/colorPrimary"
         app:menu="@menu/menu_left_navigation" />
-
 
 </androidx.drawerlayout.widget.DrawerLayout>

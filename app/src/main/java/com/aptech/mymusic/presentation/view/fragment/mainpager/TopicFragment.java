@@ -16,27 +16,36 @@ import com.aptech.mymusic.presentation.presenter.Callback;
 import com.aptech.mymusic.presentation.presenter.TopicPresenter;
 import com.aptech.mymusic.presentation.view.activity.MainActivity;
 import com.aptech.mymusic.presentation.view.adapter.TopicAdapter;
-import com.mct.components.baseui.BaseFragment;
 
 import java.util.List;
 
-public class TopicFragment extends BaseFragment implements Callback.GetDataTopicCallBack {
-    private View view;
+public class TopicFragment extends BaseTabFragment implements Callback.GetDataTopicCallBack {
     private RecyclerView rcvTopic;
     private TopicPresenter topicPresenter;
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        topicPresenter = new TopicPresenter(this);
+    }
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        view = inflater.inflate(R.layout.fragment_topic, container, false);
-        return view;
+        return inflater.inflate(R.layout.fragment_topic, container, false);
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         rcvTopic = view.findViewById(R.id.rcv_topic);
-        topicPresenter = new TopicPresenter(this);
         topicPresenter.getDataTopic(this);
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        topicPresenter.release();
+        topicPresenter = null;
     }
 
     private void setAdapter(List<TopicModel> data) {
@@ -48,11 +57,6 @@ public class TopicFragment extends BaseFragment implements Callback.GetDataTopic
     }
 
     @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-    }
-
-    @Override
     public void getDataTopicSuccess(List<TopicModel> data) {
         setAdapter(data);
     }
@@ -60,5 +64,11 @@ public class TopicFragment extends BaseFragment implements Callback.GetDataTopic
     @Override
     public void getDataTopicFailure(String error) {
 
+    }
+
+    @NonNull
+    @Override
+    protected RecyclerView getScrollView() {
+        return rcvTopic;
     }
 }

@@ -3,7 +3,6 @@ package com.aptech.mymusic.presentation.view.fragment.mainpager;
 import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.os.Handler;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -28,53 +27,64 @@ import java.util.Objects;
 import me.relex.circleindicator.CircleIndicator;
 
 public class BannerFragment extends BaseFragment implements Callback.GetDataBannerCallBack {
-    private View mView;
     private ViewPager mViewPager;
     private CircleIndicator mCircleIndicator;
-    private BannerAdapter mBannerAdapter;
     private Runnable runnable;
     private Handler handler;
     private List<AdsModel> adsModelList;
     private static final int TIME_SLIDE_CHANGE = 5000;
 
+    private HomePresenter homePresenter;
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        homePresenter = new HomePresenter(this);
+    }
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        mView = inflater.inflate(R.layout.fragment_banner, container, false);
-        return mView;
+        return inflater.inflate(R.layout.fragment_banner, container, false);
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        initUi();
-        HomePresenter homePresenter = new HomePresenter(this);
+        initUi(view);
         homePresenter.getDataBanner(this);
     }
 
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        homePresenter.release();
+        homePresenter = null;
+    }
+
     private void setAdapter() {
-        mBannerAdapter = new BannerAdapter(getActivity(), adsModelList);
+        BannerAdapter mBannerAdapter = new BannerAdapter(getActivity(), adsModelList);
         mViewPager.setAdapter(mBannerAdapter);
         mCircleIndicator.setViewPager(mViewPager);
         autoRun();
     }
 
     @SuppressLint("ClickableViewAccessibility")
-    private void initUi() {
-        mViewPager = mView.findViewById(R.id.banner_view_pager);
-        mCircleIndicator = mView.findViewById(R.id.circle_indicator);
-        View.OnTouchListener touchListener = (view, motionEvent) -> {
+    private void initUi(@NonNull View view) {
+        mViewPager = view.findViewById(R.id.banner_view_pager);
+        mCircleIndicator = view.findViewById(R.id.circle_indicator);
+        View.OnTouchListener touchListener = (v, motionEvent) -> {
             if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
-                view.getParent().requestDisallowInterceptTouchEvent(true);
+                v.getParent().requestDisallowInterceptTouchEvent(true);
             }
             if (motionEvent.getAction() == MotionEvent.ACTION_UP) {
-                view.getParent().requestDisallowInterceptTouchEvent(false);
+                v.getParent().requestDisallowInterceptTouchEvent(false);
             }
             return false;
         };
         mViewPager.setOnTouchListener(touchListener);
     }
 
-    private void autoRun(){
+    private void autoRun() {
         handler = new Handler();
         runnable = () -> {
             int currentItem = mViewPager.getCurrentItem() + 1;
@@ -98,51 +108,4 @@ public class BannerFragment extends BaseFragment implements Callback.GetDataBann
         ToastUtils.makeErrorToast(getContext(), Toast.LENGTH_LONG, "404" + error, true).show();
     }
 
-    public View getView() {
-        return mView;
-    }
-
-    public void setView(View mView) {
-        this.mView = mView;
-    }
-
-    public ViewPager getViewPager() {
-        return mViewPager;
-    }
-
-    public void setViewPager(ViewPager mViewPager) {
-        this.mViewPager = mViewPager;
-    }
-
-    public CircleIndicator getCircleIndicator() {
-        return mCircleIndicator;
-    }
-
-    public void setCircleIndicator(CircleIndicator mCircleIndicator) {
-        this.mCircleIndicator = mCircleIndicator;
-    }
-
-    public BannerAdapter getBannerAdapter() {
-        return mBannerAdapter;
-    }
-
-    public void setBannerAdapter(BannerAdapter mBannerAdapter) {
-        this.mBannerAdapter = mBannerAdapter;
-    }
-
-    public Runnable getRunnable() {
-        return runnable;
-    }
-
-    public void setRunnable(Runnable runnable) {
-        this.runnable = runnable;
-    }
-
-    public Handler getHandler() {
-        return handler;
-    }
-
-    public void setHandler(Handler handler) {
-        this.handler = handler;
-    }
 }

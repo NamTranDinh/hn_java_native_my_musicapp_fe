@@ -16,30 +16,40 @@ import com.aptech.mymusic.presentation.presenter.AlbumPresenter;
 import com.aptech.mymusic.presentation.presenter.Callback;
 import com.aptech.mymusic.presentation.view.activity.MainActivity;
 import com.aptech.mymusic.presentation.view.adapter.CardAdapter;
-import com.mct.components.baseui.BaseFragment;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class AlbumFragment extends BaseFragment implements Callback.GetDataAlbumCallBack {
+public class AlbumFragment extends BaseTabFragment implements Callback.GetDataAlbumCallBack {
     private AlbumPresenter albumPresenter;
     private RecyclerView rcvCard;
-    private View view;
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        albumPresenter = new AlbumPresenter(this);
+    }
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        view = inflater.inflate(R.layout.fragment_album, container, false);
-        return view;
+        return inflater.inflate(R.layout.fragment_album, container, false);
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         rcvCard = view.findViewById(R.id.rcv_card);
-        albumPresenter = new AlbumPresenter(this);
         albumPresenter.getDataAlbum(this);
     }
 
-    private void setData(List<AlbumModel> list){
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        albumPresenter.release();
+        albumPresenter = null;
+    }
+
+    private void setData(List<AlbumModel> list) {
         CardAdapter adapter = new CardAdapter(getContext(), new ArrayList<>(list), false);
         rcvCard.setAdapter(adapter);
 
@@ -60,5 +70,11 @@ public class AlbumFragment extends BaseFragment implements Callback.GetDataAlbum
     @Override
     public void getDataAlbumFailure(String error) {
 
+    }
+
+    @NonNull
+    @Override
+    protected RecyclerView getScrollView() {
+        return rcvCard;
     }
 }

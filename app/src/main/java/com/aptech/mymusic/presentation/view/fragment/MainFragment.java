@@ -9,7 +9,6 @@ import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.widget.Toolbar;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.viewpager2.widget.ViewPager2;
@@ -17,52 +16,48 @@ import androidx.viewpager2.widget.ViewPager2.OnPageChangeCallback;
 
 import com.aptech.mymusic.R;
 import com.aptech.mymusic.presentation.view.adapter.MainViewPagerAdapter;
-import com.aptech.mymusic.presentation.view.common.CircularAvatarUser;
+import com.google.android.material.appbar.AppBarLayout;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationView;
 import com.mct.components.baseui.BaseFragment;
 
 public class MainFragment extends BaseFragment implements View.OnClickListener {
 
-    private View view;
     private DrawerLayout mDrawerLayout;
     private NavigationView mNavigationView;
+    private AppBarLayout mAppBarLayout;
     private BottomNavigationView mTopNavView;
     private ViewPager2 mViewPager2;
-
-    Toolbar toolbar;
-    private CircularAvatarUser cvAvatarUser;
 
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        view = inflater.inflate(R.layout.fragment_main, container, false);
-        return view;
+        return inflater.inflate(R.layout.fragment_main, container, false);
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        initUi();
+        initUi(view);
         initAction();
         MainViewPagerAdapter mHomeViewPagerAdapter = new MainViewPagerAdapter(requireActivity());
         mViewPager2.setAdapter(mHomeViewPagerAdapter);
         mNavigationView.getMenu().findItem(R.id.nav_home).setChecked(true);
     }
 
-    private void initUi() {
-        mDrawerLayout = requireActivity().findViewById(R.id.drawer_layout);
-        mNavigationView = requireActivity().findViewById(R.id.navigation_view);
+    private void initUi(@NonNull View view) {
+        mDrawerLayout = view.findViewById(R.id.drawer_layout);
+        mAppBarLayout = view.findViewById(R.id.app_bar_layout);
+        mNavigationView = view.findViewById(R.id.navigation_view);
         mTopNavView = view.findViewById(R.id.top_nav);
-        toolbar = view.findViewById(R.id.toolbar);
         mViewPager2 = view.findViewById(R.id.view_pager2);
-        cvAvatarUser = view.findViewById(R.id.cv_avatar_user);
+        view.findViewById(R.id.civ_avatar_user).setOnClickListener(this);
     }
 
     private void initAction() {
-        cvAvatarUser.setOnClickListener(this);
         mNavigationView.setNavigationItemSelectedListener(this::onItemSelected);
+
         mViewPager2.registerOnPageChangeCallback(new OnPageChangeCallback() {
             @Override
             public void onPageSelected(int position) {
@@ -91,9 +86,9 @@ public class MainFragment extends BaseFragment implements View.OnClickListener {
 
     @SuppressLint("NonConstantResourceId")
     @Override
-    public void onClick(View v) {
+    public void onClick(@NonNull View v) {
         int id = v.getId();
-        if (id == R.id.cv_avatar_user) {
+        if (id == R.id.civ_avatar_user) {
             mDrawerLayout.openDrawer(GravityCompat.START);
         }
     }
@@ -123,5 +118,9 @@ public class MainFragment extends BaseFragment implements View.OnClickListener {
             mDrawerLayout.closeDrawer(GravityCompat.START);
         }
         return true;
+    }
+
+    public AppBarLayout getAppBarLayout() {
+        return mAppBarLayout;
     }
 }

@@ -19,28 +19,32 @@ import com.aptech.mymusic.presentation.model.RowCardModel;
 import com.aptech.mymusic.presentation.presenter.Callback;
 import com.aptech.mymusic.presentation.presenter.HomePresenter;
 import com.aptech.mymusic.presentation.view.adapter.HomePageAdapter;
-import com.mct.components.baseui.BaseFragment;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class HomeFragment extends BaseFragment implements Callback.GetDataPlayListCallBack, Callback.GetDataNewReleaseMusicCallBack, Callback.GetDataAlbumCallBack, Callback.GetDataCategoryFavorCallBack {
+public class HomeFragment extends BaseTabFragment implements Callback.GetDataPlayListCallBack, Callback.GetDataNewReleaseMusicCallBack, Callback.GetDataAlbumCallBack, Callback.GetDataCategoryFavorCallBack {
 
-    private View view;
     private RecyclerView rcvRowCard;
     private HomePageAdapter adapter;
+    private HomePresenter homePresenter;
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        homePresenter = new HomePresenter(this);
+    }
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        view = inflater.inflate(R.layout.fragment_home, container, false);
-        return view;
+        return inflater.inflate(R.layout.fragment_home, container, false);
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        initView();
+        initView(view);
         adapter = new HomePageAdapter(getContext());
         rcvRowCard.setAdapter(adapter);
         LinearLayoutManager manager = new LinearLayoutManager(getContext(), RecyclerView.VERTICAL, false);
@@ -48,13 +52,14 @@ public class HomeFragment extends BaseFragment implements Callback.GetDataPlayLi
     }
 
     @Override
-    public void onDestroyView() {
-        super.onDestroyView();
+    public void onDestroy() {
+        super.onDestroy();
+        homePresenter.release();
+        homePresenter = null;
     }
 
-    private void initView() {
+    private void initView(@NonNull View view) {
         rcvRowCard = view.findViewById(R.id.rcv_list_card);
-        HomePresenter homePresenter = new HomePresenter(this);
         homePresenter.getDataPlaylistTop100(this);
         homePresenter.getDataNewReleasedMusic(this);
         homePresenter.getDataAlbum(this);
@@ -99,5 +104,11 @@ public class HomeFragment extends BaseFragment implements Callback.GetDataPlayLi
     @Override
     public void getDataReleaseMusicFailure(String error) {
 
+    }
+
+    @NonNull
+    @Override
+    protected RecyclerView getScrollView() {
+        return rcvRowCard;
     }
 }
