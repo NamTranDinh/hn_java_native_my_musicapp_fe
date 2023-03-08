@@ -34,8 +34,8 @@
 
             <ImageView
                 android:id="@+id/img_ic_banner"
-                android:layout_width="120dp"
-                android:layout_height="120dp"
+                android:layout_width="70dp"
+                android:layout_height="70dp"
                 android:scaleType="centerCrop"
                 tools:ignore="ContentDescription" />
         </androidx.cardview.widget.CardView>
