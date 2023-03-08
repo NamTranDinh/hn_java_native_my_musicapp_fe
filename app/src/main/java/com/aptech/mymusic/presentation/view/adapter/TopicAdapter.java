@@ -12,6 +12,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.aptech.mymusic.R;
 import com.aptech.mymusic.domain.entity.TopicModel;
+import com.aptech.mymusic.presentation.view.activity.ISendDataToDetail;
 import com.bumptech.glide.Glide;
 
 import java.util.List;
@@ -20,10 +21,12 @@ public class TopicAdapter extends RecyclerView.Adapter<TopicAdapter.TopicViewHol
 
     private final Context context;
     private final List<TopicModel> topicModelList;
+    private final ISendDataToDetail mISendDataToDetail;
 
-    public TopicAdapter(Context context, List<TopicModel> topicModelList) {
+    public TopicAdapter(Context context, List<TopicModel> topicModelList, ISendDataToDetail mISendDataToDetail) {
         this.context = context;
         this.topicModelList = topicModelList;
+        this.mISendDataToDetail = mISendDataToDetail;
     }
 
     @NonNull
@@ -42,6 +45,9 @@ public class TopicAdapter extends RecyclerView.Adapter<TopicAdapter.TopicViewHol
         Glide.with(context).load(topic.getImageUrl()).placeholder(R.drawable.ic_logo).into(holder.imgThumb);
         Glide.with(context).load(topic.getImageUrl()).into(holder.imgThumb);
         holder.tvName.setText(topic.getName());
+        if(mISendDataToDetail != null){
+            holder.itemView.setOnClickListener(view -> mISendDataToDetail.sendDataListener(topic, ISendDataToDetail.Action.SHOW_MODAL));
+        }
     }
 
     @Override

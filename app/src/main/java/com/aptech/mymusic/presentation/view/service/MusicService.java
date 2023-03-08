@@ -1,30 +1,28 @@
 package com.aptech.mymusic.presentation.view.service;
 
-import static com.aptech.mymusic.presentation.view.service.MusicInteract.ACTION_UPDATE_PLAY_LIST;
-import static com.aptech.mymusic.presentation.view.service.MusicInteract.ACTION_UPDATE_VIEW;
-import static com.aptech.mymusic.presentation.view.service.MusicInteract.Action.NEXT_SONG;
-import static com.aptech.mymusic.presentation.view.service.MusicInteract.Action.PAUSE_SONG;
-import static com.aptech.mymusic.presentation.view.service.MusicInteract.Action.PLAY_SONG;
-import static com.aptech.mymusic.presentation.view.service.MusicInteract.Action.PREV_SONG;
-import static com.aptech.mymusic.presentation.view.service.MusicInteract.Action.STOP_SERVICE;
-import static com.aptech.mymusic.presentation.view.service.MusicInteract.KEY_CURRENT_LIST_SONG;
-import static com.aptech.mymusic.presentation.view.service.MusicInteract.KEY_CURRENT_MODE;
-import static com.aptech.mymusic.presentation.view.service.MusicInteract.KEY_CURRENT_SONG;
-import static com.aptech.mymusic.presentation.view.service.MusicInteract.KEY_IS_PLAYING;
-import static com.aptech.mymusic.presentation.view.service.MusicInteract.KEY_LAST_LIST_SONG;
-import static com.aptech.mymusic.presentation.view.service.MusicInteract.KEY_LAST_MODE;
-import static com.aptech.mymusic.presentation.view.service.MusicInteract.KEY_LAST_SONG;
-import static com.aptech.mymusic.presentation.view.service.MusicInteract.KEY_LIST_SONG_OBJECT;
-import static com.aptech.mymusic.presentation.view.service.MusicInteract.KEY_MUSIC_ACTION;
-import static com.aptech.mymusic.presentation.view.service.MusicInteract.KEY_POSITION_DRAG;
-import static com.aptech.mymusic.presentation.view.service.MusicInteract.KEY_POSITION_NEW_SONG;
-import static com.aptech.mymusic.presentation.view.service.MusicInteract.KEY_POSITION_TARGET;
-import static com.aptech.mymusic.presentation.view.service.MusicInteract.KEY_SONG_OBJECT;
-import static com.aptech.mymusic.presentation.view.service.MusicInteract.KEY_TIME_SEEK_SONG;
-import static com.aptech.mymusic.presentation.view.service.MusicInteract.Mode.NORMAL;
-import static com.aptech.mymusic.presentation.view.service.MusicInteract.Mode.REPEAT;
-import static com.aptech.mymusic.presentation.view.service.MusicInteract.Mode.REPEAT_ONE;
-import static com.aptech.mymusic.presentation.view.service.MusicInteract.Mode.SHUFFLE;
+import static com.aptech.mymusic.presentation.view.service.MusicDelegate.ACTION_UPDATE_PLAY_LIST;
+import static com.aptech.mymusic.presentation.view.service.MusicDelegate.ACTION_UPDATE_VIEW;
+import static com.aptech.mymusic.presentation.view.service.MusicDelegate.Action.NEXT_SONG;
+import static com.aptech.mymusic.presentation.view.service.MusicDelegate.Action.PAUSE_SONG;
+import static com.aptech.mymusic.presentation.view.service.MusicDelegate.Action.PLAY_SONG;
+import static com.aptech.mymusic.presentation.view.service.MusicDelegate.Action.PREV_SONG;
+import static com.aptech.mymusic.presentation.view.service.MusicDelegate.Action.STOP_SERVICE;
+import static com.aptech.mymusic.presentation.view.service.MusicDelegate.Action.UPDATE_VIEW;
+import static com.aptech.mymusic.presentation.view.service.MusicDelegate.KEY_CURRENT_LIST_SONG;
+import static com.aptech.mymusic.presentation.view.service.MusicDelegate.KEY_CURRENT_MODE;
+import static com.aptech.mymusic.presentation.view.service.MusicDelegate.KEY_CURRENT_SONG;
+import static com.aptech.mymusic.presentation.view.service.MusicDelegate.KEY_IS_PLAYING;
+import static com.aptech.mymusic.presentation.view.service.MusicDelegate.KEY_LIST_SONG_OBJECT;
+import static com.aptech.mymusic.presentation.view.service.MusicDelegate.KEY_MUSIC_ACTION;
+import static com.aptech.mymusic.presentation.view.service.MusicDelegate.KEY_POSITION_DRAG;
+import static com.aptech.mymusic.presentation.view.service.MusicDelegate.KEY_POSITION_NEW_SONG;
+import static com.aptech.mymusic.presentation.view.service.MusicDelegate.KEY_POSITION_TARGET;
+import static com.aptech.mymusic.presentation.view.service.MusicDelegate.KEY_SONG_OBJECT;
+import static com.aptech.mymusic.presentation.view.service.MusicDelegate.KEY_TIME_SEEK_SONG;
+import static com.aptech.mymusic.presentation.view.service.MusicDelegate.Mode.NORMAL;
+import static com.aptech.mymusic.presentation.view.service.MusicDelegate.Mode.REPEAT;
+import static com.aptech.mymusic.presentation.view.service.MusicDelegate.Mode.REPEAT_ONE;
+import static com.aptech.mymusic.presentation.view.service.MusicDelegate.Mode.SHUFFLE;
 
 import android.app.Notification;
 import android.app.NotificationChannel;
@@ -33,7 +31,6 @@ import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.BitmapShader;
@@ -59,12 +56,13 @@ import androidx.core.app.NotificationCompat;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import com.aptech.mymusic.R;
+import com.aptech.mymusic.di.DataInjection;
 import com.aptech.mymusic.domain.entity.SongModel;
 import com.aptech.mymusic.presentation.view.activity.MainActivity;
 import com.aptech.mymusic.presentation.view.broadcast.MusicReceiver;
-import com.aptech.mymusic.presentation.view.service.MusicInteract.Action;
-import com.aptech.mymusic.presentation.view.service.MusicInteract.Mode;
-import com.aptech.mymusic.utils.JsonHelper;
+import com.aptech.mymusic.presentation.view.service.MusicDelegate.Action;
+import com.aptech.mymusic.presentation.view.service.MusicDelegate.Mode;
+import com.aptech.mymusic.utils.MusicPreference;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.DataSource;
 import com.bumptech.glide.load.engine.GlideException;
@@ -85,6 +83,27 @@ public class MusicService extends Service {
     private static final int NOTIFY_ID = 123;
 
     private static LocalService mLocalService;
+
+    public static boolean isPlaying() {
+        if (mLocalService != null) {
+            return mLocalService.mIsPlaying;
+        }
+        return false;
+    }
+
+    public static int getDuration() {
+        if (mLocalService != null && mLocalService.mMediaPlayer != null) {
+            return mLocalService.mMediaPlayer.getDuration();
+        }
+        return 0;
+    }
+
+    public static int getCurrentPosition() {
+        if (mLocalService != null && mLocalService.mMediaPlayer != null) {
+            return mLocalService.mMediaPlayer.getCurrentPosition();
+        }
+        return 0;
+    }
 
     @Nullable
     @Override
@@ -279,9 +298,8 @@ public class MusicService extends Service {
     public static class LocalService {
 
         private static final String TAG = "LocalService";
-        private static final String PREF_NAME = "music_service_pref";
-
         private WeakReference<MusicService> mService;
+        private MusicPreference mMusicPreference;
 
         private Mode mMode;
         private SongModel mSong;
@@ -293,6 +311,7 @@ public class MusicService extends Service {
 
         LocalService(MusicService mService) {
             this.mService = new WeakReference<>(mService);
+            this.mMusicPreference = DataInjection.provideMusicPreference();
             this.initData();
         }
 
@@ -385,18 +404,17 @@ public class MusicService extends Service {
         }
 
         private void playSongFromBundle(@NonNull Bundle bundle) {
-            String songJson = bundle.getString(KEY_SONG_OBJECT);
-            SongModel song = JsonHelper.jsonToObj(songJson, SongModel.class);
+            SongModel song = (SongModel) bundle.getSerializable(KEY_SONG_OBJECT);
             if (song != null) {
                 playSong(addSong(song, 0));
             }
         }
 
+        @SuppressWarnings("unchecked")
         private void playListSongFromBundle(@NonNull Bundle bundle) {
-            String listSongJson = bundle.getString(KEY_LIST_SONG_OBJECT);
-            mListSongOrigin = JsonHelper.jsonToList(listSongJson, SongModel.class);
+            mListSongOrigin = (List<SongModel>) bundle.getSerializable(KEY_LIST_SONG_OBJECT);
             mListSongTemp = new ArrayList<>(mListSongOrigin);
-            saveData(KEY_LAST_LIST_SONG, listSongJson);
+            mMusicPreference.setLastListSong(mListSongOrigin);
             if (!mListSongOrigin.isEmpty()) {
                 int index;
                 // if the mode is shuffle => shuffle and play from index 0
@@ -499,8 +517,9 @@ public class MusicService extends Service {
                 swapSong(0, mListSongTemp.indexOf(mSong));
                 Toast.makeText(mService.get(), "Random play mode", Toast.LENGTH_SHORT).show();
             }
-            saveData(KEY_LAST_MODE, mMode.name());
+            mMusicPreference.setLastMode(mMode);
             updatePlayList();
+            updateView();
         }
 
         private void repeatMode() {
@@ -519,7 +538,8 @@ public class MusicService extends Service {
                     Toast.makeText(mService.get(), "Normal play mode", Toast.LENGTH_SHORT).show();
                     break;
             }
-            saveData(KEY_LAST_MODE, mMode.name());
+            mMusicPreference.setLastMode(mMode);
+            updateView();
         }
 
         private int addSong(SongModel song, int i) {
@@ -527,7 +547,7 @@ public class MusicService extends Service {
                 int index = validateSongIndex(i);
                 mListSongOrigin.add(index, song);
                 mListSongTemp.add(index, song);
-                saveData(KEY_LAST_LIST_SONG, JsonHelper.objToJson(mListSongOrigin));
+                mMusicPreference.setLastListSong(mListSongOrigin);
                 return index;
             }
             return mListSongTemp.indexOf(song);
@@ -536,16 +556,14 @@ public class MusicService extends Service {
         private void swapSong(int drag, int target) {
             try {
                 Collections.swap(mListSongTemp, drag, target);
-                saveData(KEY_LAST_LIST_SONG, JsonHelper.objToJson(mListSongTemp));
             } catch (Throwable ignore) {
             }
         }
 
         private void initData() {
-            SharedPreferences pref = getPref();
-            this.mMode = Mode.valueOf(pref.getString(KEY_LAST_MODE, NORMAL.name()));
-            this.mSong = JsonHelper.jsonToObj(pref.getString(KEY_LAST_SONG, ""), SongModel.class);
-            this.mListSongOrigin = JsonHelper.jsonToList(pref.getString(KEY_LAST_LIST_SONG, "[]"), SongModel.class);
+            this.mMode = mMusicPreference.getLastMode();
+            this.mSong = mMusicPreference.getLastSong();
+            this.mListSongOrigin = mMusicPreference.getLastListSong();
             this.mListSongTemp = new ArrayList<>(this.mListSongOrigin);
         }
 
@@ -573,7 +591,7 @@ public class MusicService extends Service {
                 e.printStackTrace();
             }
             updateView();
-            saveData(KEY_LAST_SONG, JsonHelper.objToJson(mSong));
+            mMusicPreference.setLastSong(mSong);
         }
 
 
@@ -583,14 +601,6 @@ public class MusicService extends Service {
 
         private int validateSongIndex(int index) {
             return index >= 0 && index <= mListSongOrigin.size() ? index : mListSongOrigin.size();
-        }
-
-        private void saveData(String key, String value) {
-            getPref().edit().putString(key, value).apply();
-        }
-
-        private SharedPreferences getPref() {
-            return mService.get().getSharedPreferences(PREF_NAME, MODE_PRIVATE);
         }
 
         public void release() {
@@ -604,6 +614,7 @@ public class MusicService extends Service {
                 mService.clear();
                 mService = null;
             }
+            mMusicPreference = null;
         }
 
     }

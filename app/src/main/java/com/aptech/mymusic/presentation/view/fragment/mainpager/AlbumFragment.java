@@ -14,13 +14,14 @@ import com.aptech.mymusic.R;
 import com.aptech.mymusic.domain.entity.AlbumModel;
 import com.aptech.mymusic.presentation.presenter.AlbumPresenter;
 import com.aptech.mymusic.presentation.presenter.Callback;
+import com.aptech.mymusic.presentation.view.activity.ISendDataToDetail;
 import com.aptech.mymusic.presentation.view.activity.MainActivity;
 import com.aptech.mymusic.presentation.view.adapter.CardAdapter;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class AlbumFragment extends BaseTabFragment implements Callback.GetDataAlbumCallBack {
+public class AlbumFragment extends BaseTabFragment implements Callback.GetDataAlbumCallBack, ISendDataToDetail {
     private AlbumPresenter albumPresenter;
     private RecyclerView rcvCard;
 
@@ -50,7 +51,7 @@ public class AlbumFragment extends BaseTabFragment implements Callback.GetDataAl
     }
 
     private void setData(List<AlbumModel> list) {
-        CardAdapter adapter = new CardAdapter(getContext(), new ArrayList<>(list), false);
+        CardAdapter adapter = new CardAdapter(getContext(), new ArrayList<>(list), false, this);
         rcvCard.setAdapter(adapter);
 
         GridLayoutManager manager = new GridLayoutManager(getContext(), MainActivity.TWO_ITEM_CARD);

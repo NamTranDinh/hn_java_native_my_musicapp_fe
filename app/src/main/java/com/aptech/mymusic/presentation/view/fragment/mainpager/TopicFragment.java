@@ -49,7 +49,7 @@ public class TopicFragment extends BaseTabFragment implements Callback.GetDataTo
     }
 
     private void setAdapter(List<TopicModel> data) {
-        TopicAdapter adapter = new TopicAdapter(getContext(), data);
+        TopicAdapter adapter = new TopicAdapter(getContext(), data, this);
         rcvTopic.setAdapter(adapter);
 
         GridLayoutManager manager = new GridLayoutManager(getContext(), MainActivity.ONE_ITEM_CARD);

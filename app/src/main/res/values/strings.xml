@@ -31,4 +31,5 @@
     <string name="text_randomly_play">Randomly Play</string>
     <string name="text_empty_song">There are currently no songs available. Please come back later.</string>
     <string name="text_login">LOGIN</string>
+    <string name="text_no_songs_to_play_yet">No songs to play yet</string>
 </resources>

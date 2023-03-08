@@ -1,5 +1,6 @@
 package com.aptech.mymusic.presentation.view.adapter;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -13,26 +14,32 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.aptech.mymusic.R;
 import com.aptech.mymusic.presentation.model.RowCardModel;
+import com.aptech.mymusic.presentation.view.activity.ISendDataToDetail;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class HomePageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     private List<RowCardModel> rowCardModelList;
-    private Context context;
+    private final Context context;
+    private final ISendDataToDetail mISendDataToDetail;
+
     private static final int TYPE_HEADER = 0;
     private static final int TYPE_ITEM = 1;
 
-    public HomePageAdapter(Context context) {
+    public HomePageAdapter(Context context, ISendDataToDetail mISendDataToDetail) {
         this.context = context;
+        this.mISendDataToDetail = mISendDataToDetail;
         this.rowCardModelList = new ArrayList<>();
     }
 
+    @SuppressLint("NotifyDataSetChanged")
     public void setCardModelList(List<RowCardModel> rowCardModelList) {
         this.rowCardModelList = rowCardModelList;
         notifyDataSetChanged();
     }
 
+    @SuppressLint("NotifyDataSetChanged")
     public void addCarModel(RowCardModel rowCardModel) {
         rowCardModelList.add(rowCardModel);
         notifyDataSetChanged();
@@ -44,11 +51,10 @@ public class HomePageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         if (viewType == TYPE_HEADER) {
             View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_header_home, parent, false);
             return new HeaderViewHolder(view);
-        } else if (viewType == TYPE_ITEM) {
+        } else {
             View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_row_card, parent, false);
             return new RowCardViewHolder(view);
         }
-        return null;
     }
 
 
@@ -64,7 +70,7 @@ public class HomePageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
             rowCardViewHolder.title.setText(rowCardModel.getTitle());
 
-            CardAdapter adapter = new CardAdapter(context, rowCardModel.getCardModelList(), true);
+            CardAdapter adapter = new CardAdapter(context, rowCardModel.getCardModelList(), true, mISendDataToDetail);
             rowCardViewHolder.rcvRandCard.setAdapter(adapter);
             LinearLayoutManager layoutManager = new LinearLayoutManager(context, RecyclerView.HORIZONTAL, false);
             rowCardViewHolder.rcvRandCard.setLayoutManager(layoutManager);

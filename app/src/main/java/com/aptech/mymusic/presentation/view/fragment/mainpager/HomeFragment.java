@@ -18,12 +18,13 @@ import com.aptech.mymusic.domain.entity.SongModel;
 import com.aptech.mymusic.presentation.model.RowCardModel;
 import com.aptech.mymusic.presentation.presenter.Callback;
 import com.aptech.mymusic.presentation.presenter.HomePresenter;
+import com.aptech.mymusic.presentation.view.activity.ISendDataToDetail;
 import com.aptech.mymusic.presentation.view.adapter.HomePageAdapter;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class HomeFragment extends BaseTabFragment implements Callback.GetDataPlayListCallBack, Callback.GetDataNewReleaseMusicCallBack, Callback.GetDataAlbumCallBack, Callback.GetDataCategoryFavorCallBack {
+public class HomeFragment extends BaseTabFragment implements Callback.GetDataPlayListCallBack, Callback.GetDataNewReleaseMusicCallBack, Callback.GetDataAlbumCallBack, Callback.GetDataCategoryFavorCallBack, ISendDataToDetail {
 
     private RecyclerView rcvRowCard;
     private HomePageAdapter adapter;
@@ -45,7 +46,7 @@ public class HomeFragment extends BaseTabFragment implements Callback.GetDataPla
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         initView(view);
-        adapter = new HomePageAdapter(getContext());
+        adapter = new HomePageAdapter(getContext(), this);
         rcvRowCard.setAdapter(adapter);
         LinearLayoutManager manager = new LinearLayoutManager(getContext(), RecyclerView.VERTICAL, false);
         rcvRowCard.setLayoutManager(manager);

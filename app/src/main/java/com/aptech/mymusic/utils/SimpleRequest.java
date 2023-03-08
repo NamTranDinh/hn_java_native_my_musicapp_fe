@@ -2,11 +2,13 @@ package com.aptech.mymusic.utils;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
 import android.widget.ImageView;
 
 import androidx.annotation.Nullable;
 
 import com.aptech.mymusic.R;
+import com.aptech.mymusic.application.App;
 import com.bumptech.glide.load.DataSource;
 import com.bumptech.glide.load.engine.GlideException;
 import com.bumptech.glide.request.RequestListener;

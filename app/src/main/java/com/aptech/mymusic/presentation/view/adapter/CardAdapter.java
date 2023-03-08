@@ -15,8 +15,10 @@ import com.aptech.mymusic.R;
 import com.aptech.mymusic.domain.entity.AlbumModel;
 import com.aptech.mymusic.domain.entity.CardModel;
 import com.aptech.mymusic.domain.entity.SongModel;
+import com.aptech.mymusic.presentation.view.activity.ISendDataToDetail;
 import com.aptech.mymusic.presentation.view.activity.MainActivity;
 import com.bumptech.glide.Glide;
+import com.mct.components.utils.ScreenUtils;
 
 import java.util.List;
 
@@ -25,11 +27,13 @@ public class CardAdapter extends RecyclerView.Adapter<CardAdapter.CardItemViewHo
     private final Context context;
     private final List<CardModel> cardModelList;
     private final boolean isLinearLayoutManager;
+    private final ISendDataToDetail mISendDataToDetail;
 
-    public CardAdapter(Context context, List<CardModel> cardModelList, boolean isLinearLayoutManager) {
+    public CardAdapter(Context context, List<CardModel> cardModelList, boolean isLinearLayoutManager, ISendDataToDetail mISendDataToDetail) {
         this.context = context;
         this.cardModelList = cardModelList;
         this.isLinearLayoutManager = isLinearLayoutManager;
+        this.mISendDataToDetail = mISendDataToDetail;
     }
 
     @NonNull
@@ -57,7 +61,7 @@ public class CardAdapter extends RecyclerView.Adapter<CardAdapter.CardItemViewHo
             // margin top cho item
             layoutParams.topMargin = margin;
             // Độ dài tối đa của 1 cell in grid layout
-            int itemLength = (MainActivity.WIDTH_DEVICE - (margin * (1 + MainActivity.TWO_ITEM_CARD))) / MainActivity.TWO_ITEM_CARD;
+            int itemLength = (ScreenUtils.getScreenWidth(holder.itemView.getContext()) - (margin * (1 + MainActivity.TWO_ITEM_CARD))) / MainActivity.TWO_ITEM_CARD;
             layoutParams.width = itemLength;
             holder.imgThumb.getLayoutParams().height = itemLength;
         }
@@ -73,6 +77,17 @@ public class CardAdapter extends RecyclerView.Adapter<CardAdapter.CardItemViewHo
             holder.subTitleCard.setText(((SongModel) card).getSingerName());
             holder.subTitleCard.setVisibility(View.VISIBLE);
         }
+
+        // set view click listener
+        holder.itemCard.setOnClickListener(view -> {
+            if(card instanceof SongModel){
+                mISendDataToDetail.sendDataListener(card, ISendDataToDetail.Action.PLAY);
+            }else{
+                mISendDataToDetail.sendDataListener(card, ISendDataToDetail.Action.SHOW_MODAL);
+            }
+        });
+
+        holder.btnPlayCard.setOnClickListener(view -> mISendDataToDetail.sendDataListener(card, ISendDataToDetail.Action.PLAY));
     }
 
     @Override

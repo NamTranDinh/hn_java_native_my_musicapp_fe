@@ -1,6 +1,6 @@
 package com.aptech.mymusic.presentation.view.service;
 
-public class MusicInteract {
+public class MusicDelegate {
 
     ///////////////////////////////////////////////////////////////////////////
     // ACTION
@@ -24,10 +24,6 @@ public class MusicInteract {
     public static final String KEY_TIME_SEEK_SONG = "KEY_TIME_SEEK_SONG";
     public static final String KEY_POSITION_DRAG = "KEY_POSITION_DRAG";
     public static final String KEY_POSITION_TARGET = "KEY_POSITION_TARGET";
-
-    public static final String KEY_LAST_MODE = "KEY_LAST_MODE";
-    public static final String KEY_LAST_SONG = "KEY_LAST_SONG";
-    public static final String KEY_LAST_LIST_SONG = "KEY_LAST_LIST_SONG";
 
     ///////////////////////////////////////////////////////////////////////////
     // ENUM

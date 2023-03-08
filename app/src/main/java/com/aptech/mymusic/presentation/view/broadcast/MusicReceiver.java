@@ -1,6 +1,6 @@
 package com.aptech.mymusic.presentation.view.broadcast;
 
-import static com.aptech.mymusic.presentation.view.service.MusicInteract.KEY_MUSIC_ACTION;
+import static com.aptech.mymusic.presentation.view.service.MusicDelegate.KEY_MUSIC_ACTION;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
