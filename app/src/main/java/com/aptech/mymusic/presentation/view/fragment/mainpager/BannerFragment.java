@@ -2,7 +2,6 @@ package com.aptech.mymusic.presentation.view.fragment.mainpager;
 
 import android.annotation.SuppressLint;
 import android.os.Bundle;
-import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -22,7 +21,6 @@ import com.mct.components.baseui.BaseFragment;
 import com.mct.components.utils.ToastUtils;
 
 import java.util.List;
-import java.util.Objects;
 
 import me.relex.circleindicator.CircleIndicator;
 
@@ -30,9 +28,7 @@ public class BannerFragment extends BaseFragment implements Callback.GetDataBann
 
     private static final int TIME_SLIDE_CHANGE = 3000;
     private ViewPager mViewPager;
-    private CircleIndicator mCircleIndicator;
     private Runnable runnable;
-    private List<AdsModel> adsModelList;
 
     private HomePresenter homePresenter;
 
@@ -73,17 +69,11 @@ public class BannerFragment extends BaseFragment implements Callback.GetDataBann
         homePresenter = null;
     }
 
-    private void setAdapter() {
-        BannerAdapter mBannerAdapter = new BannerAdapter(getActivity(), adsModelList);
-        mViewPager.setAdapter(mBannerAdapter);
-        mCircleIndicator.setViewPager(mViewPager);
-    }
-
     @SuppressLint("ClickableViewAccessibility")
     private void initUi(@NonNull View view) {
         mViewPager = view.findViewById(R.id.banner_view_pager);
-        mCircleIndicator = view.findViewById(R.id.circle_indicator);
-        View.OnTouchListener touchListener = (v, motionEvent) -> {
+        mViewPager.setAdapter(new BannerAdapter(getActivity(), null));
+        mViewPager.setOnTouchListener((v, motionEvent) -> {
             if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
                 v.getParent().requestDisallowInterceptTouchEvent(true);
                 stopRun();
@@ -93,19 +83,22 @@ public class BannerFragment extends BaseFragment implements Callback.GetDataBann
                 autoRun();
             }
             return false;
-        };
-        mViewPager.setOnTouchListener(touchListener);
+        });
+        CircleIndicator mCircleIndicator = view.findViewById(R.id.circle_indicator);
+        mCircleIndicator.setViewPager(mViewPager);
     }
 
     private void autoRun() {
         if (runnable == null) {
             runnable = () -> {
-                int currentItem = mViewPager.getCurrentItem() + 1;
-                if (currentItem >= Objects.requireNonNull(mViewPager.getAdapter()).getCount()) {
-                    currentItem = 0;
+                if (mViewPager.getAdapter() != null && mViewPager.getAdapter().getCount() > 1) {
+                    int currentItem = mViewPager.getCurrentItem() + 1;
+                    if (currentItem >= mViewPager.getAdapter().getCount()) {
+                        currentItem = 0;
+                    }
+                    mViewPager.setCurrentItem(currentItem, true);
+                    mViewPager.postDelayed(runnable, BannerFragment.TIME_SLIDE_CHANGE);
                 }
-                mViewPager.setCurrentItem(currentItem, true);
-                mViewPager.postDelayed(runnable, BannerFragment.TIME_SLIDE_CHANGE);
             };
         }
         mViewPager.removeCallbacks(runnable);
@@ -118,8 +111,8 @@ public class BannerFragment extends BaseFragment implements Callback.GetDataBann
 
     @Override
     public void getDataBannerSuccess(List<AdsModel> data) {
-        adsModelList = data;
-        setAdapter();
+        mViewPager.setAdapter(new BannerAdapter(getActivity(), data));
+        autoRun();
     }
 
     @Override
