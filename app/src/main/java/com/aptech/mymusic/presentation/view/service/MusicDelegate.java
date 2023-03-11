@@ -12,18 +12,18 @@ public class MusicDelegate {
     // KEY
     ///////////////////////////////////////////////////////////////////////////
 
-    public static final String KEY_MUSIC_ACTION = "KEY_MUSIC_ACTION";
-    public static final String KEY_IS_PLAYING = "KEY_IS_PLAYING";
-    public static final String KEY_CURRENT_MODE = "KEY_CURRENT_MODE";
-    public static final String KEY_CURRENT_SONG = "KEY_CURRENT_SONG";
-    public static final String KEY_CURRENT_LIST_SONG = "KEY_CURRENT_LIST_SONG";
+    public static final String KEY_MUSIC_ACTION = "music_action";
+    public static final String KEY_IS_PLAYING = "is_playing";
+    public static final String KEY_CURRENT_MODE = "current_mode";
+    public static final String KEY_CURRENT_SONG = "current_song";
+    public static final String KEY_CURRENT_LIST_SONG = "current_list_song";
 
-    public static final String KEY_SONG_OBJECT = "KEY_SONG_OBJECT";
-    public static final String KEY_LIST_SONG_OBJECT = "KEY_LIST_SONG_OBJECT";
-    public static final String KEY_POSITION_NEW_SONG = "KEY_POSITION_NEW_SONG";
-    public static final String KEY_TIME_SEEK_SONG = "KEY_TIME_SEEK_SONG";
-    public static final String KEY_POSITION_DRAG = "KEY_POSITION_DRAG";
-    public static final String KEY_POSITION_TARGET = "KEY_POSITION_TARGET";
+    public static final String KEY_SONG_OBJECT = "song_object";
+    public static final String KEY_LIST_SONG_OBJECT = "list_song_object";
+    public static final String KEY_POSITION_NEW_SONG = "position_new_song";
+    public static final String KEY_TIME_SEEK_SONG = "time_seek_song";
+    public static final String KEY_POSITION_DRAG = "drag_position";
+    public static final String KEY_POSITION_TARGET = "target_position";
 
     ///////////////////////////////////////////////////////////////////////////
     // ENUM
@@ -44,6 +44,7 @@ public class MusicDelegate {
         REPEAT_SONG,
 
         ADD_SONG,
+        REMOVE_SONG,
         SWAP_SONG,
 
     }

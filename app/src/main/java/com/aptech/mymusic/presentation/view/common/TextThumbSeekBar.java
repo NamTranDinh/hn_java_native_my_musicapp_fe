@@ -20,8 +20,8 @@ public class TextThumbSeekBar extends AppCompatSeekBar {
 
     private final int mThumbSize;
     private final TextPaint mTextPaint;
-    private final  Rect mBounds;
-    private static SimpleDateFormat dateFormat;
+    private final Rect mBounds;
+    private final SimpleDateFormat dateFormat;
 
     public TextThumbSeekBar(Context context) {
         this(context, null);
@@ -48,7 +48,7 @@ public class TextThumbSeekBar extends AppCompatSeekBar {
         super.onDraw(canvas);
         int max = this.getMax();
         String progressText = "••• / •••";
-        if(max != 100){
+        if (max != 100) {
             progressText = dateFormat.format(getProgress()) + " / " + dateFormat.format(getMax());
         }
         mTextPaint.getTextBounds(progressText, 0, progressText.length(), mBounds);

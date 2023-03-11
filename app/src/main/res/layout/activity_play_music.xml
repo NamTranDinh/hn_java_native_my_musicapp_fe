@@ -13,45 +13,11 @@
         android:scaleType="centerCrop"
         tools:ignore="ContentDescription" />
 
-    <com.google.android.material.appbar.AppBarLayout
-        android:id="@+id/app_bar_layout"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@android:color/transparent"
-        app:elevation="0dp">
-
-        <androidx.appcompat.widget.Toolbar
-            android:id="@+id/toolbar"
-            style="@style/AppToolbar.NavBack"
-            android:background="@android:color/transparent"
-            app:navigationIcon="@drawable/ic_back"
-            app:subtitle="@string/app_name"
-            app:title="@string/app_name"
-            tools:menu="@menu/menu_timer" />
-
-    </com.google.android.material.appbar.AppBarLayout>
-
-    <LinearLayout
-        android:id="@+id/ll_view_pager"
+    <FrameLayout
+        android:id="@+id/main_music_frame"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_above="@id/layout_control_music"
-        android:layout_below="@id/app_bar_layout"
-        android:gravity="center_horizontal"
-        android:orientation="vertical">
-
-        <me.relex.circleindicator.CircleIndicator3
-            android:id="@+id/circle_indicator"
-            android:layout_width="60dp"
-            android:layout_height="12dp"
-            app:ci_drawable="@drawable/custom_indicator" />
-
-        <androidx.viewpager2.widget.ViewPager2
-            android:id="@+id/view_pager2"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent" />
-
-    </LinearLayout>
+        android:layout_above="@id/layout_control_music" />
 
     <LinearLayout
         android:id="@+id/layout_control_music"
@@ -75,55 +41,76 @@
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:paddingVertical="@dimen/half_space_view">
+            android:paddingVertical="8dp">
 
-            <ImageView
+            <ImageButton
                 android:id="@+id/img_shuffle"
                 android:layout_width="64dp"
                 android:layout_height="64dp"
                 android:layout_alignParentStart="true"
+                android:layout_centerVertical="true"
+                android:background="?attr/selectableItemBackground"
+                android:contentDescription="@string/text_play_music_shuffle"
                 android:padding="@dimen/shuffle_repeat_pad"
-                android:src="@drawable/ic_shuffle_white"
-                tools:ignore="ContentDescription" />
+                android:src="@drawable/ic_shuffle"
+                android:tooltipText="@string/text_play_music_shuffle"
+                tools:targetApi="o" />
 
-            <ImageView
+            <ImageButton
                 android:id="@+id/img_prev"
                 android:layout_width="64dp"
                 android:layout_height="64dp"
+                android:layout_centerVertical="true"
                 android:layout_toEndOf="@id/img_shuffle"
+                android:background="?attr/selectableItemBackground"
+                android:contentDescription="@string/text_play_music_previous"
                 android:padding="@dimen/next_prev_pad"
+                android:scaleType="centerCrop"
                 android:src="@drawable/ic_prev"
+                android:tooltipText="@string/text_play_music_previous"
                 app:tint="@color/white"
-                tools:ignore="ContentDescription" />
+                tools:targetApi="o" />
 
-            <ImageView
+            <ImageButton
                 android:id="@+id/img_play_pause"
-                android:layout_width="64dp"
-                android:layout_height="64dp"
+                android:layout_width="72dp"
+                android:layout_height="72dp"
                 android:layout_centerHorizontal="true"
-                android:padding="5dp"
-                android:src="@drawable/ic_play_big"
+                android:background="?attr/selectableItemBackground"
+                android:contentDescription="@string/text_play_music_play_or_pause"
+                android:scaleType="centerCrop"
+                android:src="@drawable/ic_play_circle"
+                android:tooltipText="@string/text_play_music_play_or_pause"
                 app:tint="@color/white"
-                tools:ignore="ContentDescription" />
+                tools:targetApi="o" />
 
-            <ImageView
+            <ImageButton
                 android:id="@+id/img_next"
                 android:layout_width="64dp"
                 android:layout_height="64dp"
+                android:layout_centerVertical="true"
                 android:layout_toStartOf="@id/img_repeat"
+                android:background="?attr/selectableItemBackground"
+                android:contentDescription="@string/text_play_music_next"
                 android:padding="@dimen/next_prev_pad"
+                android:scaleType="centerCrop"
                 android:src="@drawable/ic_next"
+                android:tooltipText="@string/text_play_music_next"
                 app:tint="@color/white"
-                tools:ignore="ContentDescription" />
+                tools:targetApi="o" />
 
-            <ImageView
+            <ImageButton
                 android:id="@+id/img_repeat"
                 android:layout_width="64dp"
                 android:layout_height="64dp"
                 android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
+                android:background="?attr/selectableItemBackground"
+                android:contentDescription="@string/text_play_music_repeat"
                 android:padding="@dimen/shuffle_repeat_pad"
-                android:src="@drawable/ic_repeat_white"
-                tools:ignore="ContentDescription" />
+                android:src="@drawable/ic_repeat"
+                android:tooltipText="@string/text_play_music_repeat"
+                tools:targetApi="o" />
 
         </RelativeLayout>
 

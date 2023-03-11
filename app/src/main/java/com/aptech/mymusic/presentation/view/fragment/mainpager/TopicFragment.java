@@ -37,6 +37,7 @@ public class TopicFragment extends BaseTabFragment implements Callback.GetDataTo
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
         rcvTopic = view.findViewById(R.id.rcv_topic);
         topicPresenter.getDataTopic(this);
     }
@@ -49,7 +50,7 @@ public class TopicFragment extends BaseTabFragment implements Callback.GetDataTo
     }
 
     private void setAdapter(List<TopicModel> data) {
-        TopicAdapter adapter = new TopicAdapter(getContext(), data, this);
+        TopicAdapter adapter = new TopicAdapter(data, this);
         rcvTopic.setAdapter(adapter);
 
         GridLayoutManager manager = new GridLayoutManager(getContext(), MainActivity.ONE_ITEM_CARD);

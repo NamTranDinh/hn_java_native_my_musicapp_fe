@@ -14,35 +14,28 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.aptech.mymusic.R;
 import com.aptech.mymusic.presentation.model.RowCardModel;
-import com.aptech.mymusic.presentation.view.activity.ISendDataToDetail;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class HomePageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
-    private List<RowCardModel> rowCardModelList;
+    private final List<RowCardModel> rowCardModelList;
     private final Context context;
-    private final ISendDataToDetail mISendDataToDetail;
+    private final ICardListener mICardListener;
 
     private static final int TYPE_HEADER = 0;
     private static final int TYPE_ITEM = 1;
 
-    public HomePageAdapter(Context context, ISendDataToDetail mISendDataToDetail) {
+    public HomePageAdapter(Context context, ICardListener mICardListener) {
         this.context = context;
-        this.mISendDataToDetail = mISendDataToDetail;
+        this.mICardListener = mICardListener;
         this.rowCardModelList = new ArrayList<>();
-    }
-
-    @SuppressLint("NotifyDataSetChanged")
-    public void setCardModelList(List<RowCardModel> rowCardModelList) {
-        this.rowCardModelList = rowCardModelList;
-        notifyDataSetChanged();
     }
 
     @SuppressLint("NotifyDataSetChanged")
     public void addCarModel(RowCardModel rowCardModel) {
         rowCardModelList.add(rowCardModel);
-        notifyDataSetChanged();
+        notifyItemInserted(rowCardModelList.size());
     }
 
     @NonNull
@@ -70,7 +63,7 @@ public class HomePageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
             rowCardViewHolder.title.setText(rowCardModel.getTitle());
 
-            CardAdapter adapter = new CardAdapter(context, rowCardModel.getCardModelList(), true, mISendDataToDetail);
+            CardAdapter adapter = new CardAdapter(context, rowCardModel.getCardModelList(), true, mICardListener);
             rowCardViewHolder.rcvRandCard.setAdapter(adapter);
             LinearLayoutManager layoutManager = new LinearLayoutManager(context, RecyclerView.HORIZONTAL, false);
             rowCardViewHolder.rcvRandCard.setLayoutManager(layoutManager);
@@ -124,10 +117,7 @@ public class HomePageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
     @Override
     public int getItemCount() {
-        if (rowCardModelList != null) {
-            return rowCardModelList.size() + 1;
-        }
-        return 0;
+        return rowCardModelList.size() + 1;
     }
 
     @Override

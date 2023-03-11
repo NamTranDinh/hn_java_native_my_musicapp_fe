@@ -31,7 +31,9 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".presentation.view.activity.PlayMusicActivity" />
+        <activity
+            android:name=".presentation.view.activity.PlayMusicActivity"
+            android:parentActivityName=".presentation.view.activity.MainActivity" />
 
         <receiver android:name=".presentation.view.broadcast.MusicReceiver" />
 

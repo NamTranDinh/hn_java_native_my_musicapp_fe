@@ -17,7 +17,7 @@
             android:id="@+id/img_thumb"
             android:layout_width="match_parent"
             android:layout_height="@dimen/item_card_width"
-            android:src="@drawable/ic_logo"
+            tools:src="@drawable/ic_placeholder"
             tools:ignore="ContentDescription" />
     </androidx.cardview.widget.CardView>
 

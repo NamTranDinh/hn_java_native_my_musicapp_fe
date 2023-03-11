@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginTop="@dimen/half_space_view"
@@ -18,7 +19,8 @@
             android:scaleType="centerCrop"
             android:layout_width="match_parent"
             android:layout_height="@dimen/item_topic_height"
-            android:src="@drawable/bg_header_layout"/>
+            android:src="@drawable/background_header_layout"
+            tools:ignore="ContentDescription" />
     </androidx.cardview.widget.CardView>
 
     <TextView

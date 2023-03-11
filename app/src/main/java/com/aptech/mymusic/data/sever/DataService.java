@@ -78,9 +78,8 @@ public interface DataService {
     @GET("all_topic")
     Call<List<TopicModel>> getAllTopic();
 
-    @FormUrlEncoded
-    @POST("all_category_in_topic")
-    Call<List<CategoryModel>> getAllCategoryInTopic(@Field("id") int topicId);
+    @GET("all_category_in_topic/{id}")
+    Call<List<CategoryModel>> getAllCategoryInTopic(@Path("id") int topicId);
 
     @GET("newly_released_music")
     Call<List<SongModel>> getNewlyReleasedMusic();
@@ -88,7 +87,11 @@ public interface DataService {
     @GET("all_song_from/{type}/{id}")
     Call<List<SongModel>> getAllSongFrom(@Path("type") String type, @Path("id") Long id);
 
-    @GET("get_suggest_song/{id}/{list_current_song_id}")
-    Call<List<SongModel>> getSuggestSong(@Path("id") Long id, @Path("list_current_song_id") String listCurrentSongId);
+    @FormUrlEncoded
+    @POST("get_suggest_song")
+    Call<List<SongModel>> getSuggestSong(@Field("id") Long id,
+                                         @Field("current_song_ids") String listCurrentSongId,
+                                         @Field("limit") Integer limit
+    );
 
 }

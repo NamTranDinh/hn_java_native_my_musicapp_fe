@@ -1,7 +1,6 @@
 package com.aptech.mymusic.presentation.view.fragment.musicplayer;
 
 import static com.aptech.mymusic.presentation.view.service.MusicDelegate.ACTION_UPDATE_VIEW;
-import static com.aptech.mymusic.presentation.view.service.MusicDelegate.Action.UPDATE_VIEW;
 import static com.aptech.mymusic.presentation.view.service.MusicDelegate.KEY_CURRENT_SONG;
 import static com.aptech.mymusic.presentation.view.service.MusicDelegate.KEY_IS_PLAYING;
 
@@ -16,24 +15,22 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.LinearInterpolator;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import com.aptech.mymusic.R;
 import com.aptech.mymusic.domain.entity.SongModel;
 import com.aptech.mymusic.presentation.view.service.MusicService;
-import com.aptech.mymusic.presentation.view.service.MusicStarter;
-import com.bumptech.glide.Glide;
+import com.aptech.mymusic.utils.GlideUtils;
+import com.mct.components.baseui.BaseActivity;
+import com.mct.components.baseui.BaseFragment;
 
-public class MainSongFragment extends Fragment {
+public class MainSongFragment extends BaseFragment {
 
-    private View view;
-    private ImageView imgSong, imgLikes;
-    private LinearLayout llPlaylist;
+    private ImageView imgSong;
+    private Integer mSongId;
 
     BroadcastReceiver receiverFromMusicService = new BroadcastReceiver() {
         @SuppressLint("ClickableViewAccessibility")
@@ -43,39 +40,55 @@ public class MainSongFragment extends Fragment {
             if (bundle != null) {
                 SongModel song = (SongModel) bundle.getSerializable(KEY_CURRENT_SONG);
                 boolean isPlaying = bundle.getBoolean(KEY_IS_PLAYING);
-                Glide.with(context).load(song.getImageUrl()).into(imgSong);
-                if (isPlaying) {
-                    startAnim();
-                } else {
-                    stopAnim();
-                }
+                initData(song, isPlaying);
             }
         }
     };
 
+    @Override
+    public void onAttach(@NonNull Context context) {
+        super.onAttach(context);
+        LocalBroadcastManager.getInstance(context).registerReceiver(receiverFromMusicService, new IntentFilter(ACTION_UPDATE_VIEW));
+    }
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        view = inflater.inflate(R.layout.fragment_main_song, container, false);
-        LocalBroadcastManager.getInstance(requireContext()).registerReceiver(receiverFromMusicService, new IntentFilter(ACTION_UPDATE_VIEW));
-        if (MusicService.isPlaying()) {
-            MusicStarter.startService(UPDATE_VIEW);
-        }
-        initUi();
-        return view;
+        return inflater.inflate(R.layout.fragment_play_music_home, container, false);
     }
 
     @Override
-    public void onDestroy() {
-        super.onDestroy();
-        LocalBroadcastManager.getInstance(requireContext()).unregisterReceiver(receiverFromMusicService);
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        imgSong = view.findViewById(R.id.img_song);
+        view.findViewById(R.id.img_likes).setOnClickListener(v -> {
+
+        });
+        view.findViewById(R.id.tv_playlist).setOnClickListener(v ->
+                replaceFragment(new PlaylistSongFragment(), true, BaseActivity.Anim.TRANSIT_FADE)
+        );
+        initData(MusicService.getCurrentSong(), MusicService.isPlaying());
     }
 
-    private void initUi() {
-        imgSong = view.findViewById(R.id.img_song);
-        imgLikes = view.findViewById(R.id.img_likes);
-        llPlaylist = view.findViewById(R.id.ll_playlist);
-//        llPlaylist.setOnClickListener(view -> ((PlayMusicActivity) requireActivity()).showPlaylistFragment());
+    private void initData(SongModel song, boolean isPlaying) {
+        if (song != null) {
+            if (!song.getId().equals(mSongId)) {
+                mSongId = song.getId();
+                imgSong.setRotation(0);
+            }
+            GlideUtils.load(song.getImageUrl(), imgSong);
+        }
+        if (isPlaying) {
+            startAnim();
+        } else {
+            stopAnim();
+        }
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        LocalBroadcastManager.getInstance(requireContext()).unregisterReceiver(receiverFromMusicService);
     }
 
     private void startAnim() {

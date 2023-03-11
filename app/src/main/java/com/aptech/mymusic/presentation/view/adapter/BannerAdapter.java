@@ -1,17 +1,19 @@
 package com.aptech.mymusic.presentation.view.adapter;
 
 import android.content.Context;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+
 import androidx.annotation.NonNull;
 import androidx.viewpager.widget.PagerAdapter;
+
 import com.aptech.mymusic.R;
 import com.aptech.mymusic.domain.entity.AdsModel;
-import com.bumptech.glide.Glide;
+import com.aptech.mymusic.utils.GlideUtils;
+
 import java.util.List;
 
 public class BannerAdapter extends PagerAdapter {
@@ -48,8 +50,8 @@ public class BannerAdapter extends PagerAdapter {
 
         AdsModel ads = mAdsModelList.get(position);
 
-        Glide.with(context).load(ads.getImageUrl()).placeholder(R.drawable.ic_logo).into(imgBackground);
-        Glide.with(context).load(ads.getSong().getImageUrl()).placeholder(R.drawable.ic_logo).into(imgSongIcon);
+        GlideUtils.load(ads.getImageUrl(), imgBackground);
+        GlideUtils.load(ads.getSong().getImageUrl(), imgSongIcon);
         titleBanner.setText(ads.getSong().getName());
         contentBanner.setText(ads.getContent());
 

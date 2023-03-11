@@ -28,6 +28,7 @@ public class BannerFragment extends BaseFragment implements Callback.GetDataBann
 
     private static final int TIME_SLIDE_CHANGE = 3000;
     private ViewPager mViewPager;
+    private CircleIndicator mCircleIndicator;
     private Runnable runnable;
 
     private HomePresenter homePresenter;
@@ -84,8 +85,7 @@ public class BannerFragment extends BaseFragment implements Callback.GetDataBann
             }
             return false;
         });
-        CircleIndicator mCircleIndicator = view.findViewById(R.id.circle_indicator);
-        mCircleIndicator.setViewPager(mViewPager);
+        mCircleIndicator = view.findViewById(R.id.circle_indicator);
     }
 
     private void autoRun() {
@@ -112,6 +112,7 @@ public class BannerFragment extends BaseFragment implements Callback.GetDataBann
     @Override
     public void getDataBannerSuccess(List<AdsModel> data) {
         mViewPager.setAdapter(new BannerAdapter(getActivity(), data));
+        mCircleIndicator.setViewPager(mViewPager);
         autoRun();
     }
 

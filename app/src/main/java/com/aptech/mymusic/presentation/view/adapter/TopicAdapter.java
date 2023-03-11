@@ -1,6 +1,5 @@
 package com.aptech.mymusic.presentation.view.adapter;
 
-import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,21 +11,19 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.aptech.mymusic.R;
 import com.aptech.mymusic.domain.entity.TopicModel;
-import com.aptech.mymusic.presentation.view.activity.ISendDataToDetail;
-import com.bumptech.glide.Glide;
+import com.aptech.mymusic.utils.GlideUtils;
 
+import java.lang.ref.WeakReference;
 import java.util.List;
 
 public class TopicAdapter extends RecyclerView.Adapter<TopicAdapter.TopicViewHolder> {
 
-    private final Context context;
     private final List<TopicModel> topicModelList;
-    private final ISendDataToDetail mISendDataToDetail;
+    private final ICardListener mICardListener;
 
-    public TopicAdapter(Context context, List<TopicModel> topicModelList, ISendDataToDetail mISendDataToDetail) {
-        this.context = context;
+    public TopicAdapter(List<TopicModel> topicModelList, ICardListener mICardListener) {
         this.topicModelList = topicModelList;
-        this.mISendDataToDetail = mISendDataToDetail;
+        this.mICardListener = mICardListener;
     }
 
     @NonNull
@@ -42,11 +39,10 @@ public class TopicAdapter extends RecyclerView.Adapter<TopicAdapter.TopicViewHol
         if (topic == null) {
             return;
         }
-        Glide.with(context).load(topic.getImageUrl()).placeholder(R.drawable.ic_logo).into(holder.imgThumb);
-        Glide.with(context).load(topic.getImageUrl()).into(holder.imgThumb);
+        GlideUtils.load(topic.getImageUrl(), holder.imgThumb.get());
         holder.tvName.setText(topic.getName());
-        if(mISendDataToDetail != null){
-            holder.itemView.setOnClickListener(view -> mISendDataToDetail.sendDataListener(topic, ISendDataToDetail.Action.SHOW_MODAL));
+        if (mICardListener != null) {
+            holder.itemView.setOnClickListener(view -> mICardListener.onCardClicked(topic, ICardListener.Action.SHOW_MODAL));
         }
     }
 
@@ -59,12 +55,12 @@ public class TopicAdapter extends RecyclerView.Adapter<TopicAdapter.TopicViewHol
     }
 
     public static class TopicViewHolder extends RecyclerView.ViewHolder {
-        ImageView imgThumb;
+        WeakReference<ImageView> imgThumb;
         TextView tvName;
 
         public TopicViewHolder(@NonNull View itemView) {
             super(itemView);
-            imgThumb = itemView.findViewById(R.id.img_thumb);
+            imgThumb = new WeakReference<>(itemView.findViewById(R.id.img_thumb));
             tvName = itemView.findViewById(R.id.tv_name);
         }
     }

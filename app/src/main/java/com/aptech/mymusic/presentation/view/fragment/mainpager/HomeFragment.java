@@ -18,13 +18,13 @@ import com.aptech.mymusic.domain.entity.SongModel;
 import com.aptech.mymusic.presentation.model.RowCardModel;
 import com.aptech.mymusic.presentation.presenter.Callback;
 import com.aptech.mymusic.presentation.presenter.HomePresenter;
-import com.aptech.mymusic.presentation.view.activity.ISendDataToDetail;
 import com.aptech.mymusic.presentation.view.adapter.HomePageAdapter;
+import com.aptech.mymusic.presentation.view.adapter.ICardListener;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class HomeFragment extends BaseTabFragment implements Callback.GetDataPlayListCallBack, Callback.GetDataNewReleaseMusicCallBack, Callback.GetDataAlbumCallBack, Callback.GetDataCategoryFavorCallBack, ISendDataToDetail {
+public class HomeFragment extends BaseTabFragment implements Callback.GetDataPlayListCallBack, Callback.GetDataNewReleaseMusicCallBack, Callback.GetDataAlbumCallBack, Callback.GetDataCategoryFavorCallBack, ICardListener {
 
     private RecyclerView rcvRowCard;
     private HomePageAdapter adapter;

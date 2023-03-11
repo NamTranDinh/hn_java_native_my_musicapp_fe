@@ -3,7 +3,6 @@ package com.aptech.mymusic.presentation.view.activity;
 import static com.aptech.mymusic.presentation.view.service.MusicDelegate.Action.NEXT_SONG;
 import static com.aptech.mymusic.presentation.view.service.MusicDelegate.Action.PAUSE_SONG;
 import static com.aptech.mymusic.presentation.view.service.MusicDelegate.Action.PLAY_SONG;
-import static com.aptech.mymusic.presentation.view.service.MusicDelegate.Action.UPDATE_VIEW;
 import static com.aptech.mymusic.presentation.view.service.MusicDelegate.KEY_CURRENT_SONG;
 import static com.aptech.mymusic.presentation.view.service.MusicDelegate.KEY_IS_PLAYING;
 
@@ -30,8 +29,8 @@ import com.aptech.mymusic.domain.entity.SongModel;
 import com.aptech.mymusic.presentation.view.fragment.MainFragment;
 import com.aptech.mymusic.presentation.view.service.MusicDelegate;
 import com.aptech.mymusic.presentation.view.service.MusicService;
-import com.aptech.mymusic.presentation.view.service.MusicStarter;
-import com.bumptech.glide.Glide;
+import com.aptech.mymusic.presentation.view.service.MusicServiceHelper;
+import com.aptech.mymusic.utils.GlideUtils;
 import com.mct.components.baseui.BaseActivity;
 
 public class MainActivity extends BaseActivity {
@@ -54,22 +53,7 @@ public class MainActivity extends BaseActivity {
             if (bundle != null) {
                 SongModel song = (SongModel) bundle.getSerializable(KEY_CURRENT_SONG);
                 boolean isPlaying = bundle.getBoolean(KEY_IS_PLAYING);
-                if (isPlaying) {
-                    imgPlayPause.setImageResource(R.drawable.ic_pause);
-                    startAnim();
-                } else {
-                    imgPlayPause.setImageResource(R.drawable.ic_play);
-                    stopAnim();
-                }
-                if (song != null) {
-                    tvSongName.setText(song.getName());
-                    tvSingerName.setText(song.getSingerName());
-                    if (tvSingerName.getVisibility() != View.VISIBLE) {
-                        tvSingerName.setVisibility(View.VISIBLE);
-                    }
-                    Glide.with(MainActivity.this).load(song.getImageUrl()).into(imgThumb);
-                    initSeekbar();
-                }
+                initData(song, isPlaying);
             }
         }
     };
@@ -80,7 +64,8 @@ public class MainActivity extends BaseActivity {
         setContentView(R.layout.activity_main);
         LocalBroadcastManager.getInstance(this).registerReceiver(receiverFromMusicService, new IntentFilter(MusicDelegate.ACTION_UPDATE_VIEW));
         replaceFragment(new MainFragment());
-        initView();
+        initUi();
+        initData(MusicService.getCurrentSong(), MusicService.isPlaying());
     }
 
     @Override
@@ -90,7 +75,7 @@ public class MainActivity extends BaseActivity {
     }
 
     @SuppressLint("ClickableViewAccessibility")
-    private void initView() {
+    private void initUi() {
         mSeekBar = findViewById(R.id.sb_music);
         mSeekBar.setOnTouchListener((v, event) -> true);
 
@@ -101,9 +86,9 @@ public class MainActivity extends BaseActivity {
         imgPlayPause = findViewById(R.id.img_play_pause);
         imgPlayPause.setOnClickListener(view -> {
             if (MusicService.isPlaying()) {
-                MusicStarter.startService(PAUSE_SONG);
+                MusicServiceHelper.sendAction(PAUSE_SONG);
             } else {
-                MusicStarter.startService(PLAY_SONG);
+                MusicServiceHelper.sendAction(PLAY_SONG);
             }
         });
         findViewById(R.id.control_layout).setOnClickListener(v -> {
@@ -113,10 +98,26 @@ public class MainActivity extends BaseActivity {
         });
         findViewById(R.id.img_next).setOnClickListener(v -> {
             if (!DataInjection.provideMusicPreference().getLastListSong().isEmpty()) {
-                MusicStarter.startService(NEXT_SONG);
+                MusicServiceHelper.sendAction(NEXT_SONG);
             }
         });
-        MusicStarter.startService(UPDATE_VIEW);
+    }
+
+    private void initData(SongModel song, boolean isPlaying) {
+        if (isPlaying) {
+            imgPlayPause.setImageResource(R.drawable.ic_pause);
+            startAnim();
+        } else {
+            imgPlayPause.setImageResource(R.drawable.ic_play);
+            stopAnim();
+        }
+        if (song != null) {
+            tvSongName.setText(song.getName());
+            tvSingerName.setText(song.getSingerName());
+            tvSingerName.setVisibility(View.VISIBLE);
+            GlideUtils.load(song.getImageUrl(), imgThumb);
+            initSeekbar();
+        }
     }
 
     private void initSeekbar() {

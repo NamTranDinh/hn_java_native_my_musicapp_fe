@@ -13,7 +13,7 @@
         android:elevation="0dp"
         android:innerRadius="0dp"
         android:shape="rectangle"
-        android:src="@drawable/test_bg"
+        android:src="@drawable/ic_placeholder"
         app:cardCornerRadius="1000dp"/>
 
 </RelativeLayout>

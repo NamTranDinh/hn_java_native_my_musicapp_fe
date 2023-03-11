@@ -14,14 +14,14 @@ import com.aptech.mymusic.R;
 import com.aptech.mymusic.domain.entity.AlbumModel;
 import com.aptech.mymusic.presentation.presenter.AlbumPresenter;
 import com.aptech.mymusic.presentation.presenter.Callback;
-import com.aptech.mymusic.presentation.view.activity.ISendDataToDetail;
 import com.aptech.mymusic.presentation.view.activity.MainActivity;
 import com.aptech.mymusic.presentation.view.adapter.CardAdapter;
+import com.aptech.mymusic.presentation.view.adapter.ICardListener;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class AlbumFragment extends BaseTabFragment implements Callback.GetDataAlbumCallBack, ISendDataToDetail {
+public class AlbumFragment extends BaseTabFragment implements Callback.GetDataAlbumCallBack, ICardListener {
     private AlbumPresenter albumPresenter;
     private RecyclerView rcvCard;
 
@@ -39,6 +39,7 @@ public class AlbumFragment extends BaseTabFragment implements Callback.GetDataAl
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
         rcvCard = view.findViewById(R.id.rcv_card);
         albumPresenter.getDataAlbum(this);
     }

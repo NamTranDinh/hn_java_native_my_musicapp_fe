@@ -42,7 +42,6 @@ public class MainFragment extends BaseFragment implements View.OnClickListener {
         initUi(view);
         initAction();
         mViewPager2.setAdapter(new MainViewPagerAdapter(requireActivity()));
-        mViewPager2.setOffscreenPageLimit(4);
         mNavigationView.getMenu().findItem(R.id.nav_home).setChecked(true);
     }
 

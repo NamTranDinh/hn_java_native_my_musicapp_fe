@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <com.aptech.mymusic.presentation.view.common.swipe.SwipeRevealLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/swr_layout"
     android:layout_width="match_parent"
     android:layout_height="64dp"
@@ -20,7 +21,8 @@
             android:layout_marginEnd="@dimen/half_space_view"
             android:padding="10dp"
             android:src="@drawable/ic_trash"
-            app:tint="@android:color/holo_red_light" />
+            app:tint="@android:color/holo_red_light"
+            tools:ignore="ContentDescription" />
 
     </RelativeLayout>
 
@@ -28,6 +30,7 @@
         android:id="@+id/rl_item_song"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:background="@drawable/selector_song_item"
         android:paddingTop="6dp"
         android:paddingBottom="6dp">
 
@@ -43,7 +46,8 @@
                 android:id="@+id/img_thumb"
                 android:layout_width="52dp"
                 android:layout_height="52dp"
-                android:src="@drawable/ic_logo" />
+                tools:ignore="ContentDescription"
+                tools:src="@drawable/ic_placeholder" />
         </androidx.cardview.widget.CardView>
 
         <LinearLayout
@@ -84,7 +88,8 @@
             android:layout_marginEnd="@dimen/half_space_view"
             android:padding="10dp"
             android:src="@drawable/ic_menu_song_line"
-            app:tint="@color/white" />
+            app:tint="@color/white"
+            tools:ignore="ContentDescription" />
     </RelativeLayout>
 
 </com.aptech.mymusic.presentation.view.common.swipe.SwipeRevealLayout>

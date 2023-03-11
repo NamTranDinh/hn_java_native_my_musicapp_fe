@@ -10,8 +10,9 @@
     <color name="ripple_color">#4DFFFFFF</color>
     <color name="toolbar_color">#FEFEFA</color>
 
-    <color name="custom_seekbar_main">?attr/colorPrimary</color>
+    <color name="colorPrimary">#03a9f4</color>
+    <color name="custom_seekbar_main">@color/colorPrimary</color>
     <color name="custom_seekbar_detail_process">#AA24CF</color>
-    <color name="custom_seekbar_detail_background">#fff</color>
+    <color name="custom_seekbar_detail_background">#ffffff</color>
 
 </resources>

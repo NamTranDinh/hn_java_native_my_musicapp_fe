@@ -1,7 +1,6 @@
 package com.aptech.mymusic.presentation.view.adapter;
 
 import android.annotation.SuppressLint;
-import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -17,50 +16,50 @@ import com.aptech.mymusic.R;
 import com.aptech.mymusic.domain.entity.SongModel;
 import com.aptech.mymusic.presentation.view.common.swipe.SwipeRevealLayout;
 import com.aptech.mymusic.presentation.view.common.swipe.ViewBinderHelper;
-import com.bumptech.glide.Glide;
+import com.aptech.mymusic.utils.GlideUtils;
 
+import java.lang.ref.WeakReference;
 import java.util.List;
 
 public class SongSpecialAdapter extends RecyclerView.Adapter<SongSpecialAdapter.SongViewHolder> {
 
-    private final Context context;
-    private final List<SongModel> mListSong;
-    private final ViewBinderHelper binderHelper = new ViewBinderHelper();
-    private IOnClickSongItem mIOnClickSongItem;
+    private final ViewBinderHelper mBinderHelper = new ViewBinderHelper();
+    private final IOnClickSongItem mIOnClickSongItem;
+    private SongModel mSong;
+    private List<SongModel> mListSong;
     private final IOnItemDelete mIOnItemDelete;
-    private StartDragListener dragListener;
+    private StartDragListener mDragListener;
 
-    public SongSpecialAdapter(Context context, List<SongModel> mListSong, IOnItemDelete mIOnItemDelete) {
-        this.context = context;
-        this.mListSong = mListSong;
-
+    public SongSpecialAdapter(IOnClickSongItem mIOnClickSongItem, IOnItemDelete mIOnItemDelete) {
+        this.mIOnClickSongItem = mIOnClickSongItem;
         this.mIOnItemDelete = mIOnItemDelete;
-        if (context instanceof IOnClickSongItem) {
-            mIOnClickSongItem = (IOnClickSongItem) context;
-        }
     }
 
     public interface IOnClickSongItem {
         void onClickSongItem(SongModel song);
     }
 
-    public interface IOnItemDelete {
-        void onItemDeleted();
+    @SuppressLint("NotifyDataSetChanged")
+    public void setData(SongModel song, List<SongModel> songs) {
+        mSong = song;
+        mListSong = songs;
+        notifyDataSetChanged();
     }
 
     public interface StartDragListener {
         void requestDrag(RecyclerView.ViewHolder viewHolder);
     }
 
-    public void setDragListener(StartDragListener dragListener) {
-        this.dragListener = dragListener;
+    public void setSong(SongModel song) {
+        setData(song, mListSong);
     }
 
-    @NonNull
-    @Override
-    public SongViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_song_sw_delete, parent, false);
-        return new SongViewHolder(view);
+    public void setListSong(List<SongModel> mListSong) {
+        setData(mSong, mListSong);
+    }
+
+    public void setDragListener(StartDragListener dragListener) {
+        this.mDragListener = dragListener;
     }
 
     @SuppressLint("ClickableViewAccessibility")
@@ -70,29 +69,49 @@ public class SongSpecialAdapter extends RecyclerView.Adapter<SongSpecialAdapter.
         if (song == null) {
             return;
         }
-        binderHelper.bind(holder.swrLayout, String.valueOf(song.getId()));
+        String id = String.valueOf(song.getId());
+        boolean isActive = song.equals(mSong);
 
+        mBinderHelper.bind(holder.swrLayout, id);
+
+        holder.rlItem.setSelected(isActive);
+        if (isActive) {
+            mBinderHelper.lockSwipe(id);
+        } else {
+            mBinderHelper.unlockSwipe(id);
+        }
         holder.tvSongName.setText(song.getName());
         holder.tvSingerName.setText(song.getSingerName());
-        Glide.with(context).load(song.getImageUrl()).placeholder(R.drawable.ic_logo).into(holder.imgThumb);
+        GlideUtils.load(song.getImageUrl(), holder.imgThumb.get());
 
         if (mIOnClickSongItem != null) {
-            holder.rlItem.setOnClickListener(view -> mIOnClickSongItem.onClickSongItem(song));
+            holder.rlItem.setOnClickListener(isActive ? null : (view -> mIOnClickSongItem.onClickSongItem(song)));
         }
         if (mIOnItemDelete != null) {
             holder.imgDelete.setOnClickListener(view -> {
                 mListSong.remove(holder.getAdapterPosition());
                 notifyItemRemoved(holder.getAdapterPosition());
-                mIOnItemDelete.onItemDeleted();
+                mIOnItemDelete.onItemDeleted(song);
             });
         }
 
         holder.imgMenu.setOnTouchListener((v, event) -> {
             if (event.getAction() == MotionEvent.ACTION_DOWN) {
-                dragListener.requestDrag(holder);
+                mDragListener.requestDrag(holder);
             }
             return false;
         });
+    }
+
+    @NonNull
+    @Override
+    public SongViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_song_sw_delete, parent, false);
+        return new SongViewHolder(view);
+    }
+
+    public interface IOnItemDelete {
+        void onItemDeleted(SongModel song);
     }
 
     @Override
@@ -106,16 +125,16 @@ public class SongSpecialAdapter extends RecyclerView.Adapter<SongSpecialAdapter.
     public static class SongViewHolder extends RecyclerView.ViewHolder {
 
         SwipeRevealLayout swrLayout;
-        RelativeLayout rlLayout, rlItem;
-        ImageView imgThumb, imgMenu, imgDelete;
+        RelativeLayout rlItem;
+        WeakReference<ImageView> imgThumb;
+        ImageView imgMenu, imgDelete;
         TextView tvSongName, tvSingerName;
 
         public SongViewHolder(@NonNull View itemView) {
             super(itemView);
             swrLayout = itemView.findViewById(R.id.swr_layout);
-            rlLayout = itemView.findViewById(R.id.rl_layout);
             rlItem = itemView.findViewById(R.id.rl_item_song);
-            imgThumb = itemView.findViewById(R.id.img_thumb);
+            imgThumb = new WeakReference<>(itemView.findViewById(R.id.img_thumb));
             imgMenu = itemView.findViewById(R.id.img_menu_song);
             imgDelete = itemView.findViewById(R.id.img_delete);
             tvSongName = itemView.findViewById(R.id.tv_song_name);

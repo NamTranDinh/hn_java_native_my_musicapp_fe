@@ -40,10 +40,14 @@ public abstract class Callback {
 
         void getDataReleaseMusicFailure(String error);
     }
+
     public interface GetDataTopicCallBack {
         void getDataTopicSuccess(List<TopicModel> data);
 
         void getDataTopicFailure(String error);
     }
 
+    public interface GetSuggestSongCallback {
+        void onGot(List<SongModel> data);
+    }
 }

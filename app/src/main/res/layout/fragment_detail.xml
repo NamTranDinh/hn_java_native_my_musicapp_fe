@@ -54,7 +54,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:scaleType="centerCrop"
-                        android:src="@drawable/bg_header_layout"
+                        android:src="@drawable/background_header_layout"
                         tools:ignore="ContentDescription" />
 
                     <View
@@ -85,7 +85,7 @@
                             android:id="@+id/img_thumb"
                             android:layout_width="150dp"
                             android:layout_height="150dp"
-                            tools:background="@drawable/test_card_thumb"
+                            tools:background="@drawable/ic_placeholder"
                             tools:ignore="ContentDescription" />
                     </androidx.cardview.widget.CardView>
 

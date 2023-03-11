@@ -8,8 +8,8 @@
 
     <ImageView
         android:id="@+id/img_song_notification"
-        android:layout_width="48dp"
-        android:layout_height="48dp"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
         tools:background="#cccccc"
         tools:ignore="ContentDescription" />
 
@@ -28,7 +28,7 @@
             android:fontFamily="sans-serif-medium"
             android:maxLines="1"
             android:textColor="@color/black"
-            android:textSize="16sp"
+            android:textSize="14sp"
             tools:text="Song name" />
 
         <TextView
@@ -37,7 +37,7 @@
             android:layout_height="wrap_content"
             android:ellipsize="end"
             android:maxLines="1"
-            android:textSize="12sp"
+            android:textSize="11sp"
             tools:text="Author name" />
 
     </LinearLayout>
