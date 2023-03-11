@@ -21,6 +21,7 @@ import androidx.viewpager2.widget.ViewPager2;
 import com.aptech.mymusic.R;
 import com.aptech.mymusic.domain.entity.SongModel;
 import com.aptech.mymusic.presentation.view.adapter.PlayMusicViewPagerAdapter;
+import com.aptech.mymusic.presentation.view.service.MusicService;
 import com.aptech.mymusic.utils.ZoomOutPageTransformer;
 import com.mct.components.baseui.BaseFragment;
 
@@ -68,6 +69,11 @@ public class MainPagerFragment extends BaseFragment {
         CircleIndicator3 mCircleIndicator3 = view.findViewById(R.id.circle_indicator);
         mCircleIndicator3.setViewPager(mViewPager2);
 
+        SongModel song = MusicService.getCurrentSong();
+        if (song != null) {
+            mToolbar.setTitle(song.getName());
+            mToolbar.setSubtitle(song.getSingerName());
+        }
     }
 
     @Override

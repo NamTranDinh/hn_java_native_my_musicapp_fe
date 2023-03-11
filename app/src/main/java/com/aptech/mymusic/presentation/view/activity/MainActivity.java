@@ -3,6 +3,7 @@ package com.aptech.mymusic.presentation.view.activity;
 import static com.aptech.mymusic.presentation.view.service.MusicDelegate.Action.NEXT_SONG;
 import static com.aptech.mymusic.presentation.view.service.MusicDelegate.Action.PAUSE_SONG;
 import static com.aptech.mymusic.presentation.view.service.MusicDelegate.Action.PLAY_SONG;
+import static com.aptech.mymusic.presentation.view.service.MusicDelegate.Action.UPDATE_VIEW;
 import static com.aptech.mymusic.presentation.view.service.MusicDelegate.KEY_CURRENT_SONG;
 import static com.aptech.mymusic.presentation.view.service.MusicDelegate.KEY_IS_PLAYING;
 
@@ -12,7 +13,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.view.animation.LinearInterpolator;
 import android.widget.ImageView;
@@ -49,7 +49,6 @@ public class MainActivity extends BaseActivity {
         @Override
         public void onReceive(Context context, @NonNull Intent intent) {
             Bundle bundle = intent.getExtras();
-            Log.e("ddd", "onReceive: " + bundle);
             if (bundle != null) {
                 SongModel song = (SongModel) bundle.getSerializable(KEY_CURRENT_SONG);
                 boolean isPlaying = bundle.getBoolean(KEY_IS_PLAYING);
@@ -62,10 +61,10 @@ public class MainActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        LocalBroadcastManager.getInstance(this).registerReceiver(receiverFromMusicService, new IntentFilter(MusicDelegate.ACTION_UPDATE_VIEW));
         replaceFragment(new MainFragment());
         initUi();
-        initData(MusicService.getCurrentSong(), MusicService.isPlaying());
+        LocalBroadcastManager.getInstance(this).registerReceiver(receiverFromMusicService, new IntentFilter(MusicDelegate.ACTION_UPDATE_VIEW));
+        MusicServiceHelper.sendAction(UPDATE_VIEW);
     }
 
     @Override

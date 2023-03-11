@@ -17,26 +17,22 @@
             android:id="@+id/img_thumb"
             android:layout_width="match_parent"
             android:layout_height="@dimen/item_card_width"
-            tools:src="@drawable/ic_placeholder"
-            tools:ignore="ContentDescription" />
+            tools:ignore="ContentDescription"
+            tools:src="@drawable/background_placeholder" />
     </androidx.cardview.widget.CardView>
 
-    <RelativeLayout
-        android:id="@+id/rl_play_card"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+    <ImageButton
+        android:id="@+id/btn_play_card"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
         android:layout_alignEnd="@id/card_view_ic"
         android:layout_alignBottom="@id/card_view_ic"
+        android:background="?attr/selectableItemBackgroundBorderless"
         android:elevation="2dp"
-        android:padding="8dp">
-
-        <ImageView
-            android:layout_width="20dp"
-            android:layout_height="20dp"
-            android:scaleType="centerCrop"
-            android:src="@drawable/ic_play_card"
-            tools:ignore="ContentDescription" />
-    </RelativeLayout>
+        android:src="@drawable/ic_play_circle_fill"
+        android:translationX="4dp"
+        android:translationY="4dp"
+        tools:ignore="ContentDescription" />
 
     <TextView
         android:id="@+id/tv_title_card"

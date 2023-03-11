@@ -85,7 +85,7 @@
                             android:id="@+id/img_thumb"
                             android:layout_width="150dp"
                             android:layout_height="150dp"
-                            tools:background="@drawable/ic_placeholder"
+                            tools:background="@drawable/background_placeholder"
                             tools:ignore="ContentDescription" />
                     </androidx.cardview.widget.CardView>
 

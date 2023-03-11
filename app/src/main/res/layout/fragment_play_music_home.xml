@@ -23,7 +23,7 @@
                 android:id="@+id/img_song"
                 android:layout_width="250dp"
                 android:layout_height="250dp"
-                android:src="@drawable/ic_placeholder"
+                android:src="@drawable/background_placeholder"
                 tools:ignore="ContentDescription" />
         </androidx.cardview.widget.CardView>
 
@@ -46,7 +46,7 @@
                 android:layout_width="64dp"
                 android:layout_height="match_parent"
                 android:padding="@dimen/media_player_pad"
-                android:src="@drawable/ic_likes"
+                android:src="@drawable/ic_heart"
                 app:tint="@color/white"
                 tools:ignore="ContentDescription" />
         </FrameLayout>

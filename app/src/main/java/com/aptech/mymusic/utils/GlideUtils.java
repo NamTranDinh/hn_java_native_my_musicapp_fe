@@ -22,7 +22,7 @@ import java.util.function.Consumer;
 public class GlideUtils {
 
     public static void load(String url, ImageView target) {
-        load(url, target, R.drawable.ic_placeholder, R.drawable.ic_placeholder_error);
+        load(url, target, R.drawable.background_placeholder, R.drawable.background_placeholder_error);
     }
 
     public static void load(String url, ImageView target, int placeholderRes, int errorRes) {

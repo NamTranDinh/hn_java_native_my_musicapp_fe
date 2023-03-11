@@ -187,7 +187,7 @@ public class MusicService extends Service {
             NotificationCompat.Builder builder = new NotificationCompat.Builder(this, CHANNEL_ID)
                     .setOngoing(true)
                     .setAutoCancel(false)
-                    .setSmallIcon(R.drawable.ic_app_small)
+                    .setSmallIcon(R.drawable.ic_musical_note)
                     .setContentTitle(song.getName())
                     .setContentText(song.getSingerName())
                     .setLargeIcon(image)

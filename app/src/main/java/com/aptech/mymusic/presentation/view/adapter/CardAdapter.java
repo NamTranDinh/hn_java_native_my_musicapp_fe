@@ -99,7 +99,8 @@ public class CardAdapter extends RecyclerView.Adapter<CardAdapter.CardItemViewHo
     }
 
     public static class CardItemViewHolder extends RecyclerView.ViewHolder {
-        RelativeLayout itemCard, btnPlayCard;
+        RelativeLayout itemCard;
+        ImageView btnPlayCard;
         WeakReference<ImageView> imgThumb;
         TextView titleCard, subTitleCard;
 
@@ -107,7 +108,7 @@ public class CardAdapter extends RecyclerView.Adapter<CardAdapter.CardItemViewHo
             super(itemView);
             itemCard = itemView.findViewById(R.id.rl_item_card);
             imgThumb = new WeakReference<>(itemView.findViewById(R.id.img_thumb));
-            btnPlayCard = itemView.findViewById(R.id.rl_play_card);
+            btnPlayCard = itemView.findViewById(R.id.btn_play_card);
             titleCard = itemView.findViewById(R.id.tv_title_card);
             subTitleCard = itemView.findViewById(R.id.tv_sub_title_card);
         }
