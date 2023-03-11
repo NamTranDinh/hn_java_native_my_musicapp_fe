@@ -18,19 +18,19 @@ import static com.aptech.mymusic.presentation.view.service.MusicDelegate.KEY_POS
 import static com.aptech.mymusic.presentation.view.service.MusicDelegate.KEY_POSITION_TARGET;
 import static com.aptech.mymusic.presentation.view.service.MusicDelegate.KEY_SONG_OBJECT;
 import static com.aptech.mymusic.presentation.view.service.MusicDelegate.KEY_TIME_SEEK_SONG;
-import static com.aptech.mymusic.presentation.view.service.MusicDelegate.Mode.NORMAL;
-import static com.aptech.mymusic.presentation.view.service.MusicDelegate.Mode.REPEAT;
-import static com.aptech.mymusic.presentation.view.service.MusicDelegate.Mode.REPEAT_ONE;
-import static com.aptech.mymusic.presentation.view.service.MusicDelegate.Mode.SHUFFLE;
 
+import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.BitmapFactory;
 import android.media.AudioAttributes;
+import android.media.AudioFocusRequest;
 import android.media.AudioManager;
+import android.media.AudioManager.OnAudioFocusChangeListener;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Build;
@@ -51,6 +51,7 @@ import com.aptech.mymusic.domain.entity.SongModel;
 import com.aptech.mymusic.presentation.view.activity.PlayMusicActivity;
 import com.aptech.mymusic.presentation.view.broadcast.MusicReceiver;
 import com.aptech.mymusic.presentation.view.service.MusicDelegate.Action;
+import com.aptech.mymusic.presentation.view.service.MusicDelegate.MediaState;
 import com.aptech.mymusic.presentation.view.service.MusicDelegate.Mode;
 import com.aptech.mymusic.utils.GlideUtils;
 import com.aptech.mymusic.utils.MusicPreference;
@@ -67,43 +68,57 @@ public class MusicService extends Service {
     private static final String CHANNEL_ID = "MY_MUSIC_APP";
     private static final int NOTIFY_ID = 111;
 
-    private static LocalService mLocalService;
+    private static MusicPlayback sMusicPlayback;
 
     public static boolean isPlaying() {
-        if (mLocalService != null) {
-            return mLocalService.mIsPlaying;
+        if (sMusicPlayback != null) {
+            return sMusicPlayback.mMediaState == MediaState.PLAYING;
         }
         return false;
     }
 
     public static int getDuration() {
-        if (mLocalService != null && mLocalService.mMediaPlayer != null) {
-            return mLocalService.mMediaPlayer.getDuration();
+        if (sMusicPlayback != null) {
+            MediaState state = sMusicPlayback.mMediaState;
+            if (state == MediaState.PLAYING || state == MediaState.PAUSED) {
+                return sMusicPlayback.mMediaPlayer.getDuration();
+            }
         }
         return 0;
     }
 
     public static int getCurrentPosition() {
-        if (mLocalService != null && mLocalService.mMediaPlayer != null) {
-            return mLocalService.mMediaPlayer.getCurrentPosition();
+        if (sMusicPlayback != null) {
+            MediaState state = sMusicPlayback.mMediaState;
+            if (state == MediaState.PLAYING || state == MediaState.PAUSED) {
+                return sMusicPlayback.mMediaPlayer.getCurrentPosition();
+            }
         }
         return 0;
     }
 
     @Nullable
     public static SongModel getCurrentSong() {
-        if (mLocalService != null) {
-            return mLocalService.mSong;
+        if (sMusicPlayback != null) {
+            return sMusicPlayback.mSong;
         }
         return null;
     }
 
     @Nullable
     public static List<SongModel> getCurrentListSong() {
-        if (mLocalService != null) {
-            return mLocalService.mListSongTemp;
+        if (sMusicPlayback != null) {
+            return sMusicPlayback.mListSongTemp;
         }
         return null;
+    }
+
+    @Override
+    public void onCreate() {
+        super.onCreate();
+        if (sMusicPlayback == null) {
+            sMusicPlayback = new MusicPlayback(this);
+        }
     }
 
     @Nullable
@@ -113,26 +128,19 @@ public class MusicService extends Service {
     }
 
     @Override
-    public void onCreate() {
-        super.onCreate();
-        if (mLocalService == null) {
-            mLocalService = new LocalService(this);
-        }
-    }
-
-    @Override
     public int onStartCommand(@NonNull Intent intent, int flags, int startId) {
-        return mLocalService.onStartCommand(intent);
+        return sMusicPlayback.onStartCommand(intent);
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
-        if (mLocalService != null) {
-            mLocalService.release();
-            mLocalService = null;
+        if (sMusicPlayback != null) {
+            sMusicPlayback.release();
+            sMusicPlayback = null;
         }
     }
+
 
     private void sendNotificationMusic(SongModel song) {
         if (song == null) {
@@ -147,9 +155,9 @@ public class MusicService extends Service {
 
             PendingIntent pendingIntent = PendingIntent.getActivity(this, 1, intent, getFlag());
 
-            RemoteViews remoteCollapsed = getRemoteViewCollapsed(song, mLocalService.mIsPlaying);
+            RemoteViews remoteCollapsed = getRemoteViewCollapsed(song, mMusicPlayback.mIsPlaying);
 
-            RemoteViews remoteExpanded = getRemoteViewExpanded(song, mLocalService.mIsPlaying);
+            RemoteViews remoteExpanded = getRemoteViewExpanded(song, mMusicPlayback.mIsPlaying);
 
             Notification notification = new NotificationCompat.Builder(this, CHANNEL_ID)
                     .setOngoing(true)
@@ -185,6 +193,7 @@ public class MusicService extends Service {
                 image = BitmapFactory.decodeResource(getResources(), R.drawable.background_header_layout);
             }
             NotificationCompat.Builder builder = new NotificationCompat.Builder(this, CHANNEL_ID)
+                    .setSilent(true)
                     .setOngoing(true)
                     .setAutoCancel(false)
                     .setSmallIcon(R.drawable.ic_musical_note)
@@ -195,14 +204,15 @@ public class MusicService extends Service {
                     .setCategory(NotificationCompat.CATEGORY_TRANSPORT)
                     .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
                     .setStyle(new androidx.media.app.NotificationCompat.MediaStyle()
-                            .setMediaSession(mediaSession.getSessionToken())
-                            .setShowActionsInCompactView(0, 1, 2))
+                            .setMediaSession(mediaSession.getSessionToken()))
                     .addAction(createAction(R.drawable.ic_prev, PREV_SONG))
                     .addAction(isPlaying() ? createAction(R.drawable.ic_pause, PAUSE_SONG)
                             : createAction(R.drawable.ic_play, PLAY_SONG))
                     .addAction(createAction(R.drawable.ic_next, NEXT_SONG))
                     .addAction(createAction(R.drawable.ic_cancel, STOP_SERVICE));
 
+            NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+            notificationManager.notify(NOTIFY_ID, builder.build());
             startForeground(NOTIFY_ID, builder.build());
         });
     }
@@ -215,8 +225,10 @@ public class MusicService extends Service {
             String description = getString(R.string.channel_description);
             int importance = NotificationManager.IMPORTANCE_DEFAULT;
             NotificationChannel channel = new NotificationChannel(CHANNEL_ID, name, importance);
+            channel.setShowBadge(false);
             channel.setDescription(description);
-            channel.setSound(getSound(), new AudioAttributes.Builder().setUsage(AudioAttributes.USAGE_MEDIA).build());
+            channel.setLockscreenVisibility(Notification.VISIBILITY_PUBLIC);
+            channel.setSound(getSound(), new AudioAttributes.Builder().setUsage(AudioAttributes.USAGE_NOTIFICATION).build());
             // Register the channel with the system; you can't change the importance
             // or other notification behaviors after this
             NotificationManager notificationManager = getSystemService(NotificationManager.class);
@@ -289,9 +301,9 @@ public class MusicService extends Service {
         return Uri.parse("android.resource://" + getPackageName() + "/" + R.raw.empty_sound);
     }
 
-    public static class LocalService {
+    private static class MusicPlayback {
 
-        private static final String TAG = "LocalService";
+        private static final String TAG = "MusicPlayback";
         private WeakReference<MusicService> mService;
         private MusicPreference mMusicPreference;
 
@@ -299,16 +311,11 @@ public class MusicService extends Service {
         private SongModel mSong;
         private List<SongModel> mListSongOrigin;
         private List<SongModel> mListSongTemp;
-        private boolean mIsPlaying;
 
+        private MediaState mMediaState;
         private MediaPlayer mMediaPlayer;
         private Toast mToast;
-
-        LocalService(MusicService mService) {
-            this.mService = new WeakReference<>(mService);
-            this.mMusicPreference = DataInjection.provideMusicPreference();
-            this.initData();
-        }
+        private OnAudioFocusChangeListener mAudiofocusListener;
 
         public int onStartCommand(Intent intent) {
             Bundle bundle;
@@ -324,53 +331,8 @@ public class MusicService extends Service {
             }
             return START_NOT_STICKY;
         }
-
-        private void handleAction(@NonNull Action action, Bundle bundle) {
-            switch (action) {
-                case UPDATE_VIEW:
-                    updateView();
-                    break;
-                case PLAY_NEW_SONG:
-                    playSongFromBundle(bundle);
-                    break;
-                case PLAY_NEW_LIST_SONG:
-                    playListSongFromBundle(bundle);
-                    break;
-                case STOP_SERVICE:
-                    stopService();
-                    break;
-                case PREV_SONG:
-                    prevSong();
-                    break;
-                case PLAY_SONG:
-                    playSong();
-                    break;
-                case PAUSE_SONG:
-                    pauseSong();
-                    break;
-                case NEXT_SONG:
-                    nextSong(false);
-                    break;
-                case SEEK_SONG:
-                    seekSong(bundle.getInt(KEY_TIME_SEEK_SONG));
-                    break;
-                case SHUFFLE_SONG:
-                    shuffleMode();
-                    break;
-                case REPEAT_SONG:
-                    repeatMode();
-                    break;
-                case ADD_SONG:
-                    addSong((SongModel) bundle.getSerializable(KEY_SONG_OBJECT), -1);
-                    break;
-                case REMOVE_SONG:
-                    removeSong((SongModel) bundle.getSerializable(KEY_SONG_OBJECT));
-                    break;
-                case SWAP_SONG:
-                    swapSong(bundle.getInt(KEY_POSITION_DRAG), bundle.getInt(KEY_POSITION_TARGET));
-                    break;
-            }
-        }
+        private AudioFocusRequest mAudioFocusRequest;
+        // @formatter:on
 
         private void updateNotification() {
             if (mService != null && mService.get() != null) {
@@ -387,19 +349,7 @@ public class MusicService extends Service {
                 LocalBroadcastManager.getInstance(mService.get()).sendBroadcast(intent);
             }
         }
-
-        private void updateView() {
-            if (mService != null && mService.get() != null) {
-                // send to activity => update view
-                Bundle bundle = new Bundle();
-                bundle.putBoolean(KEY_IS_PLAYING, mIsPlaying);
-                bundle.putSerializable(KEY_CURRENT_SONG, mSong);
-                bundle.putSerializable(KEY_CURRENT_MODE, mMode);
-                Intent intent = new Intent(ACTION_UPDATE_VIEW).putExtras(bundle);
-
-                LocalBroadcastManager.getInstance(mService.get()).sendBroadcast(intent);
-            }
-        }
+        private AudioManager mAudioManager;
 
         private void playSongFromBundle(@NonNull Bundle bundle) {
             SongModel song = (SongModel) bundle.getSerializable(KEY_SONG_OBJECT);
@@ -407,24 +357,7 @@ public class MusicService extends Service {
                 playSong(addSong(song, 0));
             }
         }
-
-        @SuppressWarnings("unchecked")
-        private void playListSongFromBundle(@NonNull Bundle bundle) {
-            mListSongOrigin = (List<SongModel>) bundle.getSerializable(KEY_LIST_SONG_OBJECT);
-            mListSongTemp = new ArrayList<>(mListSongOrigin);
-            mMusicPreference.setLastListSong(mListSongOrigin);
-            if (!mListSongOrigin.isEmpty()) {
-                int index;
-                // if the mode is shuffle => shuffle and play from index 0
-                if (mMode == SHUFFLE) {
-                    index = 0;
-                    shuffleSong(mListSongTemp);
-                } else {
-                    index = validateSongIndex(bundle.getInt(KEY_POSITION_NEW_SONG, 0));
-                }
-                playSong(index);
-            }
-        }
+        private boolean mHasAudioFocus;
 
         private void stopService() {
             if (mService != null && mService.get() != null) {
@@ -437,38 +370,52 @@ public class MusicService extends Service {
             playSong(index != 0 ? index - 1 : mListSongTemp.size() - 1);
         }
 
-        private void playSong(int index) {
-            if (!mIsPlaying || !mListSongTemp.get(index).equals(mSong)) {
-                mSong = mListSongTemp.get(index);
-                if (mMediaPlayer != null) {
-                    mMediaPlayer.release();
-                    mMediaPlayer = null;
-                }
-            }
-            playSong();
+        MusicPlayback(MusicService mService) {
+            this.mService = new WeakReference<>(mService);
+            this.mMusicPreference = DataInjection.provideMusicPreference();
+            this.mMediaState = MediaState.IDLE;
+            this.mMediaPlayer = new MediaPlayer();
+            this.initData();
         }
 
-        private void playSong() {
-            if (mMediaPlayer != null) {
-                mMediaPlayer.start();
-                if (!mIsPlaying) {
-                    mIsPlaying = true;
-                    updateNotification();
-                    updateView();
-                }
-            } else {
-                initSong();
+        // @formatter:off
+        private void handleAction(@NonNull Action action, Bundle bundle) {
+            switch (action) {
+                case UPDATE_VIEW:           updateView();                   break;
+                case PLAY_NEW_SONG:         playSongFromBundle(bundle);     break;
+                case PLAY_NEW_LIST_SONG:    playListSongFromBundle(bundle); break;
+                case STOP_SERVICE:          stopService();                  break;
+                case PREV_SONG:             prevSong();                     break;
+                case PLAY_SONG:             playSong();                     break;
+                case PAUSE_SONG:            pauseSong();                    break;
+                case NEXT_SONG:             nextSong(false);                break;
+                case SHUFFLE_SONG:          shuffleMode();                  break;
+                case REPEAT_SONG:           repeatMode();                   break;
+                case SEEK_SONG:
+                    seekSong(bundle.getInt(KEY_TIME_SEEK_SONG));
+                    break;
+                case ADD_SONG:
+                    addSong((SongModel) bundle.getSerializable(KEY_SONG_OBJECT), -1);
+                    break;
+                case REMOVE_SONG:
+                    removeSong((SongModel) bundle.getSerializable(KEY_SONG_OBJECT));
+                    break;
+                case SWAP_SONG:
+                    swapSong(bundle.getInt(KEY_POSITION_DRAG), bundle.getInt(KEY_POSITION_TARGET));
+                    break;
             }
         }
 
-        private void pauseSong() {
-            if (mMediaPlayer != null) {
-                mMediaPlayer.pause();
-                if (mIsPlaying) {
-                    mIsPlaying = false;
-                    updateNotification();
-                    updateView();
-                }
+        private void updateView() {
+            if (mService != null && mService.get() != null) {
+                // send to activity => update view
+                Bundle bundle = new Bundle();
+                bundle.putBoolean(KEY_IS_PLAYING, mMediaState == MediaState.PLAYING);
+                bundle.putSerializable(KEY_CURRENT_SONG, mSong);
+                bundle.putSerializable(KEY_CURRENT_MODE, mMode);
+                Intent intent = new Intent(ACTION_UPDATE_VIEW).putExtras(bundle);
+
+                LocalBroadcastManager.getInstance(mService.get()).sendBroadcast(intent);
             }
         }
 
@@ -494,50 +441,62 @@ public class MusicService extends Service {
             }
         }
 
-        private void seekSong(int time) {
-            if (mMediaPlayer != null) {
-                mIsPlaying = true;
-                mMediaPlayer.seekTo(time);
-                mMediaPlayer.start();
+        @SuppressWarnings("unchecked")
+        private void playListSongFromBundle(@NonNull Bundle bundle) {
+            mListSongOrigin = (List<SongModel>) bundle.getSerializable(KEY_LIST_SONG_OBJECT);
+            mListSongTemp = new ArrayList<>(mListSongOrigin);
+            mMusicPreference.setLastListSong(mListSongOrigin);
+            if (!mListSongOrigin.isEmpty()) {
+                int index;
+                // if the mode is shuffle => shuffle and play from index 0
+                if (mMode == Mode.SHUFFLE) {
+                    index = 0;
+                    shuffleSong(mListSongTemp);
+                } else {
+                    index = validateSongIndex(bundle.getInt(KEY_POSITION_NEW_SONG, 0));
+                }
+                playSong(index);
+            }
+        }
+
+        private void playSong(int index) {
+            if (!mListSongTemp.get(index).equals(mSong)) {
+                mSong = mListSongTemp.get(index);
+                setMediaState(MediaState.IDLE);
+                playSong();
+            }
+        }
+
+        private void playSong() {
+            if (mMediaState == MediaState.IDLE) {
+                try {
+                    mMediaPlayer.reset();
+                    mMediaPlayer.setAudioAttributes(getAudioAttributes());
+                    mMediaPlayer.setDataSource(mSong.getAudioUrl());
+                    mMediaPlayer.setOnCompletionListener(null);
+                    mMediaPlayer.setOnPreparedListener(mediaPlayer -> {
+                        Log.e(TAG, "PrepareAsync done : " + mSong.getName());
+                        mediaPlayer.setOnCompletionListener(mp -> nextSong(true));
+                        setMediaState(MediaState.PREPARED);
+                        playSong();
+                    });
+                    Log.e(TAG, "Start prepareAsync: " + mSong.getName());
+                    mMediaPlayer.prepareAsync();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                mMusicPreference.setLastSong(mSong);
                 updateView();
             }
-        }
-
-        private void shuffleMode() {
-            // reset to origin list
-            mListSongTemp = new ArrayList<>(mListSongOrigin);
-            if (mMode == SHUFFLE) {
-                mMode = NORMAL;
-                showToast("Normal play mode");
-            } else {
-                mMode = SHUFFLE;
-                shuffleSong(mListSongTemp);
-                swapSong(0, mListSongTemp.indexOf(mSong));
-                showToast("Random play mode");
+            if (mMediaState == MediaState.PREPARED || mMediaState == MediaState.PAUSED) {
+                // requestAudioFocus();
+                if (requestAudioFocus()) {
+                    setMediaState(MediaState.PLAYING);
+                    mMediaPlayer.start();
+                    updateNotification();
+                    updateView();
+                }
             }
-            mMusicPreference.setLastMode(mMode);
-            updatePlayList();
-            updateView();
-        }
-
-        private void repeatMode() {
-            switch (mMode) {
-                case NORMAL:
-                case SHUFFLE:
-                    mMode = REPEAT;
-                    showToast("Current playlist is repeating");
-                    break;
-                case REPEAT:
-                    mMode = REPEAT_ONE;
-                    showToast("One-song looping mode");
-                    break;
-                case REPEAT_ONE:
-                    mMode = NORMAL;
-                    showToast("Normal play mode");
-                    break;
-            }
-            mMusicPreference.setLastMode(mMode);
-            updateView();
         }
 
         private int addSong(SongModel song, int i) {
@@ -558,15 +517,12 @@ public class MusicService extends Service {
             }
         }
 
-        private void swapSong(int drag, int target) {
-            try {
-                if (mMode == SHUFFLE) {
-                    Collections.swap(mListSongTemp, drag, target);
-                } else {
-                    Collections.swap(mListSongOrigin, drag, target);
-                    Collections.swap(mListSongTemp, drag, target);
-                }
-            } catch (Throwable ignore) {
+        private void pauseSong() {
+            if (mMediaState == MediaState.PLAYING) {
+                setMediaState(MediaState.PAUSED);
+                mMediaPlayer.pause();
+                updateNotification();
+                updateView();
             }
         }
 
@@ -577,33 +533,125 @@ public class MusicService extends Service {
             this.mListSongTemp = new ArrayList<>(this.mListSongOrigin);
         }
 
-        private void initSong() {
-            if (mSong == null) {
-                return;
+        private void shuffleMode() {
+            // reset to origin list
+            mListSongTemp = new ArrayList<>(mListSongOrigin);
+            if (mMode == Mode.SHUFFLE) {
+                mMode = Mode.NORMAL;
+                showToast("Normal play mode");
+            } else {
+                mMode = Mode.SHUFFLE;
+                shuffleSong(mListSongTemp);
+                swapSong(0, mListSongTemp.indexOf(mSong));
+                showToast("Random play mode");
             }
-            if (mMediaPlayer != null) {
-                mMediaPlayer.release();
-                mMediaPlayer = null;
-            }
-            mIsPlaying = false;
-            mMediaPlayer = new MediaPlayer();
-            mMediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
-            try {
-                mMediaPlayer.setDataSource(mSong.getAudioUrl());
-                Log.e(TAG, "songInit: prepare " + mSong.getName());
-                mMediaPlayer.setOnPreparedListener(mediaPlayer -> {
-                    Log.e(TAG, "songInit: success " + mSong.getName());
-                    playSong();
-                    mediaPlayer.setOnCompletionListener(mp -> nextSong(true));
-                });
-                mMediaPlayer.prepareAsync();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            mMusicPreference.setLastMode(mMode);
+            updatePlayList();
             updateView();
-            mMusicPreference.setLastSong(mSong);
         }
 
+        private void repeatMode() {
+            switch (mMode) {
+                case NORMAL:
+                case SHUFFLE:
+                    mMode = Mode.REPEAT;
+                    showToast("Current playlist is repeating");
+                    break;
+                case REPEAT:
+                    mMode = Mode.REPEAT_ONE;
+                    showToast("One-song looping mode");
+                    break;
+                case REPEAT_ONE:
+                    mMode = Mode.NORMAL;
+                    showToast("Normal play mode");
+                    break;
+            }
+            mMusicPreference.setLastMode(mMode);
+            updateView();
+        }
+
+        private void seekSong(int time) {
+            if (mMediaState == MediaState.PLAYING || mMediaState == MediaState.PAUSED) {
+                setMediaState(MediaState.PLAYING);
+                mMediaPlayer.seekTo(time);
+                mMediaPlayer.start();
+                updateView();
+            }
+        }
+
+        private void swapSong(int drag, int target) {
+            try {
+                if (mMode == Mode.SHUFFLE) {
+                    Collections.swap(mListSongTemp, drag, target);
+                } else {
+                    Collections.swap(mListSongOrigin, drag, target);
+                    Collections.swap(mListSongTemp, drag, target);
+                }
+            } catch (Throwable ignore) {
+            }
+        }
+
+        public boolean requestAudioFocus() {
+            if (!mHasAudioFocus) {
+                mAudioManager = (AudioManager) mService.get().getSystemService(Context.AUDIO_SERVICE);
+                mAudiofocusListener = focusChange -> {
+                    if (focusChange == AudioManager.AUDIOFOCUS_LOSS_TRANSIENT) {
+                        // Pause playback
+                        Log.e(TAG, "Audio Focus Change: AUDIOFOCUS_LOSS_TRANSIENT");
+                        pauseSong();
+                    } else if (focusChange == AudioManager.AUDIOFOCUS_GAIN) {
+                        // Resume playback
+                        Log.e(TAG, "Audio Focus Change: AUDIOFOCUS_GAIN");
+                        playSong();
+                    } else if (focusChange == AudioManager.AUDIOFOCUS_LOSS) {
+                        // Stop playback
+                        Log.e(TAG, "Audio Focus Change: AUDIOFOCUS_LOSS");
+                        abandonAudioFocus();
+                        pauseSong();
+                    } else {
+                        Log.e(TAG, "Audio Focus Change: " + focusChange);
+                    }
+                };
+                int result;
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    mAudioFocusRequest = new AudioFocusRequest
+                            .Builder(AudioManager.AUDIOFOCUS_GAIN)
+                            .setAudioAttributes(getAudioAttributes())
+                            .setOnAudioFocusChangeListener(mAudiofocusListener)
+                            .build();
+                    result = mAudioManager.requestAudioFocus(mAudioFocusRequest);
+                } else {
+                    result = mAudioManager.requestAudioFocus(mAudiofocusListener,
+                            AudioManager.STREAM_MUSIC,
+                            AudioManager.AUDIOFOCUS_GAIN);
+                }
+                if (result == AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
+                    mHasAudioFocus = true;
+                }
+            }
+            return mHasAudioFocus;
+        }
+
+        public void abandonAudioFocus() {
+            if (mHasAudioFocus) {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    mAudioManager.abandonAudioFocusRequest(mAudioFocusRequest);
+                } else {
+                    mAudioManager.abandonAudioFocus(mAudiofocusListener);
+                }
+                mAudioFocusRequest = null;
+                mAudiofocusListener = null;
+                mHasAudioFocus = false;
+            }
+        }
+
+        private AudioAttributes getAudioAttributes() {
+            return new AudioAttributes.Builder()
+                    .setLegacyStreamType(AudioManager.STREAM_MUSIC)
+                    .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
+                    .setUsage(AudioAttributes.USAGE_MEDIA)
+                    .build();
+        }
 
         private void shuffleSong(List<SongModel> songs) {
             Collections.shuffle(songs);
@@ -611,6 +659,36 @@ public class MusicService extends Service {
 
         private int validateSongIndex(int index) {
             return index >= 0 && index <= mListSongOrigin.size() ? index : mListSongOrigin.size();
+        }
+
+        private void setMediaState(MediaState state) {
+            if (mMediaState == state) {
+                return;
+            }
+            Log.e(TAG, "Media State change: " + mMediaState + " --> " + state);
+            switch (mMediaState) {
+                case IDLE:
+                    if (state == MediaState.PREPARED || state == MediaState.RELEASE) {
+                        mMediaState = state;
+                        return;
+                    }
+                    throw new RuntimeException("Idle state only acp state (Prepare or Release)");
+                case PREPARED:
+                    if (state != MediaState.PAUSED) {
+                        mMediaState = state;
+                        return;
+                    }
+                    throw new RuntimeException("Prepare state not acp state (Pause)");
+                case PLAYING:
+                case PAUSED:
+                    if (state != MediaState.PREPARED) {
+                        mMediaState = state;
+                        return;
+                    }
+                    throw new RuntimeException("Start or Pause state not acp state (Prepare)");
+                case RELEASE:
+                    throw new RuntimeException("Release state can't set again!");
+            }
         }
 
         private void showToast(String text) {
@@ -622,11 +700,9 @@ public class MusicService extends Service {
         }
 
         public void release() {
-            mIsPlaying = false;
-            if (mMediaPlayer != null) {
-                mMediaPlayer.release();
-                mMediaPlayer = null;
-            }
+            setMediaState(MediaState.RELEASE);
+            mMediaPlayer.release();
+            mMediaPlayer = null;
             updateView();
             if (mService != null && mService.get() != null) {
                 mService.clear();

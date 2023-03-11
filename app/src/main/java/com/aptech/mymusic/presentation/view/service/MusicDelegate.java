@@ -39,9 +39,9 @@ public class MusicDelegate {
         PLAY_SONG,
         PAUSE_SONG,
         NEXT_SONG,
-        SEEK_SONG,
         SHUFFLE_SONG,
         REPEAT_SONG,
+        SEEK_SONG,
 
         ADD_SONG,
         REMOVE_SONG,
@@ -55,6 +55,14 @@ public class MusicDelegate {
         REPEAT,     // run to end of list song and restart
         REPEAT_ONE, // run to end of song and restart
 
+    }
+
+    public enum MediaState {
+        IDLE,
+        PREPARED,
+        PLAYING,
+        PAUSED,
+        RELEASE
     }
 
 }
