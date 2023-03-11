@@ -125,10 +125,11 @@ public class MainActivity extends BaseActivity {
             seekBarUpdateRunnable = () -> {
                 if (MusicService.isPlaying()) {
                     mSeekBar.setProgress(MusicService.getCurrentPosition());
-                    mSeekBar.postDelayed(seekBarUpdateRunnable, 1000);
+                    mSeekBar.postDelayed(seekBarUpdateRunnable, 500);
                 }
             };
         }
+        mSeekBar.removeCallbacks(seekBarUpdateRunnable);
         mSeekBar.post(seekBarUpdateRunnable);
     }
 

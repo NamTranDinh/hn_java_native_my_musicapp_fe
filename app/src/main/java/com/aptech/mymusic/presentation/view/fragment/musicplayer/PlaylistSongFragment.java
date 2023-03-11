@@ -120,7 +120,7 @@ public class PlaylistSongFragment extends BaseFragment implements SongSpecialAda
             public void onChildDrawOver(@NonNull Canvas c, @NonNull RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, float dX, float dY, int actionState, boolean isCurrentlyActive) {
                 if (!isDrawing && isCurrentlyActive) {
                     isDrawing = true;
-                    viewHolder.itemView.setBackgroundColor(Color.parseColor("#33000000"));
+                    viewHolder.itemView.setBackgroundColor(Color.parseColor("#66000000"));
                 }
                 if (isDrawing && !isCurrentlyActive) {
                     isDrawing = false;

@@ -32,6 +32,7 @@ import com.mct.components.baseui.BaseFragment;
 import com.mct.components.utils.ToastUtils;
 
 import java.util.List;
+import java.util.Random;
 
 public class SuggestSongFragment extends BaseFragment implements Callback.GetSuggestSongCallback, SongAdapter.ItemClickedListener {
 
@@ -84,7 +85,7 @@ public class SuggestSongFragment extends BaseFragment implements Callback.GetSug
 
     public void initData(@NonNull SongModel song, List<SongModel> currentListSong) {
         mSongId = song.getId();
-        mPresenter.requestSuggestSong(song, currentListSong, 10, this);
+        mPresenter.requestSuggestSong(song, currentListSong, new Random().nextInt(8) + 3, this);
     }
 
     @Override

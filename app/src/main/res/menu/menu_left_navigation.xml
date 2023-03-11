@@ -1,12 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
-
     <group android:checkableBehavior="single">
         <item
             android:id="@+id/nav_home"
             android:icon="@drawable/ic_home"
-            android:title="@string/nav_home"
-            />
+            android:title="@string/nav_home" />
         <item
             android:id="@+id/nav_playlist"
             android:icon="@drawable/ic_playlist"
@@ -20,13 +18,24 @@
             android:icon="@drawable/ic_topic"
             android:title="@string/nav_topic" />
     </group>
-
+    <item android:title="@string/nav_other">
+        <menu>
+            <item
+                android:id="@+id/nav_favorite"
+                android:icon="@drawable/ic_heart_fill"
+                android:title="@string/nav_favorite" />
+            <item
+                android:id="@+id/nav_downloaded"
+                android:icon="@drawable/ic_download"
+                android:title="@string/nav_downloaded" />
+        </menu>
+    </item>
     <item android:title="@string/nav_about_us">
         <menu>
             <item
-                android:id="@+id/nav_rate"
+                android:id="@+id/nav_rate_app"
                 android:icon="@drawable/ic_star"
-                android:title="@string/nav_rate" />
+                android:title="@string/nav_rate_app" />
             <item
                 android:id="@+id/nav_app_info"
                 android:icon="@drawable/ic_info"
@@ -37,5 +46,4 @@
                 android:title="@string/nav_setting" />
         </menu>
     </item>
-
 </menu>
