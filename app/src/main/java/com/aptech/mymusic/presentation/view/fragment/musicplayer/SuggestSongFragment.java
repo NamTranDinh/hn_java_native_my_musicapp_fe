@@ -19,6 +19,7 @@ import androidx.annotation.Nullable;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.aptech.mymusic.R;
 import com.aptech.mymusic.domain.entity.SongModel;
@@ -34,6 +35,7 @@ import java.util.List;
 
 public class SuggestSongFragment extends BaseFragment implements Callback.GetSuggestSongCallback, SongAdapter.ItemClickedListener {
 
+    private SwipeRefreshLayout mSwipeRefreshLayout;
     private RecyclerView mRcvListSuggestSong;
     private PlayMusicPresenter mPresenter;
     private Integer mSongId;
@@ -67,11 +69,17 @@ public class SuggestSongFragment extends BaseFragment implements Callback.GetSug
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        mSwipeRefreshLayout = view.findViewById(R.id.srl_refresh);
         mRcvListSuggestSong = view.findViewById(R.id.rcv_list_suggest_song);
         mRcvListSuggestSong.setLayoutManager(new LinearLayoutManager(requireContext()));
         if (MusicService.getCurrentSong() != null) {
             initData(MusicService.getCurrentSong(), MusicService.getCurrentListSong());
         }
+        mSwipeRefreshLayout.setOnRefreshListener(() -> mSwipeRefreshLayout.postDelayed(() -> {
+            if (MusicService.getCurrentSong() != null) {
+                initData(MusicService.getCurrentSong(), MusicService.getCurrentListSong());
+            }
+        }, 600));
     }
 
     public void initData(@NonNull SongModel song, List<SongModel> currentListSong) {
@@ -89,13 +97,14 @@ public class SuggestSongFragment extends BaseFragment implements Callback.GetSug
 
     @Override
     public void onGot(List<SongModel> data) {
-        SongAdapter adapter = new SongAdapter(data, this, SongAdapter.TYPE_SUGGEST);
-        mRcvListSuggestSong.setAdapter(adapter);
+        mSwipeRefreshLayout.setRefreshing(false);
+        mRcvListSuggestSong.setAdapter(new SongAdapter(data, this, SongAdapter.TYPE_SUGGEST));
     }
 
     @Override
     public void onFalse(Throwable t) {
         Log.e("ddd", "onError: ", t);
+        mSwipeRefreshLayout.setRefreshing(false);
     }
 
     @Override
