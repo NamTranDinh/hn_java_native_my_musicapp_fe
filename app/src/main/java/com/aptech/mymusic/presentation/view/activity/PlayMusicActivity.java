@@ -7,8 +7,6 @@ import static com.aptech.mymusic.presentation.view.service.MusicDelegate.Action.
 import static com.aptech.mymusic.presentation.view.service.MusicDelegate.Action.PREV_SONG;
 import static com.aptech.mymusic.presentation.view.service.MusicDelegate.Action.REPEAT_SONG;
 import static com.aptech.mymusic.presentation.view.service.MusicDelegate.Action.SHUFFLE_SONG;
-import static com.aptech.mymusic.presentation.view.service.MusicDelegate.KEY_CURRENT_SONG;
-import static com.aptech.mymusic.presentation.view.service.MusicDelegate.KEY_IS_PLAYING;
 
 import android.annotation.SuppressLint;
 import android.content.BroadcastReceiver;
@@ -56,12 +54,7 @@ public class PlayMusicActivity extends BaseActivity {
     BroadcastReceiver receiverFromMusicService = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, @NonNull Intent intent) {
-            Bundle bundle = intent.getExtras();
-            if (bundle != null) {
-                SongModel song = (SongModel) bundle.getSerializable(KEY_CURRENT_SONG);
-                boolean isPlaying = bundle.getBoolean(KEY_IS_PLAYING);
-                initData(song, isPlaying);
-            }
+            initData();
         }
     };
 
@@ -85,7 +78,7 @@ public class PlayMusicActivity extends BaseActivity {
         setContentView(R.layout.activity_play_music);
         LocalBroadcastManager.getInstance(this).registerReceiver(receiverFromMusicService, new IntentFilter(ACTION_UPDATE_VIEW));
         initUi();
-        initData(MusicServiceHelper.getCurrentSong(), MusicServiceHelper.isPlaying());
+        initData();
         replaceFragment(new MainPagerFragment());
     }
 
@@ -143,7 +136,9 @@ public class PlayMusicActivity extends BaseActivity {
         viewGroup.setLayoutParams(lp);
     }
 
-    private void initData(SongModel song, boolean isPlaying) {
+    private void initData() {
+        SongModel song = MusicServiceHelper.getCurrentSong();
+        boolean isPlaying = MusicServiceHelper.isPlaying();
         if (song != null) {
             GlideUtils.load(song.getImageUrl(), image -> {
                 if (image == null) {

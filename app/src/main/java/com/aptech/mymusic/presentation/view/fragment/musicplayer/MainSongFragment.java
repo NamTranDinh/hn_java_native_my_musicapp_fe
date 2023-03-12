@@ -1,10 +1,7 @@
 package com.aptech.mymusic.presentation.view.fragment.musicplayer;
 
 import static com.aptech.mymusic.presentation.view.service.MusicDelegate.ACTION_UPDATE_VIEW;
-import static com.aptech.mymusic.presentation.view.service.MusicDelegate.KEY_CURRENT_SONG;
-import static com.aptech.mymusic.presentation.view.service.MusicDelegate.KEY_IS_PLAYING;
 
-import android.annotation.SuppressLint;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -33,15 +30,9 @@ public class MainSongFragment extends BaseFragment {
     private Integer mSongId;
 
     BroadcastReceiver receiverFromMusicService = new BroadcastReceiver() {
-        @SuppressLint("ClickableViewAccessibility")
         @Override
         public void onReceive(Context context, @NonNull Intent intent) {
-            Bundle bundle = intent.getExtras();
-            if (bundle != null) {
-                SongModel song = (SongModel) bundle.getSerializable(KEY_CURRENT_SONG);
-                boolean isPlaying = bundle.getBoolean(KEY_IS_PLAYING);
-                initData(song, isPlaying);
-            }
+            initData();
         }
     };
 
@@ -67,10 +58,12 @@ public class MainSongFragment extends BaseFragment {
         view.findViewById(R.id.tv_playlist).setOnClickListener(v ->
                 replaceFragment(new PlaylistSongFragment(), true, BaseActivity.Anim.TRANSIT_FADE)
         );
-        initData(MusicServiceHelper.getCurrentSong(), MusicServiceHelper.isPlaying());
+        initData();
     }
 
-    private void initData(SongModel song, boolean isPlaying) {
+    private void initData() {
+        SongModel song = MusicServiceHelper.getCurrentSong();
+        boolean isPlaying = MusicServiceHelper.isPlaying();
         if (song != null) {
             if (!song.getId().equals(mSongId)) {
                 mSongId = song.getId();

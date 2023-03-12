@@ -26,32 +26,61 @@ public class SongSwipeDeleteAdapter extends RecyclerView.Adapter<SongSwipeDelete
 
     private final ViewBinderHelper mBinderHelper = new ViewBinderHelper();
     private final IOnClickListener mIOnClickListener;
-    private SongModel mSong;
+    private boolean mIsPlaying;
+    private SongModel mCurrentSong;
     private List<SongModel> mListSong;
     private StartDragListener mDragListener;
 
+    private boolean mIsSelectMode;
 
     public SongSwipeDeleteAdapter(IOnClickListener mIOnClickListener) {
         this.mIOnClickListener = mIOnClickListener;
     }
 
     @SuppressLint("NotifyDataSetChanged")
-    public void setData(SongModel song, List<SongModel> songs) {
-        mSong = song;
+    public void setData(boolean isPlaying, SongModel song, List<SongModel> songs) {
+        mIsPlaying = isPlaying;
+        mCurrentSong = song;
         mListSong = songs;
+        mCurrentSong.setSelected(false);
         notifyDataSetChanged();
-    }
-
-    public void setSong(SongModel song) {
-        setData(song, mListSong);
-    }
-
-    public void setListSong(List<SongModel> mListSong) {
-        setData(mSong, mListSong);
     }
 
     public void setDragListener(StartDragListener dragListener) {
         this.mDragListener = dragListener;
+    }
+
+    public boolean isSelectMode() {
+        return mIsSelectMode;
+    }
+
+    @SuppressLint("NotifyDataSetChanged")
+    public void setSelectMode(boolean isSelectMode) {
+        if (mIsSelectMode != isSelectMode) {
+            mIsSelectMode = isSelectMode;
+            notifyDataSetChanged();
+        }
+        if (!mIsSelectMode) {
+            mListSong.forEach(s -> s.setSelected(false));
+        }
+    }
+
+    public int getSelectedItemCount() {
+        return (int) mListSong.stream().filter(SongModel::isSelected).count();
+    }
+
+    @SuppressLint("NotifyDataSetChanged")
+    public List<SongModel> removeAllSelectedSong() {
+        mListSong.removeIf(SongModel::isSelected);
+        notifyDataSetChanged();
+        return mListSong;
+    }
+
+    @NonNull
+    @Override
+    public SongViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_song_sw_delete, parent, false);
+        return new SongViewHolder(view);
     }
 
     @SuppressLint("ClickableViewAccessibility")
@@ -61,21 +90,42 @@ public class SongSwipeDeleteAdapter extends RecyclerView.Adapter<SongSwipeDelete
         if (song == null) {
             return;
         }
-        int holderPosition = holder.getAdapterPosition();
         String id = String.valueOf(song.getId());
-        boolean isActive = song.equals(mSong);
+        boolean isActive = song.equals(mCurrentSong);
 
         mBinderHelper.bind(holder.swrLayout, id);
 
-        holder.rlItem.setSelected(isActive);
+        holder.rlItem.setActivated(isActive);
+        holder.rlItem.setSelected(song.isSelected());
         if (isActive) {
+            mBinderHelper.closeLayout(id);
             mBinderHelper.lockSwipe(id);
+            if (mIsPlaying) {
+                holder.lottieMusicWave.playAnimation();
+            } else {
+                holder.lottieMusicWave.pauseAnimation();
+            }
             holder.lottieMusicWave.setVisibility(View.VISIBLE);
-            holder.lottieMusicWave.playAnimation();
+            if (mIsSelectMode) {
+                holder.btnMove.setVisibility(View.GONE);
+                holder.btnCheckBox.setVisibility(View.GONE);
+            } else {
+                holder.btnMove.setVisibility(View.VISIBLE);
+                holder.btnCheckBox.setVisibility(View.GONE);
+            }
         } else {
-            mBinderHelper.unlockSwipe(id);
-            holder.lottieMusicWave.setVisibility(View.GONE);
             holder.lottieMusicWave.pauseAnimation();
+            holder.lottieMusicWave.setVisibility(View.GONE);
+            if (mIsSelectMode) {
+                mBinderHelper.closeLayout(id);
+                mBinderHelper.lockSwipe(id);
+                holder.btnMove.setVisibility(View.GONE);
+                holder.btnCheckBox.setVisibility(View.VISIBLE);
+            } else {
+                mBinderHelper.unlockSwipe(id);
+                holder.btnMove.setVisibility(View.VISIBLE);
+                holder.btnCheckBox.setVisibility(View.GONE);
+            }
         }
 
         holder.tvSongName.setText(song.getName());
@@ -83,29 +133,30 @@ public class SongSwipeDeleteAdapter extends RecyclerView.Adapter<SongSwipeDelete
         GlideUtils.load(song.getImageUrl(), holder.imgThumb.get());
 
         holder.rlItem.setOnClickListener(view -> {
+            if (holder.rlItem.isActivated()) return;
             if (mIOnClickListener != null) {
-                mIOnClickListener.onItemClicked(song, holderPosition);
+                mIOnClickListener.onItemClicked(song, holder.getAdapterPosition());
             }
+        });
+        holder.rlItem.setOnLongClickListener(v -> {
+            if (holder.rlItem.isActivated()) return false;
+            if (mIOnClickListener != null) {
+                mIOnClickListener.onItemLongClicked(song, holder.getAdapterPosition());
+            }
+            return false;
         });
         holder.btnDelete.setOnClickListener(view -> {
             if (mIOnClickListener != null) {
-                mIOnClickListener.onDeleteClicked(song, holderPosition);
+                mIOnClickListener.onDeleteClicked(song, holder.getAdapterPosition());
             }
         });
-
+        holder.btnCheckBox.setOnClickListener(view -> holder.rlItem.performClick());
         holder.btnMove.setOnTouchListener((v, event) -> {
             if (event.getAction() == MotionEvent.ACTION_DOWN) {
                 mDragListener.requestDrag(holder);
             }
             return false;
         });
-    }
-
-    @NonNull
-    @Override
-    public SongViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_song_sw_delete, parent, false);
-        return new SongViewHolder(view);
     }
 
     @Override
@@ -118,6 +169,8 @@ public class SongSwipeDeleteAdapter extends RecyclerView.Adapter<SongSwipeDelete
 
     public interface IOnClickListener {
         void onItemClicked(SongModel song, int position);
+
+        void onItemLongClicked(SongModel song, int position);
 
         void onDeleteClicked(SongModel song, int position);
 

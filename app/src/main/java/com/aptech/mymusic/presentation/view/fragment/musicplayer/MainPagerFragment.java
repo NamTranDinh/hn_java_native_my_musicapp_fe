@@ -1,7 +1,6 @@
 package com.aptech.mymusic.presentation.view.fragment.musicplayer;
 
 import static com.aptech.mymusic.presentation.view.service.MusicDelegate.ACTION_UPDATE_VIEW;
-import static com.aptech.mymusic.presentation.view.service.MusicDelegate.KEY_CURRENT_SONG;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -33,12 +32,7 @@ public class MainPagerFragment extends BaseFragment {
     BroadcastReceiver receiverFromMusicService = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, @NonNull Intent intent) {
-            Bundle bundle = intent.getExtras();
-            if (bundle != null) {
-                SongModel song = (SongModel) bundle.getSerializable(KEY_CURRENT_SONG);
-                mToolbar.setTitle(song.getName());
-                mToolbar.setSubtitle(song.getSingerName());
-            }
+            initData();
         }
     };
     private ViewPager2 mViewPager2;
@@ -69,11 +63,7 @@ public class MainPagerFragment extends BaseFragment {
         CircleIndicator3 mCircleIndicator3 = view.findViewById(R.id.circle_indicator);
         mCircleIndicator3.setViewPager(mViewPager2);
 
-        SongModel song = MusicServiceHelper.getCurrentSong();
-        if (song != null) {
-            mToolbar.setTitle(song.getName());
-            mToolbar.setSubtitle(song.getSingerName());
-        }
+        initData();
     }
 
     @Override
@@ -86,5 +76,11 @@ public class MainPagerFragment extends BaseFragment {
         if (mViewPager2 != null) {
             mViewPager2.setCurrentItem(page, smoothScroll);
         }
+    }
+
+    private void initData() {
+        SongModel song = MusicServiceHelper.getCurrentSong();
+        mToolbar.setTitle(song.getName());
+        mToolbar.setSubtitle(song.getSingerName());
     }
 }

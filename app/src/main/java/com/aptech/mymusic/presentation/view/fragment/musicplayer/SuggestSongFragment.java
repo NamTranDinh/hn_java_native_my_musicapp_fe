@@ -1,8 +1,6 @@
 package com.aptech.mymusic.presentation.view.fragment.musicplayer;
 
-
 import static com.aptech.mymusic.presentation.view.service.MusicDelegate.ACTION_UPDATE_VIEW;
-import static com.aptech.mymusic.presentation.view.service.MusicDelegate.KEY_CURRENT_SONG;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -43,12 +41,10 @@ public class SuggestSongFragment extends BaseFragment implements Callback.GetSug
     BroadcastReceiver receiverFromMusicService = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, @NonNull Intent intent) {
-            Bundle bundle = intent.getExtras();
-            if (bundle != null) {
-                SongModel song = (SongModel) bundle.getSerializable(KEY_CURRENT_SONG);
-                if (song != null && !song.getId().equals(mSongId)) {
-                    initData(song, MusicServiceHelper.getCurrentListSong());
-                }
+            SongModel song = MusicServiceHelper.getCurrentSong();
+            if (song != null && !song.getId().equals(mSongId)) {
+                mSongId = song.getId();
+                initData();
             }
         }
     };
@@ -72,19 +68,14 @@ public class SuggestSongFragment extends BaseFragment implements Callback.GetSug
         mSwipeRefreshLayout = view.findViewById(R.id.srl_refresh);
         mRcvListSuggestSong = view.findViewById(R.id.rcv_list_suggest_song);
         mRcvListSuggestSong.setLayoutManager(new LinearLayoutManager(requireContext()));
-        if (MusicServiceHelper.getCurrentSong() != null) {
-            initData(MusicServiceHelper.getCurrentSong(), MusicServiceHelper.getCurrentListSong());
-        }
-        mSwipeRefreshLayout.setOnRefreshListener(() -> mSwipeRefreshLayout.postDelayed(() -> {
-            if (MusicServiceHelper.getCurrentSong() != null) {
-                initData(MusicServiceHelper.getCurrentSong(), MusicServiceHelper.getCurrentListSong());
-            }
-        }, 600));
+        mSwipeRefreshLayout.setOnRefreshListener(() -> mSwipeRefreshLayout.postDelayed(this::initData, 600));
+        initData();
     }
 
-    public void initData(@NonNull SongModel song, List<SongModel> currentListSong) {
-        mSongId = song.getId();
-        mPresenter.requestSuggestSong(song, currentListSong, new Random().nextInt(8) + 3, this);
+    public void initData() {
+        SongModel song = MusicServiceHelper.getCurrentSong();
+        List<SongModel> songs = MusicServiceHelper.getCurrentListSong();
+        mPresenter.requestSuggestSong(song, songs, new Random().nextInt(8) + 3, this);
     }
 
     @Override
@@ -118,6 +109,6 @@ public class SuggestSongFragment extends BaseFragment implements Callback.GetSug
     @Override
     public void onClickedAdd(SongModel song, int position) {
         MusicServiceHelper.addSong(song);
-        showToast("Added to playlist", ToastUtils.SUCCESS, true);
+        showToast(String.format("Added %s to playlist", song.getName()), ToastUtils.INFO, true);
     }
 }

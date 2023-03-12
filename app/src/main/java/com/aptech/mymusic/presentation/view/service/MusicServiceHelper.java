@@ -85,6 +85,10 @@ public class MusicServiceHelper {
         MusicService.swapSong(drag, target);
     }
 
+    public static void setListSong(List<SongModel> songs) {
+        MusicService.setListSong(songs);
+    }
+
     private static void startService(Bundle bundle) {
         Context context = App.getInstance();
         Intent intent = new Intent(context, MusicService.class);

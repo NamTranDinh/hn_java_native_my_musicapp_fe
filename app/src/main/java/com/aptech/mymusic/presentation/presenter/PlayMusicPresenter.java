@@ -21,8 +21,15 @@ public class PlayMusicPresenter extends BasePresenter {
         super(baseView);
     }
 
-    public void requestSuggestSong(@NonNull SongModel song, @NonNull List<SongModel> blacklist, Integer limit,
+    public void requestSuggestSong(SongModel song, List<SongModel> blacklist, Integer limit,
                                    @NonNull Callback.GetSuggestSongCallback callback) {
+        if (song == null) {
+            callback.onGot(Collections.emptyList());
+            return;
+        }
+        if (blacklist == null) {
+            blacklist = Collections.emptyList();
+        }
         String blacklistIds = JsonHelper.objToJson(blacklist.stream().map(SongModel::getId).collect(Collectors.toList()));
         DataInjection.provideRepository().getSongRepository()
                 .getSuggestSong(Long.valueOf(song.getId()), blacklistIds, limit)

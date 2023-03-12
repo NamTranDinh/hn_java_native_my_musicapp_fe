@@ -4,8 +4,6 @@ import static com.aptech.mymusic.presentation.view.service.MusicDelegate.Action.
 import static com.aptech.mymusic.presentation.view.service.MusicDelegate.Action.PAUSE_SONG;
 import static com.aptech.mymusic.presentation.view.service.MusicDelegate.Action.PLAY_SONG;
 import static com.aptech.mymusic.presentation.view.service.MusicDelegate.Action.UPDATE_VIEW;
-import static com.aptech.mymusic.presentation.view.service.MusicDelegate.KEY_CURRENT_SONG;
-import static com.aptech.mymusic.presentation.view.service.MusicDelegate.KEY_IS_PLAYING;
 
 import android.annotation.SuppressLint;
 import android.content.BroadcastReceiver;
@@ -14,6 +12,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.animation.LinearInterpolator;
 import android.widget.ImageView;
 import android.widget.SeekBar;
@@ -31,11 +30,12 @@ import com.aptech.mymusic.presentation.view.service.MusicServiceHelper;
 import com.aptech.mymusic.utils.GlideUtils;
 import com.mct.components.baseui.BaseActivity;
 
-public class MainActivity extends BaseActivity {
+public class MainActivity extends BaseActivity implements View.OnClickListener {
     public static final int TWO_ITEM_CARD = 2;
     public static final int ONE_ITEM_CARD = 1;
 
-    private SeekBar mSeekBar;
+    private ViewGroup controlLayout;
+    private SeekBar seekBar;
     private ImageView imgThumb;
     private TextView tvSongName;
     private TextView tvSingerName;
@@ -46,12 +46,7 @@ public class MainActivity extends BaseActivity {
     BroadcastReceiver receiverFromMusicService = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, @NonNull Intent intent) {
-            Bundle bundle = intent.getExtras();
-            if (bundle != null) {
-                SongModel song = (SongModel) bundle.getSerializable(KEY_CURRENT_SONG);
-                boolean isPlaying = bundle.getBoolean(KEY_IS_PLAYING);
-                initData(song, isPlaying);
-            }
+            initData();
         }
     };
 
@@ -73,34 +68,25 @@ public class MainActivity extends BaseActivity {
 
     @SuppressLint("ClickableViewAccessibility")
     private void initUi() {
-        mSeekBar = findViewById(R.id.sb_music);
-        mSeekBar.setOnTouchListener((v, event) -> true);
+        controlLayout = findViewById(R.id.control_layout);
+        seekBar = findViewById(R.id.sb_music);
+        seekBar.setOnTouchListener((v, event) -> true);
 
         imgThumb = findViewById(R.id.img_thumb);
         tvSongName = findViewById(R.id.tv_song_name);
         tvSingerName = findViewById(R.id.tv_singer_name);
         imgLikes = findViewById(R.id.img_likes);
         imgPlayPause = findViewById(R.id.img_play_pause);
-        imgPlayPause.setOnClickListener(view -> {
-            if (MusicServiceHelper.isPlaying()) {
-                MusicServiceHelper.sendAction(PAUSE_SONG);
-            } else {
-                MusicServiceHelper.sendAction(PLAY_SONG);
-            }
-        });
-        findViewById(R.id.control_layout).setOnClickListener(v -> {
-            if (MusicServiceHelper.getCurrentSong() != null) {
-                startActivity(new Intent(this, PlayMusicActivity.class));
-            }
-        });
-        findViewById(R.id.img_next).setOnClickListener(v -> {
-            if (MusicServiceHelper.getCurrentListSong() != null) {
-                MusicServiceHelper.sendAction(NEXT_SONG);
-            }
-        });
+
+        controlLayout.setOnClickListener(this);
+        imgLikes.setOnClickListener(this);
+        imgPlayPause.setOnClickListener(this);
+        findViewById(R.id.img_next).setOnClickListener(this);
     }
 
-    private void initData(SongModel song, boolean isPlaying) {
+    private void initData() {
+        SongModel song = MusicServiceHelper.getCurrentSong();
+        boolean isPlaying = MusicServiceHelper.isPlaying();
         if (isPlaying) {
             imgPlayPause.setImageResource(R.drawable.ic_pause);
             startAnim();
@@ -109,26 +95,31 @@ public class MainActivity extends BaseActivity {
             stopAnim();
         }
         if (song != null) {
+            controlLayout.setVisibility(View.VISIBLE);
+            seekBar.setVisibility(View.VISIBLE);
             tvSongName.setText(song.getName());
             tvSingerName.setText(song.getSingerName());
             tvSingerName.setVisibility(View.VISIBLE);
             GlideUtils.load(song.getImageUrl(), imgThumb);
             initSeekbar();
+        } else {
+            controlLayout.setVisibility(View.GONE);
+            seekBar.setVisibility(View.GONE);
         }
     }
 
     private void initSeekbar() {
-        mSeekBar.setMax(MusicServiceHelper.getDuration());
+        seekBar.setMax(MusicServiceHelper.getDuration());
         if (seekBarUpdateRunnable == null) {
             seekBarUpdateRunnable = () -> {
                 if (MusicServiceHelper.isPlaying()) {
-                    mSeekBar.setProgress(MusicServiceHelper.getCurrentPosition());
-                    mSeekBar.postDelayed(seekBarUpdateRunnable, 500);
+                    seekBar.setProgress(MusicServiceHelper.getCurrentPosition());
+                    seekBar.postDelayed(seekBarUpdateRunnable, 500);
                 }
             };
         }
-        mSeekBar.removeCallbacks(seekBarUpdateRunnable);
-        mSeekBar.post(seekBarUpdateRunnable);
+        seekBar.removeCallbacks(seekBarUpdateRunnable);
+        seekBar.post(seekBarUpdateRunnable);
     }
 
     private void startAnim() {
@@ -152,6 +143,33 @@ public class MainActivity extends BaseActivity {
 
     private void stopAnim() {
         imgThumb.animate().cancel();
+    }
+
+    @Override
+    @SuppressLint("NonConstantResourceId")
+    public void onClick(View v) {
+        if (MusicServiceHelper.getCurrentSong() == null) {
+            return;
+        }
+        switch (v.getId()) {
+            case R.id.img_likes:
+
+                break;
+            case R.id.img_play_pause:
+                if (MusicServiceHelper.isPlaying()) {
+                    MusicServiceHelper.sendAction(PAUSE_SONG);
+                } else {
+                    MusicServiceHelper.sendAction(PLAY_SONG);
+                }
+                break;
+            case R.id.img_next:
+                MusicServiceHelper.sendAction(NEXT_SONG);
+                break;
+            case R.id.control_layout:
+                MusicServiceHelper.sendAction(PLAY_SONG);
+                startActivity(new Intent(this, PlayMusicActivity.class));
+                break;
+        }
     }
 
     @Override

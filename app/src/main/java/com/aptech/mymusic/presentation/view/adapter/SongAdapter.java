@@ -55,14 +55,14 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.SongViewHolder
 
         holder.itemView.setOnClickListener(view -> {
             if (mItemClickedListener != null) {
-                mItemClickedListener.onClickedItem(mListSong, song, position);
+                mItemClickedListener.onClickedItem(mListSong, song, holder.getAdapterPosition());
             }
         });
 
         holder.imgAdd.setVisibility(mType == TYPE_SUGGEST ? View.VISIBLE : View.GONE);
         holder.imgAdd.setOnClickListener(view -> {
             if (mItemClickedListener != null) {
-                mItemClickedListener.onClickedAdd(song, position);
+                mItemClickedListener.onClickedAdd(song, holder.getAdapterPosition());
                 mListSong.remove(song);
                 notifyItemRemoved(position);
             }

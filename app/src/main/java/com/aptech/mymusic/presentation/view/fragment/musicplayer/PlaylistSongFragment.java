@@ -1,10 +1,6 @@
 package com.aptech.mymusic.presentation.view.fragment.musicplayer;
 
-import static com.aptech.mymusic.presentation.view.service.MusicDelegate.ACTION_UPDATE_PLAY_LIST;
 import static com.aptech.mymusic.presentation.view.service.MusicDelegate.ACTION_UPDATE_VIEW;
-import static com.aptech.mymusic.presentation.view.service.MusicDelegate.KEY_CURRENT_LIST_SONG;
-import static com.aptech.mymusic.presentation.view.service.MusicDelegate.KEY_CURRENT_SONG;
-import static com.aptech.mymusic.presentation.view.service.MusicDelegate.KEY_IS_PLAYING;
 
 import android.annotation.SuppressLint;
 import android.content.BroadcastReceiver;
@@ -13,6 +9,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -21,6 +18,7 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.content.ContextCompat;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -29,42 +27,30 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.aptech.mymusic.R;
 import com.aptech.mymusic.domain.entity.SongModel;
 import com.aptech.mymusic.presentation.view.adapter.SongSwipeDeleteAdapter;
+import com.aptech.mymusic.presentation.view.dialog.ConfirmDialog;
 import com.aptech.mymusic.presentation.view.service.MusicServiceHelper;
+import com.mct.components.baseui.BaseActivity;
 import com.mct.components.baseui.BaseFragment;
+import com.mct.components.baseui.BaseOverlayDialog;
+import com.mct.components.utils.ToastUtils;
 
-import java.util.List;
+public class PlaylistSongFragment extends BaseFragment implements BaseActivity.OnBackPressed, SongSwipeDeleteAdapter.IOnClickListener {
 
-public class PlaylistSongFragment extends BaseFragment implements SongSwipeDeleteAdapter.IOnClickListener {
-
+    private Toolbar toolbar;
+    private SongSwipeDeleteAdapter adapter;
     BroadcastReceiver receiverFromMusicService = new BroadcastReceiver() {
         @SuppressLint("ClickableViewAccessibility")
         @Override
         public void onReceive(Context context, @NonNull Intent intent) {
-            Bundle bundle = intent.getExtras();
-            if (ACTION_UPDATE_VIEW.equals(intent.getAction())) {
-                if (bundle != null) {
-                    boolean isPlaying = bundle.getBoolean(KEY_IS_PLAYING);
-                    adapter.setSong(isPlaying ? (SongModel) bundle.getSerializable(KEY_CURRENT_SONG) : null);
-                }
-            }
-            if (ACTION_UPDATE_PLAY_LIST.equals(intent.getAction())) {
-                if (bundle != null) {
-                    //noinspection unchecked
-                    adapter.setListSong((List<SongModel>) bundle.getSerializable(KEY_CURRENT_LIST_SONG));
-                }
-            }
+            initData();
+            initToolbar();
         }
     };
-    private SongSwipeDeleteAdapter adapter;
-    private Toolbar toolbar;
 
     @Override
     public void onAttach(@NonNull Context context) {
         super.onAttach(context);
-        IntentFilter filter = new IntentFilter();
-        filter.addAction(ACTION_UPDATE_VIEW);
-        filter.addAction(ACTION_UPDATE_PLAY_LIST);
-        LocalBroadcastManager.getInstance(context).registerReceiver(receiverFromMusicService, filter);
+        LocalBroadcastManager.getInstance(context).registerReceiver(receiverFromMusicService, new IntentFilter(ACTION_UPDATE_VIEW));
     }
 
     @Nullable
@@ -77,7 +63,33 @@ public class PlaylistSongFragment extends BaseFragment implements SongSwipeDelet
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         toolbar = view.findViewById(R.id.toolbar);
-        toolbar.setNavigationOnClickListener(v -> popLastFragment());
+        toolbar.setNavigationOnClickListener(v -> onClickBack());
+        toolbar.setOnMenuItemClickListener(item -> {
+            if (item.getItemId() == R.id.menu_delete) {
+                final int count = adapter.getSelectedItemCount();
+                if (count == 0) {
+                    showToast("Please choose song to delete", ToastUtils.WARNING, true);
+                    return false;
+                }
+                String message = String.format("Are you sure want to delete %s selected song?", count);
+                new ConfirmDialog(requireContext(), message, new ConfirmDialog.IOnClickListener() {
+                    @Override
+                    public void onClickCancel(BaseOverlayDialog dialog) {
+                        dialog.dismiss();
+                    }
+
+                    @Override
+                    public void onClickOk(BaseOverlayDialog dialog) {
+                        dialog.dismiss();
+                        MusicServiceHelper.setListSong(adapter.removeAllSelectedSong());
+                        onClickBack();
+                        showToast(String.format("Deleted %s songs", count), ToastUtils.SUCCESS, true);
+                    }
+                }).create(null);
+                return true;
+            }
+            return false;
+        });
 
         RecyclerView rcvListSong = view.findViewById(R.id.rcv_list_song);
 
@@ -99,7 +111,7 @@ public class PlaylistSongFragment extends BaseFragment implements SongSwipeDelet
                 int positionTarget = target.getAdapterPosition();
                 MusicServiceHelper.swapSong(positionDrag, positionTarget);
                 adapter.notifyItemMoved(positionDrag, positionTarget);
-                return false;
+                return true;
             }
 
             // disable onLongPressItem
@@ -132,8 +144,8 @@ public class PlaylistSongFragment extends BaseFragment implements SongSwipeDelet
         // set adapter
         rcvListSong.setAdapter(adapter);
 
-        adapter.setData(MusicServiceHelper.isPlaying() ? MusicServiceHelper.getCurrentSong() : null, MusicServiceHelper.getCurrentListSong());
-        initToolbarTitle();
+        initData();
+        initToolbar();
     }
 
     @Override
@@ -142,19 +154,73 @@ public class PlaylistSongFragment extends BaseFragment implements SongSwipeDelet
         LocalBroadcastManager.getInstance(requireContext()).unregisterReceiver(receiverFromMusicService);
     }
 
-    private void initToolbarTitle() {
-        toolbar.setTitle(getString(R.string.text_play_music_playlist_n, adapter.getItemCount()));
+    private void initData() {
+        adapter.setData(MusicServiceHelper.isPlaying(), MusicServiceHelper.getCurrentSong(), MusicServiceHelper.getCurrentListSong());
+    }
+
+    private void initToolbar() {
+        if (adapter.isSelectMode()) {
+            Drawable drawable = ContextCompat.getDrawable(requireContext(), R.drawable.ic_cancel);
+            if (drawable != null) {
+                drawable.setTint(Color.WHITE);
+            }
+            toolbar.setNavigationIcon(drawable);
+            toolbar.getMenu().findItem(R.id.menu_delete).setVisible(true);
+            toolbar.setTitle(getString(R.string.text_play_music_selected_n, adapter.getSelectedItemCount()));
+        } else {
+            toolbar.setNavigationIcon(R.drawable.ic_back);
+            toolbar.getMenu().findItem(R.id.menu_delete).setVisible(false);
+            toolbar.setTitle(getString(R.string.text_play_music_playlist_n, adapter.getItemCount()));
+        }
+    }
+
+    public void onClickBack() {
+        if (adapter.isSelectMode()) {
+            adapter.setSelectMode(false);
+            initToolbar();
+        } else {
+            popLastFragment();
+        }
     }
 
     @Override
     public void onItemClicked(SongModel song, int position) {
-        MusicServiceHelper.playSong(song);
+        if (adapter.isSelectMode()) {
+            song.setSelected(!song.isSelected());
+            adapter.notifyItemChanged(position);
+            if (adapter.getSelectedItemCount() == 0) {
+                onClickBack();
+            } else {
+                initToolbar();
+            }
+        } else {
+            MusicServiceHelper.playSong(song);
+        }
+    }
+
+    @Override
+    public void onItemLongClicked(SongModel song, int position) {
+        if (!adapter.isSelectMode()) {
+            song.setSelected(true);
+            adapter.setSelectMode(true);
+            initToolbar();
+        }
     }
 
     @Override
     public void onDeleteClicked(SongModel song, int position) {
-        initToolbarTitle();
         MusicServiceHelper.removeSong(song);
         adapter.notifyItemRemoved(position);
+        showToast(String.format("Removed %s from playlist", song.getName()), ToastUtils.INFO, true);
+        initToolbar();
+    }
+
+    @Override
+    public boolean onBackPressed() {
+        if (adapter.isSelectMode()) {
+            onClickBack();
+            return true;
+        }
+        return false;
     }
 }
