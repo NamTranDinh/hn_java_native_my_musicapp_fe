@@ -43,10 +43,6 @@ public class MusicDelegate {
         REPEAT_SONG,
         SEEK_SONG,
 
-        ADD_SONG,
-        REMOVE_SONG,
-        SWAP_SONG,
-
     }
 
     public enum Mode {

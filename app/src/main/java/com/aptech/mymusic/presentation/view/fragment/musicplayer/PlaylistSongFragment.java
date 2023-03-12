@@ -28,14 +28,13 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.aptech.mymusic.R;
 import com.aptech.mymusic.domain.entity.SongModel;
-import com.aptech.mymusic.presentation.view.adapter.SongSpecialAdapter;
-import com.aptech.mymusic.presentation.view.service.MusicService;
+import com.aptech.mymusic.presentation.view.adapter.SongSwipeDeleteAdapter;
 import com.aptech.mymusic.presentation.view.service.MusicServiceHelper;
 import com.mct.components.baseui.BaseFragment;
 
 import java.util.List;
 
-public class PlaylistSongFragment extends BaseFragment implements SongSpecialAdapter.IOnClickSongItem {
+public class PlaylistSongFragment extends BaseFragment implements SongSwipeDeleteAdapter.IOnClickListener {
 
     BroadcastReceiver receiverFromMusicService = new BroadcastReceiver() {
         @SuppressLint("ClickableViewAccessibility")
@@ -56,7 +55,7 @@ public class PlaylistSongFragment extends BaseFragment implements SongSpecialAda
             }
         }
     };
-    private SongSpecialAdapter adapter;
+    private SongSwipeDeleteAdapter adapter;
     private Toolbar toolbar;
 
     @Override
@@ -87,10 +86,7 @@ public class PlaylistSongFragment extends BaseFragment implements SongSpecialAda
         rcvListSong.setLayoutManager(layoutManager);
 
         // create adapter
-        adapter = new SongSpecialAdapter(this, song -> {
-            initToolbarTitle();
-            MusicServiceHelper.removeSong(song);
-        });
+        adapter = new SongSwipeDeleteAdapter(this);
 
         // create item touch helper
         ItemTouchHelper touchHelper = new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(ItemTouchHelper.UP | ItemTouchHelper.DOWN, 0) {
@@ -136,7 +132,7 @@ public class PlaylistSongFragment extends BaseFragment implements SongSpecialAda
         // set adapter
         rcvListSong.setAdapter(adapter);
 
-        adapter.setData(MusicService.isPlaying() ? MusicService.getCurrentSong() : null, MusicService.getCurrentListSong());
+        adapter.setData(MusicServiceHelper.isPlaying() ? MusicServiceHelper.getCurrentSong() : null, MusicServiceHelper.getCurrentListSong());
         initToolbarTitle();
     }
 
@@ -151,7 +147,14 @@ public class PlaylistSongFragment extends BaseFragment implements SongSpecialAda
     }
 
     @Override
-    public void onClickSongItem(SongModel song) {
+    public void onItemClicked(SongModel song, int position) {
         MusicServiceHelper.playSong(song);
+    }
+
+    @Override
+    public void onDeleteClicked(SongModel song, int position) {
+        initToolbarTitle();
+        MusicServiceHelper.removeSong(song);
+        adapter.notifyItemRemoved(position);
     }
 }

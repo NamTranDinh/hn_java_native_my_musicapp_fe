@@ -36,7 +36,7 @@ import com.aptech.mymusic.domain.entity.SongModel;
 import com.aptech.mymusic.domain.entity.TopicModel;
 import com.aptech.mymusic.presentation.view.common.TextThumbSeekBar;
 import com.aptech.mymusic.presentation.view.fragment.musicplayer.MainPagerFragment;
-import com.aptech.mymusic.presentation.view.service.MusicService;
+import com.aptech.mymusic.presentation.view.service.MusicDelegate;
 import com.aptech.mymusic.presentation.view.service.MusicServiceHelper;
 import com.aptech.mymusic.utils.BitmapUtils;
 import com.aptech.mymusic.utils.GlideUtils;
@@ -85,7 +85,7 @@ public class PlayMusicActivity extends BaseActivity {
         setContentView(R.layout.activity_play_music);
         LocalBroadcastManager.getInstance(this).registerReceiver(receiverFromMusicService, new IntentFilter(ACTION_UPDATE_VIEW));
         initUi();
-        initData(MusicService.getCurrentSong(), MusicService.isPlaying());
+        initData(MusicServiceHelper.getCurrentSong(), MusicServiceHelper.isPlaying());
         replaceFragment(new MainPagerFragment());
     }
 
@@ -129,7 +129,7 @@ public class PlayMusicActivity extends BaseActivity {
         imgShuffle.setOnClickListener(view -> MusicServiceHelper.sendAction(SHUFFLE_SONG));
         imgRepeat.setOnClickListener(view -> MusicServiceHelper.sendAction(REPEAT_SONG));
         imgPlayPause.setOnClickListener(view -> {
-            if (MusicService.isPlaying()) {
+            if (MusicServiceHelper.isPlaying()) {
                 MusicServiceHelper.sendAction(PAUSE_SONG);
             } else {
                 MusicServiceHelper.sendAction(PLAY_SONG);
@@ -158,7 +158,11 @@ public class PlayMusicActivity extends BaseActivity {
     }
 
     private void initMode() {
-        switch (DataInjection.provideMusicPreference().getLastMode()) {
+        MusicDelegate.Mode mode = MusicServiceHelper.getCurrentMode();
+        if (mode == null) {
+            mode = DataInjection.provideMusicPreference().getLastMode();
+        }
+        switch (mode) {
             case NORMAL:
                 imgShuffle.setSelected(false);
                 imgRepeat.setSelected(false);
@@ -188,8 +192,8 @@ public class PlayMusicActivity extends BaseActivity {
 
     @SuppressLint("ClickableViewAccessibility")
     private void initSeekbar() {
-        mSeekBar.setProgress(MusicService.getCurrentPosition());
-        mSeekBar.setMax(MusicService.getDuration() == 0 ? 100 : MusicService.getDuration());
+        mSeekBar.setProgress(MusicServiceHelper.getCurrentPosition());
+        mSeekBar.setMax(MusicServiceHelper.getDuration() == 0 ? 100 : MusicServiceHelper.getDuration());
         mSeekBar.setOnTouchListener((view, motionEvent) -> {
             if (motionEvent.getAction() == MotionEvent.ACTION_UP) {
                 MusicServiceHelper.seekSong(mSeekBar.getProgress());
@@ -198,8 +202,8 @@ public class PlayMusicActivity extends BaseActivity {
         });
         if (seekBarUpdateRunnable == null) {
             seekBarUpdateRunnable = () -> {
-                if (MusicService.isPlaying()) {
-                    mSeekBar.setProgress(MusicService.getCurrentPosition());
+                if (MusicServiceHelper.isPlaying()) {
+                    mSeekBar.setProgress(MusicServiceHelper.getCurrentPosition());
                     mSeekBar.postDelayed(seekBarUpdateRunnable, 500);
                 }
             };

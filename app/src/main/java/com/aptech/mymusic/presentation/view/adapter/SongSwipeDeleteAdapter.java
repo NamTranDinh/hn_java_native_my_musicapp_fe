@@ -12,6 +12,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.airbnb.lottie.LottieAnimationView;
 import com.aptech.mymusic.R;
 import com.aptech.mymusic.domain.entity.SongModel;
 import com.aptech.mymusic.presentation.view.common.swipe.SwipeRevealLayout;
@@ -21,22 +22,17 @@ import com.aptech.mymusic.utils.GlideUtils;
 import java.lang.ref.WeakReference;
 import java.util.List;
 
-public class SongSpecialAdapter extends RecyclerView.Adapter<SongSpecialAdapter.SongViewHolder> {
+public class SongSwipeDeleteAdapter extends RecyclerView.Adapter<SongSwipeDeleteAdapter.SongViewHolder> {
 
     private final ViewBinderHelper mBinderHelper = new ViewBinderHelper();
-    private final IOnClickSongItem mIOnClickSongItem;
+    private final IOnClickListener mIOnClickListener;
     private SongModel mSong;
     private List<SongModel> mListSong;
-    private final IOnItemDelete mIOnItemDelete;
     private StartDragListener mDragListener;
 
-    public SongSpecialAdapter(IOnClickSongItem mIOnClickSongItem, IOnItemDelete mIOnItemDelete) {
-        this.mIOnClickSongItem = mIOnClickSongItem;
-        this.mIOnItemDelete = mIOnItemDelete;
-    }
 
-    public interface IOnClickSongItem {
-        void onClickSongItem(SongModel song);
+    public SongSwipeDeleteAdapter(IOnClickListener mIOnClickListener) {
+        this.mIOnClickListener = mIOnClickListener;
     }
 
     @SuppressLint("NotifyDataSetChanged")
@@ -44,10 +40,6 @@ public class SongSpecialAdapter extends RecyclerView.Adapter<SongSpecialAdapter.
         mSong = song;
         mListSong = songs;
         notifyDataSetChanged();
-    }
-
-    public interface StartDragListener {
-        void requestDrag(RecyclerView.ViewHolder viewHolder);
     }
 
     public void setSong(SongModel song) {
@@ -69,6 +61,7 @@ public class SongSpecialAdapter extends RecyclerView.Adapter<SongSpecialAdapter.
         if (song == null) {
             return;
         }
+        int holderPosition = holder.getAdapterPosition();
         String id = String.valueOf(song.getId());
         boolean isActive = song.equals(mSong);
 
@@ -77,25 +70,30 @@ public class SongSpecialAdapter extends RecyclerView.Adapter<SongSpecialAdapter.
         holder.rlItem.setSelected(isActive);
         if (isActive) {
             mBinderHelper.lockSwipe(id);
+            holder.lottieMusicWave.setVisibility(View.VISIBLE);
+            holder.lottieMusicWave.playAnimation();
         } else {
             mBinderHelper.unlockSwipe(id);
+            holder.lottieMusicWave.setVisibility(View.GONE);
+            holder.lottieMusicWave.pauseAnimation();
         }
+
         holder.tvSongName.setText(song.getName());
         holder.tvSingerName.setText(song.getSingerName());
         GlideUtils.load(song.getImageUrl(), holder.imgThumb.get());
 
-        if (mIOnClickSongItem != null) {
-            holder.rlItem.setOnClickListener(isActive ? null : (view -> mIOnClickSongItem.onClickSongItem(song)));
-        }
-        if (mIOnItemDelete != null) {
-            holder.imgDelete.setOnClickListener(view -> {
-                mListSong.remove(holder.getAdapterPosition());
-                notifyItemRemoved(holder.getAdapterPosition());
-                mIOnItemDelete.onItemDeleted(song);
-            });
-        }
+        holder.rlItem.setOnClickListener(view -> {
+            if (mIOnClickListener != null) {
+                mIOnClickListener.onItemClicked(song, holderPosition);
+            }
+        });
+        holder.btnDelete.setOnClickListener(view -> {
+            if (mIOnClickListener != null) {
+                mIOnClickListener.onDeleteClicked(song, holderPosition);
+            }
+        });
 
-        holder.imgMenu.setOnTouchListener((v, event) -> {
+        holder.btnMove.setOnTouchListener((v, event) -> {
             if (event.getAction() == MotionEvent.ACTION_DOWN) {
                 mDragListener.requestDrag(holder);
             }
@@ -110,10 +108,6 @@ public class SongSpecialAdapter extends RecyclerView.Adapter<SongSpecialAdapter.
         return new SongViewHolder(view);
     }
 
-    public interface IOnItemDelete {
-        void onItemDeleted(SongModel song);
-    }
-
     @Override
     public int getItemCount() {
         if (mListSong != null) {
@@ -122,12 +116,25 @@ public class SongSpecialAdapter extends RecyclerView.Adapter<SongSpecialAdapter.
         return 0;
     }
 
+    public interface IOnClickListener {
+        void onItemClicked(SongModel song, int position);
+
+        void onDeleteClicked(SongModel song, int position);
+
+    }
+
+
+    public interface StartDragListener {
+        void requestDrag(RecyclerView.ViewHolder viewHolder);
+    }
+
     public static class SongViewHolder extends RecyclerView.ViewHolder {
 
         SwipeRevealLayout swrLayout;
         RelativeLayout rlItem;
         WeakReference<ImageView> imgThumb;
-        ImageView imgMenu, imgDelete;
+        ImageView btnCheckBox, btnMove, btnDelete;
+        LottieAnimationView lottieMusicWave;
         TextView tvSongName, tvSingerName;
 
         public SongViewHolder(@NonNull View itemView) {
@@ -135,10 +142,13 @@ public class SongSpecialAdapter extends RecyclerView.Adapter<SongSpecialAdapter.
             swrLayout = itemView.findViewById(R.id.swr_layout);
             rlItem = itemView.findViewById(R.id.rl_item_song);
             imgThumb = new WeakReference<>(itemView.findViewById(R.id.img_thumb));
-            imgMenu = itemView.findViewById(R.id.img_menu_song);
-            imgDelete = itemView.findViewById(R.id.img_delete);
+            lottieMusicWave = itemView.findViewById(R.id.lottie_music_wave);
+            btnCheckBox = itemView.findViewById(R.id.btn_check_box);
+            btnMove = itemView.findViewById(R.id.btn_move_song);
+            btnDelete = itemView.findViewById(R.id.btn_delete);
             tvSongName = itemView.findViewById(R.id.tv_song_name);
             tvSingerName = itemView.findViewById(R.id.tv_singer_name);
         }
     }
+
 }

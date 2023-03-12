@@ -7,6 +7,7 @@
     <string name="content_desc_back">Back</string>
 
     <string name="menu_timer">Timer</string>
+    <string name="menu_delete">Delete</string>
 
     <string name="nav_home">Home</string>
     <string name="nav_playlist">Playlist</string>

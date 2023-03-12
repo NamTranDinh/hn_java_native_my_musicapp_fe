@@ -14,7 +14,7 @@
         android:layout_height="wrap_content"
         android:layout_alignParentStart="true"
         android:layout_marginStart="@dimen/space_view"
-        app:cardCornerRadius="6dp">
+        app:cardCornerRadius="8dp">
 
         <ImageView
             android:id="@+id/img_thumb"
@@ -64,7 +64,8 @@
         android:src="@drawable/ic_add_song"
         android:visibility="gone"
         app:tint="@color/white"
-        tools:ignore="ContentDescription" />
+        tools:ignore="ContentDescription"
+        tools:visibility="visible" />
 
     <ImageButton
         android:id="@+id/img_menu_song"

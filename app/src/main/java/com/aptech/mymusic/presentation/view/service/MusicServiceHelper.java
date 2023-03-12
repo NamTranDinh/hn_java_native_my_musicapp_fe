@@ -1,16 +1,11 @@
 package com.aptech.mymusic.presentation.view.service;
 
-import static com.aptech.mymusic.presentation.view.service.MusicDelegate.Action.ADD_SONG;
 import static com.aptech.mymusic.presentation.view.service.MusicDelegate.Action.PLAY_NEW_LIST_SONG;
 import static com.aptech.mymusic.presentation.view.service.MusicDelegate.Action.PLAY_NEW_SONG;
-import static com.aptech.mymusic.presentation.view.service.MusicDelegate.Action.REMOVE_SONG;
 import static com.aptech.mymusic.presentation.view.service.MusicDelegate.Action.SEEK_SONG;
-import static com.aptech.mymusic.presentation.view.service.MusicDelegate.Action.SWAP_SONG;
 import static com.aptech.mymusic.presentation.view.service.MusicDelegate.KEY_LIST_SONG_OBJECT;
 import static com.aptech.mymusic.presentation.view.service.MusicDelegate.KEY_MUSIC_ACTION;
-import static com.aptech.mymusic.presentation.view.service.MusicDelegate.KEY_POSITION_DRAG;
 import static com.aptech.mymusic.presentation.view.service.MusicDelegate.KEY_POSITION_NEW_SONG;
-import static com.aptech.mymusic.presentation.view.service.MusicDelegate.KEY_POSITION_TARGET;
 import static com.aptech.mymusic.presentation.view.service.MusicDelegate.KEY_SONG_OBJECT;
 import static com.aptech.mymusic.presentation.view.service.MusicDelegate.KEY_TIME_SEEK_SONG;
 
@@ -54,26 +49,40 @@ public class MusicServiceHelper {
         startService(bundle);
     }
 
+    public static boolean isPlaying() {
+        return MusicService.isPlaying();
+    }
+
+    public static int getDuration() {
+        return MusicService.getDuration();
+    }
+
+    public static int getCurrentPosition() {
+        return MusicService.getCurrentPosition();
+    }
+
+    public static MusicDelegate.Mode getCurrentMode() {
+        return MusicService.getCurrentMode();
+    }
+
+    public static SongModel getCurrentSong() {
+        return MusicService.getCurrentSong();
+    }
+
+    public static List<SongModel> getCurrentListSong() {
+        return MusicService.getCurrentListSong();
+    }
+
     public static void addSong(SongModel song) {
-        Bundle bundle = new Bundle();
-        bundle.putSerializable(KEY_MUSIC_ACTION, ADD_SONG);
-        bundle.putSerializable(KEY_SONG_OBJECT, song);
-        startService(bundle);
+        MusicService.addSong(song);
     }
 
     public static void removeSong(SongModel song) {
-        Bundle bundle = new Bundle();
-        bundle.putSerializable(KEY_MUSIC_ACTION, REMOVE_SONG);
-        bundle.putSerializable(KEY_SONG_OBJECT, song);
-        startService(bundle);
+        MusicService.removeSong(song);
     }
 
     public static void swapSong(int drag, int target) {
-        Bundle bundle = new Bundle();
-        bundle.putSerializable(KEY_MUSIC_ACTION, SWAP_SONG);
-        bundle.putInt(KEY_POSITION_DRAG, drag);
-        bundle.putInt(KEY_POSITION_TARGET, target);
-        startService(bundle);
+        MusicService.swapSong(drag, target);
     }
 
     private static void startService(Bundle bundle) {

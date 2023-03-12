@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:background="#333">
+    tools:background="#808080">
 
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/toolbar"
@@ -14,6 +14,7 @@
         android:layout_height="@dimen/custom_action_bar_size"
         android:background="@android:color/transparent"
         app:contentInsetStart="0dp"
+        app:menu="@menu/menu_play_music_playlist"
         app:title="@string/text_play_music_playlist_n" />
 
     <androidx.recyclerview.widget.RecyclerView

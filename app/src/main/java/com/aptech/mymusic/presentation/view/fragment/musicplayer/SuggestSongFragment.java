@@ -26,7 +26,6 @@ import com.aptech.mymusic.domain.entity.SongModel;
 import com.aptech.mymusic.presentation.presenter.Callback;
 import com.aptech.mymusic.presentation.presenter.PlayMusicPresenter;
 import com.aptech.mymusic.presentation.view.adapter.SongAdapter;
-import com.aptech.mymusic.presentation.view.service.MusicService;
 import com.aptech.mymusic.presentation.view.service.MusicServiceHelper;
 import com.mct.components.baseui.BaseFragment;
 import com.mct.components.utils.ToastUtils;
@@ -48,7 +47,7 @@ public class SuggestSongFragment extends BaseFragment implements Callback.GetSug
             if (bundle != null) {
                 SongModel song = (SongModel) bundle.getSerializable(KEY_CURRENT_SONG);
                 if (song != null && !song.getId().equals(mSongId)) {
-                    initData(song, MusicService.getCurrentListSong());
+                    initData(song, MusicServiceHelper.getCurrentListSong());
                 }
             }
         }
@@ -73,12 +72,12 @@ public class SuggestSongFragment extends BaseFragment implements Callback.GetSug
         mSwipeRefreshLayout = view.findViewById(R.id.srl_refresh);
         mRcvListSuggestSong = view.findViewById(R.id.rcv_list_suggest_song);
         mRcvListSuggestSong.setLayoutManager(new LinearLayoutManager(requireContext()));
-        if (MusicService.getCurrentSong() != null) {
-            initData(MusicService.getCurrentSong(), MusicService.getCurrentListSong());
+        if (MusicServiceHelper.getCurrentSong() != null) {
+            initData(MusicServiceHelper.getCurrentSong(), MusicServiceHelper.getCurrentListSong());
         }
         mSwipeRefreshLayout.setOnRefreshListener(() -> mSwipeRefreshLayout.postDelayed(() -> {
-            if (MusicService.getCurrentSong() != null) {
-                initData(MusicService.getCurrentSong(), MusicService.getCurrentListSong());
+            if (MusicServiceHelper.getCurrentSong() != null) {
+                initData(MusicServiceHelper.getCurrentSong(), MusicServiceHelper.getCurrentListSong());
             }
         }, 600));
     }

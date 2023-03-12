@@ -24,11 +24,9 @@ import androidx.annotation.NonNull;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import com.aptech.mymusic.R;
-import com.aptech.mymusic.di.DataInjection;
 import com.aptech.mymusic.domain.entity.SongModel;
 import com.aptech.mymusic.presentation.view.fragment.MainFragment;
 import com.aptech.mymusic.presentation.view.service.MusicDelegate;
-import com.aptech.mymusic.presentation.view.service.MusicService;
 import com.aptech.mymusic.presentation.view.service.MusicServiceHelper;
 import com.aptech.mymusic.utils.GlideUtils;
 import com.mct.components.baseui.BaseActivity;
@@ -84,19 +82,19 @@ public class MainActivity extends BaseActivity {
         imgLikes = findViewById(R.id.img_likes);
         imgPlayPause = findViewById(R.id.img_play_pause);
         imgPlayPause.setOnClickListener(view -> {
-            if (MusicService.isPlaying()) {
+            if (MusicServiceHelper.isPlaying()) {
                 MusicServiceHelper.sendAction(PAUSE_SONG);
             } else {
                 MusicServiceHelper.sendAction(PLAY_SONG);
             }
         });
         findViewById(R.id.control_layout).setOnClickListener(v -> {
-            if (DataInjection.provideMusicPreference().getLastSong() != null) {
+            if (MusicServiceHelper.getCurrentSong() != null) {
                 startActivity(new Intent(this, PlayMusicActivity.class));
             }
         });
         findViewById(R.id.img_next).setOnClickListener(v -> {
-            if (!DataInjection.provideMusicPreference().getLastListSong().isEmpty()) {
+            if (MusicServiceHelper.getCurrentListSong() != null) {
                 MusicServiceHelper.sendAction(NEXT_SONG);
             }
         });
@@ -120,11 +118,11 @@ public class MainActivity extends BaseActivity {
     }
 
     private void initSeekbar() {
-        mSeekBar.setMax(MusicService.getDuration());
+        mSeekBar.setMax(MusicServiceHelper.getDuration());
         if (seekBarUpdateRunnable == null) {
             seekBarUpdateRunnable = () -> {
-                if (MusicService.isPlaying()) {
-                    mSeekBar.setProgress(MusicService.getCurrentPosition());
+                if (MusicServiceHelper.isPlaying()) {
+                    mSeekBar.setProgress(MusicServiceHelper.getCurrentPosition());
                     mSeekBar.postDelayed(seekBarUpdateRunnable, 500);
                 }
             };

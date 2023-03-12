@@ -22,7 +22,7 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import com.aptech.mymusic.R;
 import com.aptech.mymusic.domain.entity.SongModel;
-import com.aptech.mymusic.presentation.view.service.MusicService;
+import com.aptech.mymusic.presentation.view.service.MusicServiceHelper;
 import com.aptech.mymusic.utils.GlideUtils;
 import com.mct.components.baseui.BaseActivity;
 import com.mct.components.baseui.BaseFragment;
@@ -67,7 +67,7 @@ public class MainSongFragment extends BaseFragment {
         view.findViewById(R.id.tv_playlist).setOnClickListener(v ->
                 replaceFragment(new PlaylistSongFragment(), true, BaseActivity.Anim.TRANSIT_FADE)
         );
-        initData(MusicService.getCurrentSong(), MusicService.isPlaying());
+        initData(MusicServiceHelper.getCurrentSong(), MusicServiceHelper.isPlaying());
     }
 
     private void initData(SongModel song, boolean isPlaying) {
