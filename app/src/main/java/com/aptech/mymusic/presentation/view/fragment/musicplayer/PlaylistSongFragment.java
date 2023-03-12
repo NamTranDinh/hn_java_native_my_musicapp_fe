@@ -79,11 +79,13 @@ public class PlaylistSongFragment extends BaseFragment implements BaseActivity.O
                     }
 
                     @Override
+                    @SuppressLint("NotifyDataSetChanged")
                     public void onClickOk(BaseOverlayDialog dialog) {
                         dialog.dismiss();
-                        MusicServiceHelper.setListSong(adapter.removeAllSelectedSong());
-                        onClickBack();
+                        MusicServiceHelper.removeSongs(adapter.getSelectedSongs());
+                        adapter.notifyDataSetChanged();
                         showToast(String.format("Deleted %s songs", count), ToastUtils.SUCCESS, true);
+                        onClickBack();
                     }
                 }).create(null);
                 return true;

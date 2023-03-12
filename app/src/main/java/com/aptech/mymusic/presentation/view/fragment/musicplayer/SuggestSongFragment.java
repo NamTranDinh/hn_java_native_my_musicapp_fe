@@ -43,7 +43,6 @@ public class SuggestSongFragment extends BaseFragment implements Callback.GetSug
         public void onReceive(Context context, @NonNull Intent intent) {
             SongModel song = MusicServiceHelper.getCurrentSong();
             if (song != null && !song.getId().equals(mSongId)) {
-                mSongId = song.getId();
                 initData();
             }
         }
@@ -75,6 +74,7 @@ public class SuggestSongFragment extends BaseFragment implements Callback.GetSug
     public void initData() {
         SongModel song = MusicServiceHelper.getCurrentSong();
         List<SongModel> songs = MusicServiceHelper.getCurrentListSong();
+        mSongId = song.getId();
         mPresenter.requestSuggestSong(song, songs, new Random().nextInt(8) + 3, this);
     }
 

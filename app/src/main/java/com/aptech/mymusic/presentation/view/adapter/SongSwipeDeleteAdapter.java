@@ -21,6 +21,7 @@ import com.aptech.mymusic.utils.GlideUtils;
 
 import java.lang.ref.WeakReference;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class SongSwipeDeleteAdapter extends RecyclerView.Adapter<SongSwipeDeleteAdapter.SongViewHolder> {
 
@@ -69,11 +70,8 @@ public class SongSwipeDeleteAdapter extends RecyclerView.Adapter<SongSwipeDelete
         return (int) mListSong.stream().filter(SongModel::isSelected).count();
     }
 
-    @SuppressLint("NotifyDataSetChanged")
-    public List<SongModel> removeAllSelectedSong() {
-        mListSong.removeIf(SongModel::isSelected);
-        notifyDataSetChanged();
-        return mListSong;
+    public List<SongModel> getSelectedSongs() {
+        return mListSong.stream().filter(SongModel::isSelected).collect(Collectors.toList());
     }
 
     @NonNull
