@@ -116,9 +116,7 @@ public class MusicService extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
-        if (sMusicPlayback == null) {
-            sMusicPlayback = new MusicPlayback(this);
-        }
+        sMusicPlayback = new MusicPlayback(this);
     }
 
     @Nullable
@@ -329,8 +327,9 @@ public class MusicService extends Service {
             if ((s = bundle.getSerializable(KEY_MUSIC_ACTION)) instanceof Action) {
                 handleAction((Action) s, bundle);
             }
-            return START_NOT_STICKY;
+            return START_STICKY;
         }
+
         private AudioFocusRequest mAudioFocusRequest;
         // @formatter:on
 
@@ -349,6 +348,7 @@ public class MusicService extends Service {
                 LocalBroadcastManager.getInstance(mService.get()).sendBroadcast(intent);
             }
         }
+
         private AudioManager mAudioManager;
 
         private void playSongFromBundle(@NonNull Bundle bundle) {
@@ -357,6 +357,7 @@ public class MusicService extends Service {
                 playSong(addSong(song, 0));
             }
         }
+
         private boolean mHasAudioFocus;
 
         private void stopService() {
@@ -405,6 +406,7 @@ public class MusicService extends Service {
                     break;
             }
         }
+        // @formatter:on
 
         private void updateView() {
             if (mService != null && mService.get() != null) {
@@ -475,15 +477,15 @@ public class MusicService extends Service {
                     mMediaPlayer.setDataSource(mSong.getAudioUrl());
                     mMediaPlayer.setOnCompletionListener(null);
                     mMediaPlayer.setOnPreparedListener(mediaPlayer -> {
-                        Log.e(TAG, "PrepareAsync done : " + mSong.getName());
+                        Log.i(TAG, "PrepareAsync done : " + mSong.getName());
                         mediaPlayer.setOnCompletionListener(mp -> nextSong(true));
                         setMediaState(MediaState.PREPARED);
                         playSong();
                     });
-                    Log.e(TAG, "Start prepareAsync: " + mSong.getName());
+                    Log.i(TAG, "Start prepareAsync: " + mSong.getName());
                     mMediaPlayer.prepareAsync();
                 } catch (IOException e) {
-                    e.printStackTrace();
+                    Log.e(TAG, "PrepareAsync error: ", e);
                 }
                 mMusicPreference.setLastSong(mSong);
                 updateView();
@@ -595,21 +597,23 @@ public class MusicService extends Service {
             if (!mHasAudioFocus) {
                 mAudioManager = (AudioManager) mService.get().getSystemService(Context.AUDIO_SERVICE);
                 mAudiofocusListener = focusChange -> {
-                    if (focusChange == AudioManager.AUDIOFOCUS_LOSS_TRANSIENT) {
-                        // Pause playback
-                        Log.e(TAG, "Audio Focus Change: AUDIOFOCUS_LOSS_TRANSIENT");
-                        pauseSong();
-                    } else if (focusChange == AudioManager.AUDIOFOCUS_GAIN) {
-                        // Resume playback
-                        Log.e(TAG, "Audio Focus Change: AUDIOFOCUS_GAIN");
-                        playSong();
-                    } else if (focusChange == AudioManager.AUDIOFOCUS_LOSS) {
-                        // Stop playback
-                        Log.e(TAG, "Audio Focus Change: AUDIOFOCUS_LOSS");
-                        abandonAudioFocus();
-                        pauseSong();
-                    } else {
-                        Log.e(TAG, "Audio Focus Change: " + focusChange);
+                    switch (focusChange) {
+                        case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT:
+                            // Pause playback
+                            Log.d(TAG, "AudioFocus Changed: AUDIOFOCUS_LOSS_TRANSIENT");
+                            pauseSong();
+                            break;
+                        case AudioManager.AUDIOFOCUS_GAIN:
+                            // Resume playback
+                            Log.d(TAG, "AudioFocus Changed: AUDIOFOCUS_GAIN");
+                            playSong();
+                            break;
+                        case AudioManager.AUDIOFOCUS_LOSS:
+                            // Stop playback
+                            Log.d(TAG, "AudioFocus Changed: AUDIOFOCUS_LOSS");
+                            abandonAudioFocus();
+                            pauseSong();
+                            break;
                     }
                 };
                 int result;
@@ -629,6 +633,7 @@ public class MusicService extends Service {
                     mHasAudioFocus = true;
                 }
             }
+            Log.d(TAG, "AudioFocus Request: Has focus is " + mHasAudioFocus);
             return mHasAudioFocus;
         }
 
@@ -665,7 +670,7 @@ public class MusicService extends Service {
             if (mMediaState == state) {
                 return;
             }
-            Log.e(TAG, "Media State change: " + mMediaState + " --> " + state);
+            Log.w(TAG, "Media State change: " + mMediaState + " --> " + state);
             switch (mMediaState) {
                 case IDLE:
                     if (state == MediaState.PREPARED || state == MediaState.RELEASE) {

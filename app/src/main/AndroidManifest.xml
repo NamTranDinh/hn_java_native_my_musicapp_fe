@@ -47,6 +47,7 @@
             android:name=".presentation.view.service.MusicService"
             android:enabled="true"
             android:exported="true"
+            android:foregroundServiceType="mediaPlayback"
             android:permission="android.permission.FOREGROUND_SERVICE">
 
             <intent-filter>
