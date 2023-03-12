@@ -63,7 +63,7 @@ public class HomePageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
             rowCardViewHolder.title.setText(rowCardModel.getTitle());
 
-            CardAdapter adapter = new CardAdapter(context, rowCardModel.getCardModelList(), true, mICardListener);
+            CardAdapter adapter = new CardAdapter(rowCardModel.getCardModelList(), true, mICardListener);
             rowCardViewHolder.rcvRandCard.setAdapter(adapter);
             LinearLayoutManager layoutManager = new LinearLayoutManager(context, RecyclerView.HORIZONTAL, false);
             rowCardViewHolder.rcvRandCard.setLayoutManager(layoutManager);

@@ -73,7 +73,6 @@ public class BannerFragment extends BaseFragment implements Callback.GetDataBann
     @SuppressLint("ClickableViewAccessibility")
     private void initUi(@NonNull View view) {
         mViewPager = view.findViewById(R.id.banner_view_pager);
-        mViewPager.setAdapter(new BannerAdapter(getActivity(), null));
         mViewPager.setOnTouchListener((v, motionEvent) -> {
             if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
                 v.getParent().requestDisallowInterceptTouchEvent(true);
@@ -111,7 +110,7 @@ public class BannerFragment extends BaseFragment implements Callback.GetDataBann
 
     @Override
     public void getDataBannerSuccess(List<AdsModel> data) {
-        mViewPager.setAdapter(new BannerAdapter(getActivity(), data));
+        mViewPager.setAdapter(new BannerAdapter(data));
         mCircleIndicator.setViewPager(mViewPager);
         autoRun();
     }

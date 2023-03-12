@@ -1,6 +1,5 @@
 package com.aptech.mymusic.presentation.view.adapter;
 
-import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -24,13 +23,11 @@ import java.util.List;
 
 public class CardAdapter extends RecyclerView.Adapter<CardAdapter.CardItemViewHolder> {
 
-    private final Context context;
     private final List<CardModel> cardModelList;
     private final boolean isLinearLayoutManager;
     private final ICardListener mICardListener;
 
-    public CardAdapter(Context context, List<CardModel> cardModelList, boolean isLinearLayoutManager, ICardListener mICardListener) {
-        this.context = context;
+    public CardAdapter(List<CardModel> cardModelList, boolean isLinearLayoutManager, ICardListener mICardListener) {
         this.cardModelList = cardModelList;
         this.isLinearLayoutManager = isLinearLayoutManager;
         this.mICardListener = mICardListener;
@@ -50,7 +47,7 @@ public class CardAdapter extends RecyclerView.Adapter<CardAdapter.CardItemViewHo
             return;
         }
         ViewGroup.MarginLayoutParams layoutParams = (ViewGroup.MarginLayoutParams) holder.itemCard.getLayoutParams();
-        int margin = (int) context.getResources().getDimension(R.dimen.space_view);
+        int margin = (int) holder.itemView.getResources().getDimension(R.dimen.space_view);
 
         if (isLinearLayoutManager) {
             if (position == 0) {

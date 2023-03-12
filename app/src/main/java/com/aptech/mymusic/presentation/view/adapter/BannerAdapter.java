@@ -1,6 +1,5 @@
 package com.aptech.mymusic.presentation.view.adapter;
 
-import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,11 +16,9 @@ import com.aptech.mymusic.utils.GlideUtils;
 import java.util.List;
 
 public class BannerAdapter extends PagerAdapter {
-    private final Context context;
     private final List<AdsModel> mAdsModelList;
 
-    public BannerAdapter(Context context, List<AdsModel> mAdsModelList) {
-        this.context = context;
+    public BannerAdapter(List<AdsModel> mAdsModelList) {
         this.mAdsModelList = mAdsModelList;
     }
 
@@ -41,7 +38,7 @@ public class BannerAdapter extends PagerAdapter {
     @NonNull
     @Override
     public Object instantiateItem(@NonNull ViewGroup container, int position) {
-        View view = LayoutInflater.from(context).inflate(R.layout.item_banner, container, false);
+        View view = LayoutInflater.from(container.getContext()).inflate(R.layout.item_banner, container, false);
 
         ImageView imgBackground = view.findViewById(R.id.img_bg_banner);
         ImageView imgSongIcon = view.findViewById(R.id.img_ic_banner);

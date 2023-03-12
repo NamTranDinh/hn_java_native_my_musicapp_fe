@@ -40,7 +40,7 @@ public class PlaylistFragment extends BaseTabFragment implements Callback.GetDat
     }
 
     private void setAdapter(List<CardModel> cardModelList) {
-        CardAdapter adapter = new CardAdapter(getContext(), cardModelList, false, this);
+        CardAdapter adapter = new CardAdapter(cardModelList, false, this);
         rcvCard.setAdapter(adapter);
 
         GridLayoutManager manager = new GridLayoutManager(getContext(), MainActivity.TWO_ITEM_CARD);

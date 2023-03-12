@@ -52,7 +52,7 @@ public class AlbumFragment extends BaseTabFragment implements Callback.GetDataAl
     }
 
     private void setData(List<AlbumModel> list) {
-        CardAdapter adapter = new CardAdapter(getContext(), new ArrayList<>(list), false, this);
+        CardAdapter adapter = new CardAdapter(new ArrayList<>(list), false, this);
         rcvCard.setAdapter(adapter);
 
         GridLayoutManager manager = new GridLayoutManager(getContext(), MainActivity.TWO_ITEM_CARD);
