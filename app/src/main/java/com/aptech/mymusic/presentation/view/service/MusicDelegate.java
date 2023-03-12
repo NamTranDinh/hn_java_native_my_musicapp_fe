@@ -1,5 +1,12 @@
 package com.aptech.mymusic.presentation.view.service;
 
+import android.os.Handler;
+import android.os.Looper;
+import android.os.Message;
+import android.os.SystemClock;
+
+import androidx.annotation.NonNull;
+
 import com.aptech.mymusic.di.DataInjection;
 import com.aptech.mymusic.domain.entity.SongModel;
 import com.aptech.mymusic.utils.MusicPreference;
@@ -127,6 +134,53 @@ public class MusicDelegate {
 
         private int validateSongIndex(int index, int size) {
             return index >= 0 && index <= size ? index : size;
+        }
+
+    }
+
+    public static class MediaTimer {
+
+        private static final int MSG = 1;
+        private static MediaTimer instance;
+        private boolean mCancelled;
+        private Action mAction;
+        private final Handler mHandler = new Handler(Looper.getMainLooper()) {
+            @Override
+            public void handleMessage(@NonNull Message msg) {
+                mCancelled = true;
+                MusicServiceHelper.sendAction(mAction);
+            }
+        };
+        private long mStopTimeInFuture;
+        private MediaTimer() {
+        }
+
+        public static MediaTimer getInstance() {
+            if (instance == null) {
+                instance = new MediaTimer();
+            }
+            return instance;
+        }
+
+        public void startTimer(Action action, long millisInFuture) {
+            mCancelled = false;
+            mAction = action;
+            mStopTimeInFuture = SystemClock.elapsedRealtime() + millisInFuture;
+            mHandler.removeMessages(MSG);
+            mHandler.sendMessageDelayed(mHandler.obtainMessage(MSG), millisInFuture);
+        }
+
+        public void cancelTimer() {
+            mCancelled = true;
+            mHandler.removeMessages(MSG);
+        }
+
+        public boolean isCancelled() {
+            return mCancelled;
+        }
+
+        public long getTimeRemaining() {
+            return mStopTimeInFuture - SystemClock.elapsedRealtime();
         }
 
     }
