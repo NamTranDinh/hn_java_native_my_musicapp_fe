@@ -8,23 +8,24 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class MusicBundle {
+public class MediaBundle {
 
-    private static MusicBundle instance;
+    private static MediaBundle instance;
     MusicDelegate.Mode mMode;
     SongModel mSong;
     List<SongModel> mListSongOrigin;
     List<SongModel> mListSongTemp;
-    private MusicBundle() {
+
+    private MediaBundle() {
         this.mMode = getPreference().getLastMode();
         this.mSong = getPreference().getLastSong();
         this.mListSongOrigin = getPreference().getLastListSong();
         this.mListSongTemp = new ArrayList<>(this.mListSongOrigin);
     }
 
-    public static MusicBundle getInstance() {
+    static MediaBundle getInstance() {
         if (instance == null) {
-            instance = new MusicBundle();
+            instance = new MediaBundle();
         }
         return instance;
     }

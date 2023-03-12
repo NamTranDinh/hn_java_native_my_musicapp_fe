@@ -62,31 +62,31 @@ public class MusicServiceHelper {
     }
 
     public static MusicDelegate.Mode getCurrentMode() {
-        return MusicBundle.getInstance().mMode;
+        return MediaBundle.getInstance().mMode;
     }
 
     public static SongModel getCurrentSong() {
-        return MusicBundle.getInstance().mSong;
+        return MediaBundle.getInstance().mSong;
     }
 
     public static List<SongModel> getCurrentListSong() {
-        return MusicBundle.getInstance().mListSongTemp;
+        return MediaBundle.getInstance().mListSongTemp;
     }
 
     public static void addSong(SongModel song) {
-        MusicBundle.getInstance().addSong(song, -1);
+        MediaBundle.getInstance().addSong(song, -1);
     }
 
     public static void removeSong(SongModel song) {
-        MusicBundle.getInstance().removeSong(song);
+        MediaBundle.getInstance().removeSong(song);
     }
 
     public static void removeSongs(List<SongModel> songs) {
-        MusicBundle.getInstance().removeSongs(songs);
+        MediaBundle.getInstance().removeSongs(songs);
     }
 
     public static void swapSong(int drag, int target) {
-        MusicBundle.getInstance().swapSong(drag, target);
+        MediaBundle.getInstance().swapSong(drag, target);
     }
 
     private static void startService(Bundle bundle) {

@@ -290,20 +290,20 @@ public class MusicService extends Service {
 
         private static final String TAG = "MusicPlayback";
         private WeakReference<MusicService> mService;
+        private Toast mToast;
 
-        private MusicBundle mb;
-
+        private MediaBundle mb;
         private MediaState mMediaState;
         private MediaPlayer mMediaPlayer;
-        private Toast mToast;
-        private OnAudioFocusChangeListener mAudiofocusListener;
-        private AudioFocusRequest mAudioFocusRequest;
-        private AudioManager mAudioManager;
+
         private boolean mHasAudioFocus;
+        private AudioManager mAudioManager;
+        private AudioFocusRequest mAudioFocusRequest;
+        private OnAudioFocusChangeListener mAudiofocusListener;
 
         private MusicPlayback(MusicService mService) {
             this.mService = new WeakReference<>(mService);
-            this.mb = MusicBundle.getInstance();
+            this.mb = MediaBundle.getInstance();
             this.mMediaState = MediaState.IDLE;
             this.mMediaPlayer = new MediaPlayer();
         }
