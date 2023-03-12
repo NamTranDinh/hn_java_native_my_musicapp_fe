@@ -3,7 +3,6 @@ package com.aptech.mymusic.presentation.view.activity;
 import static com.aptech.mymusic.presentation.view.service.MusicDelegate.Action.NEXT_SONG;
 import static com.aptech.mymusic.presentation.view.service.MusicDelegate.Action.PAUSE_SONG;
 import static com.aptech.mymusic.presentation.view.service.MusicDelegate.Action.PLAY_SONG;
-import static com.aptech.mymusic.presentation.view.service.MusicDelegate.Action.UPDATE_VIEW;
 
 import android.annotation.SuppressLint;
 import android.content.BroadcastReceiver;
@@ -53,11 +52,11 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        LocalBroadcastManager.getInstance(this).registerReceiver(receiverFromMusicService, new IntentFilter(MusicDelegate.ACTION_UPDATE_VIEW));
         setContentView(R.layout.activity_main);
         replaceFragment(new MainFragment());
         initUi();
-        LocalBroadcastManager.getInstance(this).registerReceiver(receiverFromMusicService, new IntentFilter(MusicDelegate.ACTION_UPDATE_VIEW));
-        MusicServiceHelper.sendAction(UPDATE_VIEW);
+        initData();
     }
 
     @Override
