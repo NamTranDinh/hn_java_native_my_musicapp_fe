@@ -187,8 +187,8 @@ public class PlayMusicActivity extends BaseActivity {
 
     @SuppressLint("ClickableViewAccessibility")
     private void initSeekbar() {
-        mSeekBar.setProgress(MusicServiceHelper.getCurrentPosition());
         mSeekBar.setMax(MusicServiceHelper.getDuration() == 0 ? 100 : MusicServiceHelper.getDuration());
+        mSeekBar.setProgress(MusicServiceHelper.getCurrentPosition());
         mSeekBar.setOnTouchListener((view, motionEvent) -> {
             if (motionEvent.getAction() == MotionEvent.ACTION_UP) {
                 MusicServiceHelper.seekSong(mSeekBar.getProgress());

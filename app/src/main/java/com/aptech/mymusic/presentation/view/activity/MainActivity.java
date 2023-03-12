@@ -61,6 +61,19 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
     }
 
     @Override
+    protected void onResume() {
+        super.onResume();
+        seekBar.removeCallbacks(seekBarUpdateRunnable);
+        seekBar.post(seekBarUpdateRunnable);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        seekBar.removeCallbacks(seekBarUpdateRunnable);
+    }
+
+    @Override
     protected void onDestroy() {
         super.onDestroy();
         LocalBroadcastManager.getInstance(this).unregisterReceiver(receiverFromMusicService);
@@ -110,6 +123,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
 
     private void initSeekbar() {
         seekBar.setMax(MusicServiceHelper.getDuration());
+        seekBar.setProgress(MusicServiceHelper.getCurrentPosition());
         if (seekBarUpdateRunnable == null) {
             seekBarUpdateRunnable = () -> {
                 if (MusicServiceHelper.isPlaying()) {
