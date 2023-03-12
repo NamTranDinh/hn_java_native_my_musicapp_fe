@@ -166,7 +166,6 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
                 MusicServiceHelper.sendAction(NEXT_SONG);
                 break;
             case R.id.control_layout:
-                MusicServiceHelper.sendAction(PLAY_SONG);
                 startActivity(new Intent(this, PlayMusicActivity.class));
                 break;
         }
