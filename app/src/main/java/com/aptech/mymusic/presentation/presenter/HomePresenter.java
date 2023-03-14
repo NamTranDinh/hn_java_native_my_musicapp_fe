@@ -87,6 +87,36 @@ public class HomePresenter extends BasePresenter {
         });
     }
 
+    public void getDataAllCategory(int idTopic, Callback.GetDataAllCategoryCallBack callBack) {
+        DataInjection.provideRepository().getCategoryRepository().getAllCategoryInTopic(idTopic).enqueue(new retrofit2.Callback<List<CategoryModel>>() {
+            @Override
+            public void onResponse(@NonNull Call<List<CategoryModel>> call, @NonNull Response<List<CategoryModel>> response) {
+                if (response.body() != null) {
+                    callBack.getDataAllCategorySuccess(response.body());
+                }
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<List<CategoryModel>> call, @NonNull Throwable t) {
+                callBack.getDataAllCategoryFailure(t.getMessage());
+            }
+        });
+    }
+
+    public void getDataAllSong(String type, long id, Callback.GetDataAllSongCallBack callback) {
+        DataInjection.provideRepository().getSongRepository().getAllSongFrom(type, id).enqueue(new retrofit2.Callback<List<SongModel>>() {
+            @Override
+            public void onResponse(@NonNull Call<List<SongModel>> call, @NonNull Response<List<SongModel>> response) {
+                callback.getDataSongSuccess(response.body());
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<List<SongModel>> call, @NonNull Throwable t) {
+                callback.getDataSongFailure(t.getMessage());
+            }
+        });
+    }
+
     public void getDataNewReleasedMusic(Callback.GetDataNewReleaseMusicCallBack callBack) {
         DataInjection.provideRepository().getSongRepository().getNewlyReleasedMusic().enqueue(new retrofit2.Callback<List<SongModel>>() {
             @Override

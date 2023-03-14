@@ -4,6 +4,8 @@ import java.io.Serializable;
 
 public interface CardModel extends Serializable {
 
+    Integer getId();
+
     String getName();
 
     String getImageUrl();

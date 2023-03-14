@@ -106,17 +106,13 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
             imgPlayPause.setImageResource(R.drawable.ic_play);
             stopAnim();
         }
+        dispatchShowControlLayout(true);
         if (song != null) {
-            controlLayout.setVisibility(View.VISIBLE);
-            seekBar.setVisibility(View.VISIBLE);
             tvSongName.setText(song.getName());
             tvSingerName.setText(song.getSingerName());
             tvSingerName.setVisibility(View.VISIBLE);
             GlideUtils.load(song.getImageUrl(), imgThumb);
             initSeekbar();
-        } else {
-            controlLayout.setVisibility(View.GONE);
-            seekBar.setVisibility(View.GONE);
         }
     }
 
@@ -182,6 +178,19 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
                 startActivity(new Intent(this, PlayMusicActivity.class));
                 break;
         }
+    }
+
+    public void dispatchShowControlLayout(boolean isShow) {
+        SongModel song = MusicServiceHelper.getCurrentSong();
+        if (song != null) {
+            if (isShow) {
+                controlLayout.setVisibility(View.VISIBLE);
+                seekBar.setVisibility(View.VISIBLE);
+                return;
+            }
+        }
+        controlLayout.setVisibility(View.GONE);
+        seekBar.setVisibility(View.GONE);
     }
 
     @Override

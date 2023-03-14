@@ -50,4 +50,16 @@ public abstract class Callback {
     public interface GetSuggestSongCallback {
         void onGot(List<SongModel> data);
     }
+
+    public interface GetDataAllSongCallBack {
+        void getDataSongSuccess(List<SongModel> data);
+
+        void getDataSongFailure(String error);
+    }
+
+    public interface GetDataAllCategoryCallBack {
+        void getDataAllCategorySuccess(List<CategoryModel> data);
+
+        void getDataAllCategoryFailure(String error);
+    }
 }
