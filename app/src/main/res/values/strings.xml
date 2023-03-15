@@ -43,6 +43,8 @@
     <string name="text_play_music_repeat">Repeat</string>
     <string name="text_play_music_playlist_n">Playlist (%d)</string>
     <string name="text_play_music_selected_n">Selected (%d)</string>
+
     <string name="dialog_btn_cancel">Cancel</string>
     <string name="dialog_btn_ok">OK</string>
+    <string name="dialog_title_timer">Timer</string>
 </resources>

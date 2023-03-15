@@ -6,6 +6,7 @@ import android.os.Message;
 import android.os.SystemClock;
 
 import androidx.annotation.NonNull;
+import androidx.core.util.Pair;
 
 import com.aptech.mymusic.di.DataInjection;
 import com.aptech.mymusic.domain.entity.SongModel;
@@ -142,7 +143,7 @@ public class MusicDelegate {
 
         private static final int MSG = 1;
         private static MediaTimer instance;
-        private boolean mCancelled;
+        private boolean mCancelled = true;
         private Action mAction;
         private final Handler mHandler = new Handler(Looper.getMainLooper()) {
             @Override
@@ -152,10 +153,11 @@ public class MusicDelegate {
             }
         };
         private long mStopTimeInFuture;
+
         private MediaTimer() {
         }
 
-        public static MediaTimer getInstance() {
+        static MediaTimer getInstance() {
             if (instance == null) {
                 instance = new MediaTimer();
             }
@@ -180,7 +182,21 @@ public class MusicDelegate {
         }
 
         public long getTimeRemaining() {
+            if (isCancelled()) {
+                return 0;
+            }
             return mStopTimeInFuture - SystemClock.elapsedRealtime();
+        }
+
+        @NonNull
+        public Pair<Integer, Integer> getTimeRemainingInPair() {
+            if (isCancelled()) {
+                return new Pair<>(0, 0);
+            }
+            int totalMinutes = (int) (getTimeRemaining() / (1000 * 60));
+            int hours = totalMinutes / 60;
+            int minutes = totalMinutes % 60;
+            return new Pair<>(hours, minutes);
         }
 
     }

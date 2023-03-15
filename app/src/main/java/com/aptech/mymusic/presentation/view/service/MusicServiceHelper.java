@@ -89,6 +89,10 @@ public class MusicServiceHelper {
         MusicDelegate.MediaBundle.getInstance().swapSong(drag, target);
     }
 
+    public static MusicDelegate.MediaTimer getMediaTimer() {
+        return MusicDelegate.MediaTimer.getInstance();
+    }
+
     private static void startService(Bundle bundle) {
         Context context = App.getInstance();
         Intent intent = new Intent(context, MusicService.class);

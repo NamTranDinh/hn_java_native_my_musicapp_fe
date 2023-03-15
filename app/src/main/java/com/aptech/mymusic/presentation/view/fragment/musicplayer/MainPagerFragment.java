@@ -14,15 +14,22 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.util.Pair;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.viewpager2.widget.ViewPager2;
 
 import com.aptech.mymusic.R;
 import com.aptech.mymusic.domain.entity.SongModel;
 import com.aptech.mymusic.presentation.view.adapter.PlayMusicViewPagerAdapter;
+import com.aptech.mymusic.presentation.view.service.MusicDelegate;
 import com.aptech.mymusic.presentation.view.service.MusicServiceHelper;
 import com.aptech.mymusic.utils.ZoomOutPageTransformer;
+import com.google.android.material.timepicker.MaterialTimePicker;
+import com.google.android.material.timepicker.TimeFormat;
 import com.mct.components.baseui.BaseFragment;
+import com.mct.components.utils.ToastUtils;
+
+import java.util.Locale;
 
 import me.relex.circleindicator.CircleIndicator3;
 
@@ -54,6 +61,12 @@ public class MainPagerFragment extends BaseFragment {
         super.onViewCreated(view, savedInstanceState);
         mToolbar = view.findViewById(R.id.toolbar);
         mToolbar.setNavigationOnClickListener(v -> requireActivity().finish());
+        mToolbar.setOnMenuItemClickListener(item -> {
+            if (item.getItemId() == R.id.menu_timer) {
+                showTimePicker();
+            }
+            return true;
+        });
 
         mViewPager2 = view.findViewById(R.id.view_pager2);
         mViewPager2.setAdapter(new PlayMusicViewPagerAdapter(this));
@@ -83,4 +96,33 @@ public class MainPagerFragment extends BaseFragment {
         mToolbar.setTitle(song.getName());
         mToolbar.setSubtitle(song.getSingerName());
     }
+
+    private void showTimePicker() {
+        MusicDelegate.MediaTimer timer = MusicServiceHelper.getMediaTimer();
+        Pair<Integer, Integer> time = timer.getTimeRemainingInPair();
+        MaterialTimePicker timePicker = new MaterialTimePicker.Builder()
+                .setTitleText(R.string.dialog_title_timer)
+                .setHour(time.first)
+                .setMinute(time.second)
+                .setTimeFormat(TimeFormat.CLOCK_24H)
+                .setNegativeButtonText(R.string.dialog_btn_cancel)
+                .setPositiveButtonText(R.string.dialog_btn_ok)
+                .build();
+        timePicker.addOnPositiveButtonClickListener(v -> {
+            int hour = timePicker.getHour();
+            int minute = timePicker.getMinute();
+            long millisInFuture = (hour * 60L + minute) * 60 * 1000;
+            if (millisInFuture == 0) {
+                timer.cancelTimer();
+                showToast("Canceled timer", ToastUtils.INFO, true);
+            } else {
+                timer.startTimer(MusicDelegate.Action.STOP_SERVICE, millisInFuture);
+                String msg = String.format(Locale.ROOT, "Music will stop after %s hour %s minute.", hour, minute);
+                showToast(msg, ToastUtils.INFO, true);
+            }
+        });
+        timePicker.show(getParentFragmentManager(), "abc");
+    }
+
+
 }
