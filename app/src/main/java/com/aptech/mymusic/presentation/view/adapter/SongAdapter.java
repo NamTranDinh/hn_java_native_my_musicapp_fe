@@ -64,7 +64,7 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.SongViewHolder
             if (mItemClickedListener != null) {
                 mItemClickedListener.onClickedAdd(song, holder.getAdapterPosition());
                 mListSong.remove(song);
-                notifyItemRemoved(position);
+                notifyItemRemoved(holder.getAdapterPosition());
             }
         });
     }
