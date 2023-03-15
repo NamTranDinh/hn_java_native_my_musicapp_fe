@@ -7,14 +7,13 @@ import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.aptech.mymusic.R;
 import com.aptech.mymusic.domain.entity.TopicModel;
 import com.aptech.mymusic.presentation.presenter.Callback;
 import com.aptech.mymusic.presentation.presenter.TopicPresenter;
-import com.aptech.mymusic.presentation.view.activity.MainActivity;
 import com.aptech.mymusic.presentation.view.adapter.TopicAdapter;
 
 import java.util.List;
@@ -49,17 +48,15 @@ public class TopicFragment extends BaseTabFragment implements Callback.GetDataTo
         topicPresenter = null;
     }
 
-    private void setAdapter(List<TopicModel> data) {
+    private void setDataTopic(List<TopicModel> data) {
         TopicAdapter adapter = new TopicAdapter(data, this);
         rcvTopic.setAdapter(adapter);
-
-        GridLayoutManager manager = new GridLayoutManager(getContext(), MainActivity.ONE_ITEM_CARD);
-        rcvTopic.setLayoutManager(manager);
+        rcvTopic.setLayoutManager(new LinearLayoutManager(getContext()));
     }
 
     @Override
     public void getDataTopicSuccess(List<TopicModel> data) {
-        setAdapter(data);
+        setDataTopic(data);
     }
 
     @Override

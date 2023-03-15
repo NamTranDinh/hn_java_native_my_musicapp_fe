@@ -2,6 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/root"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical">
@@ -13,8 +14,9 @@
         android:layout_weight="1" />
 
     <RelativeLayout
+        android:id="@+id/control_layout"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="56dp"
         android:orientation="vertical">
 
         <SeekBar
@@ -28,12 +30,9 @@
             android:thumb="@null" />
 
         <RelativeLayout
-            android:id="@+id/control_layout"
             android:layout_width="match_parent"
-            android:layout_height="56dp"
-            android:background="?attr/selectableItemBackground"
-            android:paddingStart="8dp"
-            android:paddingEnd="8dp">
+            android:layout_height="match_parent"
+            android:background="?attr/selectableItemBackground">
 
             <de.hdodenhof.circleimageview.CircleImageView
                 android:id="@+id/img_thumb"
@@ -41,6 +40,7 @@
                 android:layout_height="56dp"
                 android:layout_alignParentStart="true"
                 android:layout_centerVertical="true"
+                android:layout_marginStart="8dp"
                 android:padding="8dp"
                 android:src="@drawable/background_placeholder" />
 
@@ -113,7 +113,7 @@
             </LinearLayout>
 
         </RelativeLayout>
-    </RelativeLayout>
 
+    </RelativeLayout>
 
 </LinearLayout>

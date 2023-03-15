@@ -4,8 +4,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginTop="@dimen/half_space_view"
-    android:layout_marginBottom="@dimen/half_space_view"
     android:layout_marginEnd="@dimen/space_view">
 
     <androidx.cardview.widget.CardView
@@ -16,9 +14,9 @@
 
         <ImageView
             android:id="@+id/img_thumb"
-            android:scaleType="centerCrop"
             android:layout_width="match_parent"
             android:layout_height="@dimen/item_topic_height"
+            android:scaleType="centerCrop"
             android:src="@drawable/background_header_layout"
             tools:ignore="ContentDescription" />
     </androidx.cardview.widget.CardView>
@@ -27,11 +25,13 @@
         android:id="@+id/tv_name"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_below="@id/card_view_ic"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="@dimen/space_view"
+        android:fontFamily="sans-serif-medium"
         android:paddingTop="2dp"
-        android:visibility="gone"
         android:text="@string/app_name"
         android:textColor="@color/black"
-        android:layout_below="@id/card_view_ic"
-        android:layout_centerHorizontal="true" />
+        android:visibility="visible" />
 
 </RelativeLayout>

@@ -39,6 +39,10 @@ public class TopicAdapter extends RecyclerView.Adapter<TopicAdapter.TopicViewHol
         if (topic == null) {
             return;
         }
+        if (position == 0) {
+            ViewGroup.MarginLayoutParams layoutParams = (ViewGroup.MarginLayoutParams) holder.itemView.getLayoutParams();
+            layoutParams.topMargin = (int) holder.itemView.getResources().getDimension(R.dimen.space_view);
+        }
         GlideUtils.load(topic.getImageUrl(), holder.imgThumb.get());
         holder.tvName.setText(topic.getName());
         if (mICardListener != null) {

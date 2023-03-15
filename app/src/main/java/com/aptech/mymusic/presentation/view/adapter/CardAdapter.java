@@ -51,18 +51,23 @@ public class CardAdapter extends RecyclerView.Adapter<CardAdapter.CardItemViewHo
 
         if (isLinearLayoutManager) {
             if (position == 0) {
-                // margin left cho item đầu tiên
+                // margin left for first item
                 layoutParams.leftMargin = margin;
             }
         } else {
-            // margin top cho item
+            // margin top for item
             layoutParams.topMargin = margin;
-            // Độ dài tối đa của 1 cell in grid layout
-            int itemLength = (ScreenUtils.getScreenWidth(holder.itemView.getContext()) - (margin * (1 + MainActivity.TWO_ITEM_CARD))) / MainActivity.TWO_ITEM_CARD;
-            layoutParams.width = itemLength;
-            holder.imgThumb.get().getLayoutParams().height = itemLength;
+            if (position == getItemCount() - 1) {
+                // margin bottom for last item
+                layoutParams.bottomMargin = margin;
+            }
+            // Maximum length of 1 cell in grid layout
+            int itemSize = (ScreenUtils.getScreenWidth(holder.itemView.getContext()) -
+                    (margin * (1 + MainActivity.TWO_ITEM_CARD))) / MainActivity.TWO_ITEM_CARD;
+            layoutParams.width = itemSize;
+            holder.imgThumb.get().getLayoutParams().height = itemSize;
         }
-        // viết api trả data
+
         GlideUtils.load(card.getImageUrl(), holder.imgThumb.get());
         holder.titleCard.setText(card.getName());
 

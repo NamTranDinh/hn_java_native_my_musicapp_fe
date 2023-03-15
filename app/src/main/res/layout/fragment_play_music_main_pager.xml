@@ -22,9 +22,8 @@
             style="@style/AppToolbar.NavBack"
             android:background="@android:color/transparent"
             app:menu="@menu/menu_timer"
-            app:navigationIcon="@drawable/ic_back"
-            app:subtitle="@string/app_name"
-            app:title="@string/app_name" />
+            tools:subtitle="@string/app_name"
+            tools:title="@string/app_name" />
 
     </com.google.android.material.appbar.AppBarLayout>
 

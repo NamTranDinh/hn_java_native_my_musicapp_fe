@@ -2,6 +2,9 @@ package com.aptech.mymusic.presentation.view.fragment.detailpager;
 
 import android.content.Context;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,14 +16,13 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.ActionBar;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.aptech.mymusic.R;
 import com.aptech.mymusic.domain.entity.AlbumModel;
 import com.aptech.mymusic.domain.entity.CardModel;
 import com.aptech.mymusic.domain.entity.CategoryModel;
@@ -33,21 +35,20 @@ import com.aptech.mymusic.presentation.view.activity.MainActivity;
 import com.aptech.mymusic.presentation.view.adapter.CardAdapter;
 import com.aptech.mymusic.presentation.view.adapter.SongAdapter;
 import com.aptech.mymusic.presentation.view.fragment.mainpager.BaseTabFragment;
+import com.aptech.mymusic.utils.AnimateUtils;
 import com.aptech.mymusic.utils.BitmapUtils;
 import com.aptech.mymusic.utils.GlideUtils;
 import com.google.android.material.appbar.AppBarLayout;
-import com.google.android.material.appbar.CollapsingToolbarLayout;
-import com.aptech.mymusic.R;
+import com.mct.components.utils.ScreenUtils;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class DetailCardFragment extends BaseTabFragment implements SongAdapter.ItemClickedListener, Callback.GetDataAllSongCallBack, Callback.GetDataAllCategoryCallBack {
 
     private static final String KEY_CARD_MODEL = "KEY_CARD_MODEL";
     private CardModel card;
-    private View view;
-    private View overlay;
     private ImageView imgBackground;
     private AppBarLayout mAppBarLayout;
     private Toolbar mToolbar;
@@ -57,9 +58,11 @@ public class DetailCardFragment extends BaseTabFragment implements SongAdapter.I
     private TextView subTitleCard;
     private Button btnPlayRand;
     private RecyclerView rcvSong;
+    private TextView tvNoHaveSong;
 
     private HomePresenter mHomePresenter;
 
+    @NonNull
     public static DetailCardFragment newInstance(CardModel cardModel) {
         Bundle args = new Bundle();
         args.putSerializable(KEY_CARD_MODEL, cardModel);
@@ -71,33 +74,36 @@ public class DetailCardFragment extends BaseTabFragment implements SongAdapter.I
     @Override
     public void onAttach(@NonNull Context context) {
         super.onAttach(context);
+        Bundle bundle = requireArguments();
+        card = (CardModel) bundle.getSerializable(KEY_CARD_MODEL);
         if (getActivity() instanceof MainActivity) {
-            ((MainActivity) getActivity()).dispatchShowControlLayout(false);
+            if (!isTopic()) {
+                ((MainActivity) getActivity()).setOffsetStatusBars(false);
+                ((MainActivity) getActivity()).setAppearanceLightStatusBars(false);
+            }
+            ((MainActivity) getActivity()).setShowControlLayout(false);
         }
     }
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Bundle bundle = requireArguments();
-        card = (CardModel) bundle.getSerializable(KEY_CARD_MODEL);
         mHomePresenter = new HomePresenter(this);
     }
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        view = inflater.inflate(R.layout.fragment_detail, container, false);
-        return view;
+        return inflater.inflate(R.layout.fragment_detail, container, false);
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        initUi();
+        initUi(view);
         initToolBarAnimation();
 
-        if (card instanceof TopicModel) {
+        if (isTopic()) {
             mHomePresenter.getDataAllCategory(((TopicModel) card).getId(), this);
             return;
         }
@@ -113,10 +119,6 @@ public class DetailCardFragment extends BaseTabFragment implements SongAdapter.I
             type = "category";
         }
         mHomePresenter.getDataAllSong(type, card.getId(), this);
-
-    }
-
-    private void getDataRemote() {
     }
 
     @Override
@@ -124,24 +126,26 @@ public class DetailCardFragment extends BaseTabFragment implements SongAdapter.I
         super.onDestroy();
         mHomePresenter.release();
         mHomePresenter = null;
-
     }
 
     @Override
     public void onDetach() {
         super.onDetach();
         if (getActivity() instanceof MainActivity) {
-            ((MainActivity) getActivity()).dispatchShowControlLayout(true);
+            if (!isTopic()) {
+                ((MainActivity) getActivity()).setOffsetStatusBars(true);
+                ((MainActivity) getActivity()).setAppearanceLightStatusBars(true);
+            }
+            ((MainActivity) getActivity()).setShowControlLayout(true);
         }
     }
 
-    private void initUi() {
-        overlay = view.findViewById(R.id.overlay);
+    private void initUi(@NonNull View view) {
         imgBackground = view.findViewById(R.id.img_background);
         mAppBarLayout = view.findViewById(R.id.app_bar_layout);
         mToolbar = view.findViewById(R.id.toolbar);
         mToolbar.setNavigationOnClickListener(v -> popLastFragment());
-        if (card instanceof TopicModel) {
+        if (isTopic()) {
             rlDetailHeader = view.findViewById(R.id.rl_detail_header_with_list_category);
             imgCard = view.findViewById(R.id.img_bg_topic);
         } else {
@@ -152,66 +156,96 @@ public class DetailCardFragment extends BaseTabFragment implements SongAdapter.I
         subTitleCard = view.findViewById(R.id.tv_sub_title_card);
         btnPlayRand = view.findViewById(R.id.btn_play_rand);
         rcvSong = view.findViewById(R.id.rcv_song);
-        rcvSong.setHasFixedSize(true);
+        tvNoHaveSong = view.findViewById(R.id.tv_no_have_song);
+
+        if (!isTopic()) {
+            int pd = ScreenUtils.getStatusBarHeight(requireContext());
+            AnimateUtils.animatePaddingTop(view.findViewById(R.id.coordinator), 200, 0, pd);
+        }
     }
 
     private void initToolBarAnimation() {
+        AtomicBoolean isExpanded = new AtomicBoolean(false);
+        Drawable drawable = ContextCompat.getDrawable(requireContext(), R.drawable.ic_back);
+        mToolbar.setNavigationIcon(drawable);
         mAppBarLayout.addOnOffsetChangedListener((appBarLayout, verticalOffset) -> {
-            int maxOffset = appBarLayout.getHeight() - (int) requireContext().getResources().getDimension(R.dimen.custom_action_bar_size);
+            int maxOffset = appBarLayout.getHeight() - (int) getResources().getDimension(R.dimen.custom_action_bar_size);
             float alpha = (float) Math.abs(verticalOffset) * 100 / maxOffset;
             if (rlDetailHeader.getAlpha() != alpha) {
                 rlDetailHeader.setAlpha(1 - (float) Math.abs(verticalOffset) / maxOffset);
-                if (Math.abs(verticalOffset) == maxOffset) {
-                    mToolbar.setTitle(card.getName());
-                } else {
-                    mToolbar.setTitle("");
-
+            }
+            if (verticalOffset == 0 && !isExpanded.get()) {
+                // Expanded
+                isExpanded.set(true);
+                if (isTopic()) {
+                    mToolbar.setTitleTextColor(Color.WHITE);
+                    if (drawable != null) {
+                        drawable.setTint(Color.WHITE);
+                    }
                 }
+            } else if (Math.abs(verticalOffset) == maxOffset && isExpanded.get()) {
+                isExpanded.set(false);
+                if (isTopic()) {
+                    mToolbar.setTitleTextColor(Color.BLACK);
+                    if (drawable != null) {
+                        drawable.setTint(Color.BLACK);
+                    }
+                }
+            }
+            if (Math.abs(verticalOffset) == maxOffset) {
+                mToolbar.setTitle(card.getName());
+            } else {
+                mToolbar.setTitle("");
             }
         });
     }
 
     private void setDataCategory(List<CategoryModel> data) {
+        imgBackground.setForeground(null);
         rlDetailHeader.setVisibility(View.VISIBLE);
-        GlideUtils.load(card.getImageUrl(), imgCard);
-        CollapsingToolbarLayout collapsingToolbarLayout = view.findViewById(R.id.collapsingToolbarLayout);
-        collapsingToolbarLayout.setContentScrimColor(ContextCompat.getColor(requireContext(), R.color.colorPrimary));
-        overlay.setBackgroundResource(R.drawable.custom_overlay_card_white);
-        ((RelativeLayout.LayoutParams) rcvSong.getLayoutParams()).leftMargin = (int) getResources().getDimension(R.dimen.space_view);
-        ((RelativeLayout.LayoutParams) rcvSong.getLayoutParams()).bottomMargin = (int) getResources().getDimension(R.dimen.space_view);
+        ((ViewGroup.MarginLayoutParams) rcvSong.getLayoutParams()).leftMargin = (int) getResources().getDimension(R.dimen.space_view);
+        ((ViewGroup.MarginLayoutParams) rcvSong.getLayoutParams()).bottomMargin = (int) getResources().getDimension(R.dimen.space_view);
 
-        CardAdapter adapter = new CardAdapter(new ArrayList<>(data), true, this);
+        GlideUtils.load(card.getImageUrl(), imgCard);
+        CardAdapter adapter = new CardAdapter(new ArrayList<>(data), false, this);
         rcvSong.setAdapter(adapter);
         GridLayoutManager manager = new GridLayoutManager(getContext(), MainActivity.TWO_ITEM_CARD);
         rcvSong.setLayoutManager(manager);
     }
 
-
-    private void setDataSongAdapter(List<SongModel> data) {
+    private void setDataSong(List<SongModel> data) {
         rlDetailHeader.setVisibility(View.VISIBLE);
+        imgBackground.setForeground(ContextCompat.getDrawable(requireContext(), R.drawable.custom_overlay_card_black));
         GlideUtils.load(card.getImageUrl(), imgCard);
-        GlideUtils.load(card.getImageUrl(), img -> {
-            if (img == null) {
-                img = BitmapFactory.decodeResource(getResources(), R.drawable.custom_overlay_black);
+        GlideUtils.load(card.getImageUrl(), image -> {
+            if (getActivity() == null) {
+                return;
             }
-            imgBackground.setImageBitmap(BitmapUtils.blur(getContext(), img, 25, 1));
+            if (image == null) {
+                image = BitmapFactory.decodeResource(getResources(), R.drawable.custom_overlay_black);
+            }
+            imgBackground.setBackground(new BitmapDrawable(getResources(), BitmapUtils.blur(getContext(), image, 25, 5)));
         });
-
         titleCard.setText(card.getName());
         if (card instanceof AlbumModel) {
             subTitleCard.setText(((AlbumModel) card).getSingerName());
             subTitleCard.setVisibility(View.VISIBLE);
+        } else {
+            subTitleCard.setVisibility(View.GONE);
         }
 
         if (data == null || data.isEmpty()) {
-            view.findViewById(R.id.tv_no_have_song).setVisibility(View.VISIBLE);
-            rcvSong.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false));
+            tvNoHaveSong.setVisibility(View.VISIBLE);
         } else {
+            tvNoHaveSong.setVisibility(View.GONE);
             SongAdapter adapter = new SongAdapter((List<SongModel>) data, this);
             rcvSong.setAdapter(adapter);
-            LinearLayoutManager manager = new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false);
-            rcvSong.setLayoutManager(manager);
+            rcvSong.setLayoutManager(new LinearLayoutManager(getContext()));
         }
+    }
+
+    private boolean isTopic() {
+        return card instanceof TopicModel;
     }
 
     @NonNull
@@ -232,7 +266,7 @@ public class DetailCardFragment extends BaseTabFragment implements SongAdapter.I
 
     @Override
     public void getDataSongSuccess(List<SongModel> data) {
-        setDataSongAdapter(data);
+        setDataSong(data);
     }
 
     @Override

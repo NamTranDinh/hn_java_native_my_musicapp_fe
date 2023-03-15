@@ -12,6 +12,8 @@ import android.content.IntentFilter;
 import android.os.Bundle;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
+import android.view.WindowManager;
 import android.view.animation.LinearInterpolator;
 import android.widget.ImageView;
 import android.widget.SeekBar;
@@ -19,6 +21,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.core.view.WindowCompat;
+import androidx.core.view.WindowInsetsControllerCompat;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import com.aptech.mymusic.R;
@@ -26,13 +30,15 @@ import com.aptech.mymusic.domain.entity.SongModel;
 import com.aptech.mymusic.presentation.view.fragment.MainFragment;
 import com.aptech.mymusic.presentation.view.service.MusicDelegate;
 import com.aptech.mymusic.presentation.view.service.MusicServiceHelper;
+import com.aptech.mymusic.utils.AnimateUtils;
 import com.aptech.mymusic.utils.GlideUtils;
 import com.mct.components.baseui.BaseActivity;
+import com.mct.components.utils.ScreenUtils;
 
 public class MainActivity extends BaseActivity implements View.OnClickListener {
     public static final int TWO_ITEM_CARD = 2;
-    public static final int ONE_ITEM_CARD = 1;
 
+    private ViewGroup root;
     private ViewGroup controlLayout;
     private SeekBar seekBar;
     private ImageView imgThumb;
@@ -53,6 +59,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         LocalBroadcastManager.getInstance(this).registerReceiver(receiverFromMusicService, new IntentFilter(MusicDelegate.ACTION_UPDATE_VIEW));
+        initWindow();
         setContentView(R.layout.activity_main);
         replaceFragment(new MainFragment());
         initUi();
@@ -78,8 +85,16 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         LocalBroadcastManager.getInstance(this).unregisterReceiver(receiverFromMusicService);
     }
 
+    private void initWindow() {
+        Window window = getWindow();
+        WindowCompat.setDecorFitsSystemWindows(window, false);
+        window.setFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS,
+                WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS);
+    }
+
     @SuppressLint("ClickableViewAccessibility")
     private void initUi() {
+        root = findViewById(R.id.root);
         controlLayout = findViewById(R.id.control_layout);
         seekBar = findViewById(R.id.sb_music);
         seekBar.setOnTouchListener((v, event) -> true);
@@ -94,6 +109,9 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         imgLikes.setOnClickListener(this);
         imgPlayPause.setOnClickListener(this);
         findViewById(R.id.img_next).setOnClickListener(this);
+
+        setOffsetStatusBars(true);
+        setAppearanceLightStatusBars(true);
     }
 
     private void initData() {
@@ -106,7 +124,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
             imgPlayPause.setImageResource(R.drawable.ic_play);
             stopAnim();
         }
-        dispatchShowControlLayout(true);
+        setShowControlLayout(true, 0);
         if (song != null) {
             tvSongName.setText(song.getName());
             tvSingerName.setText(song.getSingerName());
@@ -180,17 +198,31 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         }
     }
 
-    public void dispatchShowControlLayout(boolean isShow) {
+    public void setOffsetStatusBars(boolean apply) {
+        int pd = apply ? ScreenUtils.getStatusBarHeight(this) : 0;
+        AnimateUtils.animatePaddingTop(root, 200, root.getPaddingTop(), pd);
+
+    }
+
+    public void setAppearanceLightStatusBars(boolean isLight) {
+        WindowInsetsControllerCompat windowInsetsController =
+                WindowCompat.getInsetsController(getWindow(), getWindow().getDecorView());
+        windowInsetsController.setAppearanceLightStatusBars(isLight);
+    }
+
+    public void setShowControlLayout(boolean isShow) {
+        setShowControlLayout(isShow, 200);
+    }
+
+    public void setShowControlLayout(boolean isShow, int duration) {
         SongModel song = MusicServiceHelper.getCurrentSong();
         if (song != null) {
             if (isShow) {
-                controlLayout.setVisibility(View.VISIBLE);
-                seekBar.setVisibility(View.VISIBLE);
+                AnimateUtils.animateHeightAndDisappear(controlLayout, duration, 0, ScreenUtils.dp2px(56));
                 return;
             }
         }
-        controlLayout.setVisibility(View.GONE);
-        seekBar.setVisibility(View.GONE);
+        AnimateUtils.animateHeightAndDisappear(controlLayout, duration, controlLayout.getHeight(), 0);
     }
 
     @Override
