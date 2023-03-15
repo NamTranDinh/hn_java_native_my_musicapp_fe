@@ -10,9 +10,5 @@
             <solid android:color="#4DFFEA00" />
         </shape>
     </item>
-    <item android:state_pressed="true">
-        <shape>
-            <solid android:color="#33000000" />
-        </shape>
-    </item>
+    <item android:drawable="@drawable/custom_background_song_item" android:state_pressed="true" />
 </selector>

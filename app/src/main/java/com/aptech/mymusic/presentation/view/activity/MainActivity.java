@@ -201,7 +201,6 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
     public void setOffsetStatusBars(boolean apply) {
         int pd = apply ? ScreenUtils.getStatusBarHeight(this) : 0;
         AnimateUtils.animatePaddingTop(root, 200, root.getPaddingTop(), pd);
-
     }
 
     public void setAppearanceLightStatusBars(boolean isLight) {
