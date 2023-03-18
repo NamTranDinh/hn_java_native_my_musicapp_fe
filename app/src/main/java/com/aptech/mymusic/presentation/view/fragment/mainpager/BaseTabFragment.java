@@ -84,7 +84,7 @@ public abstract class BaseTabFragment extends BaseFragment implements ICardListe
                         if (isRelease.get()) {
                             return;
                         }
-                        final int MIN_TIME_PROCESS = 1000;
+                        final int MIN_TIME_PROCESS = 500;
                         long delay = 0;
                         long timeProcess = SystemClock.elapsedRealtime() - startTime;
                         if (timeProcess < MIN_TIME_PROCESS) {
