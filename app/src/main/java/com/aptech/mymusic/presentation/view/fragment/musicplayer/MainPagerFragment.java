@@ -124,5 +124,32 @@ public class MainPagerFragment extends BaseFragment {
         timePicker.show(getParentFragmentManager(), "abc");
     }
 
+    /*/
+    private void showTimePicker2() {
+        MusicDelegate.MediaTimer timer = MusicServiceHelper.getMediaTimer();
+        Pair<Integer, Integer> time = timer.getTimeRemainingInPair();
+        new TimerDialog(requireContext(), time.first, time.second, new TimerDialog.IOnClickListener() {
+            @Override
+            public void onCancel(BaseOverlayDialog dialog) {
+                dialog.dismiss();
+            }
+
+            @Override
+            public void onTimeSet(BaseOverlayDialog dialog, int hour, int minute) {
+                long millisInFuture = (hour * 60L + minute) * 60 * 1000;
+                if (millisInFuture == 0) {
+                    timer.cancelTimer();
+                    showToast("Canceled timer", ToastUtils.INFO, true);
+                } else {
+                    timer.startTimer(MusicDelegate.Action.STOP_SERVICE, millisInFuture);
+                    String msg = String.format(Locale.ROOT, "Music will stop after %s hour %s minute.", hour, minute);
+                    showToast(msg, ToastUtils.INFO, true);
+                }
+                dialog.dismiss();
+            }
+        }).create(null);
+    }
+    /*/
+
 
 }
