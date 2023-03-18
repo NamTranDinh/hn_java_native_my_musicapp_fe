@@ -9,7 +9,6 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -32,6 +31,7 @@ import com.aptech.mymusic.domain.entity.TopicModel;
 import com.aptech.mymusic.presentation.presenter.Callback;
 import com.aptech.mymusic.presentation.presenter.HomePresenter;
 import com.aptech.mymusic.presentation.view.activity.MainActivity;
+import com.aptech.mymusic.presentation.view.activity.PlayMusicActivity;
 import com.aptech.mymusic.presentation.view.adapter.CardAdapter;
 import com.aptech.mymusic.presentation.view.adapter.SongAdapter;
 import com.aptech.mymusic.presentation.view.fragment.mainpager.BaseTabFragment;
@@ -40,8 +40,10 @@ import com.aptech.mymusic.utils.BitmapUtils;
 import com.aptech.mymusic.utils.GlideUtils;
 import com.google.android.material.appbar.AppBarLayout;
 import com.mct.components.utils.ScreenUtils;
+import com.mct.components.utils.ToastUtils;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -56,7 +58,6 @@ public class DetailCardFragment extends BaseTabFragment implements SongAdapter.I
     private ImageView imgCard;
     private TextView titleCard;
     private TextView subTitleCard;
-    private Button btnPlayRand;
     private RecyclerView rcvSong;
     private TextView tvNoHaveSong;
 
@@ -104,7 +105,7 @@ public class DetailCardFragment extends BaseTabFragment implements SongAdapter.I
         initToolBarAnimation();
 
         if (isTopic()) {
-            mHomePresenter.getDataAllCategory(((TopicModel) card).getId(), this);
+            mHomePresenter.getDataAllCategory(card.getId(), this);
             return;
         }
 
@@ -154,9 +155,18 @@ public class DetailCardFragment extends BaseTabFragment implements SongAdapter.I
         }
         titleCard = view.findViewById(R.id.tv_title_card);
         subTitleCard = view.findViewById(R.id.tv_sub_title_card);
-        btnPlayRand = view.findViewById(R.id.btn_play_rand);
         rcvSong = view.findViewById(R.id.rcv_song);
         tvNoHaveSong = view.findViewById(R.id.tv_no_have_song);
+        view.findViewById(R.id.btn_play_rand).setOnClickListener(v -> {
+            List<SongModel> songs;
+            if (rcvSong.getAdapter() instanceof SongAdapter) {
+                songs = new ArrayList<>(((SongAdapter) rcvSong.getAdapter()).getListSong());
+                Collections.shuffle(songs);
+            } else {
+                songs = null;
+            }
+            play(songs, 0);
+        });
 
         if (!isTopic()) {
             int pd = ScreenUtils.getStatusBarHeight(requireContext());
@@ -238,7 +248,7 @@ public class DetailCardFragment extends BaseTabFragment implements SongAdapter.I
             tvNoHaveSong.setVisibility(View.VISIBLE);
         } else {
             tvNoHaveSong.setVisibility(View.GONE);
-            SongAdapter adapter = new SongAdapter((List<SongModel>) data, this);
+            SongAdapter adapter = new SongAdapter(data, this);
             rcvSong.setAdapter(adapter);
             rcvSong.setLayoutManager(new LinearLayoutManager(getContext()));
         }
@@ -246,6 +256,16 @@ public class DetailCardFragment extends BaseTabFragment implements SongAdapter.I
 
     private boolean isTopic() {
         return card instanceof TopicModel;
+    }
+
+    private void play(List<SongModel> songs, int index) {
+        if (songs == null || songs.isEmpty()) {
+            String type = card.getClass().getSimpleName().replace("Model", "");
+            String msg = type + " is empty, please choose another " + type.toLowerCase() + "!";
+            showToast(msg, ToastUtils.WARNING, true);
+            return;
+        }
+        PlayMusicActivity.start(requireContext(), songs, index);
     }
 
     @NonNull
@@ -256,7 +276,7 @@ public class DetailCardFragment extends BaseTabFragment implements SongAdapter.I
 
     @Override
     public void onClickedItem(List<SongModel> songs, SongModel song, int position) {
-
+        play(songs, position);
     }
 
     @Override

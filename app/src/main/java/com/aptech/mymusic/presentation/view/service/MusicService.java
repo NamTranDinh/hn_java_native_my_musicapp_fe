@@ -29,14 +29,18 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.support.v4.media.MediaMetadataCompat;
 import android.support.v4.media.session.MediaSessionCompat;
+import android.support.v4.media.session.PlaybackStateCompat;
 import android.util.Log;
+import android.widget.RemoteViews;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.app.NotificationCompat;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
+import androidx.media.app.NotificationCompat.MediaStyle;
 
 import com.aptech.mymusic.R;
 import com.aptech.mymusic.domain.entity.SongModel;
@@ -46,7 +50,9 @@ import com.aptech.mymusic.presentation.view.service.MusicDelegate.Action;
 import com.aptech.mymusic.presentation.view.service.MusicDelegate.MediaBundle;
 import com.aptech.mymusic.presentation.view.service.MusicDelegate.MediaState;
 import com.aptech.mymusic.presentation.view.service.MusicDelegate.Mode;
+import com.aptech.mymusic.utils.BitmapUtils;
 import com.aptech.mymusic.utils.GlideUtils;
+import com.mct.components.utils.ToastUtils;
 
 import java.io.IOException;
 import java.io.Serializable;
@@ -59,6 +65,9 @@ public class MusicService extends Service {
 
     private static final String CHANNEL_ID = "MY_MUSIC_APP";
     private static final int NOTIFY_ID = 111;
+    private static final int NOTIFY_ID_1 = 333;
+
+    private static final String ACTION_CANCEL = "_action_cancel";
 
     ///////////////////////////////////////////////////////////////////////////
     // Start Helper
@@ -121,56 +130,13 @@ public class MusicService extends Service {
         sMusicPlayback = null;
     }
 
-    private void sendNotificationMusic(SongModel song) {
-        if (song == null) {
-            return;
-        }
-
-        createNotificationChannel();
-
-        Intent intent = new Intent(this, PlayMusicActivity.class).addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
-
-        PendingIntent mainIntent = PendingIntent.getActivity(this, 123, intent, getFlag());
-
-        MediaSessionCompat mediaSession = new MediaSessionCompat(this, CHANNEL_ID);
-        mediaSession.setActive(true);
-
-        GlideUtils.load(song.getImageUrl(), image -> {
-            if (image == null) {
-                image = BitmapFactory.decodeResource(getResources(), R.drawable.background_header_layout);
-            }
-            NotificationCompat.Builder builder = new NotificationCompat.Builder(this, CHANNEL_ID)
-                    .setSilent(true)
-                    .setOngoing(true)
-                    .setAutoCancel(false)
-                    .setSmallIcon(R.drawable.ic_musical_note)
-                    .setContentTitle(song.getName())
-                    .setContentText(song.getSingerName())
-                    .setLargeIcon(image)
-                    .setContentIntent(mainIntent)
-                    .setCategory(NotificationCompat.CATEGORY_TRANSPORT)
-                    .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
-                    .setStyle(new androidx.media.app.NotificationCompat.MediaStyle()
-                            .setMediaSession(mediaSession.getSessionToken()))
-                    .addAction(createAction(R.drawable.ic_prev, PREV_SONG))
-                    .addAction(isPlaying() ? createAction(R.drawable.ic_pause, PAUSE_SONG)
-                            : createAction(R.drawable.ic_play, PLAY_SONG))
-                    .addAction(createAction(R.drawable.ic_next, NEXT_SONG))
-                    .addAction(createAction(R.drawable.ic_cancel, STOP_SERVICE));
-
-            NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-            notificationManager.notify(NOTIFY_ID, builder.build());
-            startForeground(NOTIFY_ID, builder.build());
-        });
-    }
-
     private void createNotificationChannel() {
         // Create the NotificationChannel, but only on API 26+ because
         // the NotificationChannel class is new and not in the support library
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             CharSequence name = getString(R.string.channel_name);
             String description = getString(R.string.channel_description);
-            int importance = NotificationManager.IMPORTANCE_DEFAULT;
+            int importance = NotificationManager.IMPORTANCE_HIGH;
             NotificationChannel channel = new NotificationChannel(CHANNEL_ID, name, importance);
             channel.setShowBadge(false);
             channel.setDescription(description);
@@ -183,43 +149,150 @@ public class MusicService extends Service {
         }
     }
 
-    /*/
     private void sendNotificationMusic(SongModel song) {
+        if (song == null) {
+            return;
+        }
+
+        createNotificationChannel();
+
+        GlideUtils.load(song.getImageUrl(), image -> {
+            if (sMusicPlayback == null) {
+                return;
+            }
+            if (image == null) {
+                image = BitmapFactory.decodeResource(getResources(), R.drawable.background_header_layout);
+            }
+            Intent intent = new Intent(this, PlayMusicActivity.class).addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
+            PendingIntent mainIntent = PendingIntent.getActivity(this, 123, intent, getFlag());
+
+            MediaPlayer mediaPlayer = sMusicPlayback.mMediaPlayer;
+            MediaSessionCompat mediaSession = sMusicPlayback.mMediaSession;
+
+            mediaSession.setMetadata(new MediaMetadataCompat.Builder()
+                    .putBitmap(MediaMetadataCompat.METADATA_KEY_ALBUM_ART, image)
+                    .putString(MediaMetadataCompat.METADATA_KEY_TITLE, song.getName())
+                    .putString(MediaMetadataCompat.METADATA_KEY_ARTIST, song.getSingerName())
+                    .putLong(MediaMetadataCompat.METADATA_KEY_DURATION, mediaPlayer.getDuration())
+                    .build()
+            );
+            mediaSession.setPlaybackState(new PlaybackStateCompat.Builder()
+                    .setState(sMusicPlayback.getPlaybackState(), mediaPlayer.getCurrentPosition(), 1.0f)
+                    .setBufferedPosition(mediaPlayer.getCurrentPosition())
+                    .addCustomAction(ACTION_CANCEL, ACTION_CANCEL, R.drawable.ic_cancel)
+                    .setActions(PlaybackStateCompat.ACTION_SKIP_TO_PREVIOUS |
+                            PlaybackStateCompat.ACTION_PLAY_PAUSE |
+                            PlaybackStateCompat.ACTION_SKIP_TO_NEXT |
+                            PlaybackStateCompat.ACTION_SEEK_TO
+                    ).build()
+            );
+            mediaSession.setCallback(sMusicPlayback);
+            mediaSession.setActive(true);
+
+            NotificationCompat.Builder builder = new NotificationCompat.Builder(this, CHANNEL_ID)
+                    .setSilent(true)
+                    .setOngoing(true)
+                    .setAutoCancel(false)
+                    .setContentIntent(mainIntent)
+                    .setSmallIcon(R.drawable.ic_musical_note)
+                    .setPriority(NotificationCompat.PRIORITY_HIGH)
+                    .setCategory(NotificationCompat.CATEGORY_TRANSPORT)
+                    .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
+                    .setStyle(new MediaStyle().setMediaSession(mediaSession.getSessionToken()));
+
+            startForeground(NOTIFY_ID, builder.build());
+        });
+    }
+
+    /**
+     * Notify no have seek bar interact
+     */
+    @SuppressWarnings("unused")
+    private void sendNotificationMusic1(SongModel song) {
+        if (song == null) {
+            return;
+        }
+
+        createNotificationChannel();
+
+        GlideUtils.load(song.getImageUrl(), image -> {
+            if (sMusicPlayback == null) {
+                return;
+            }
+            if (image == null) {
+                image = BitmapFactory.decodeResource(getResources(), R.drawable.background_header_layout);
+            }
+            Intent intent = new Intent(this, PlayMusicActivity.class).addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
+            PendingIntent mainIntent = PendingIntent.getActivity(this, 123, intent, getFlag());
+
+            MediaSessionCompat mediaSession = sMusicPlayback.mMediaSession;
+            mediaSession.setActive(true);
+
+            NotificationCompat.Builder builder = new NotificationCompat.Builder(this, CHANNEL_ID)
+                    .setSilent(true)
+                    .setOngoing(true)
+                    .setAutoCancel(false)
+                    .setContentIntent(mainIntent)
+                    .setLargeIcon(image)
+                    .setSmallIcon(R.drawable.ic_musical_note)
+                    .setContentTitle(song.getName())
+                    .setContentText(song.getSingerName())
+                    .setPriority(NotificationCompat.PRIORITY_HIGH)
+                    .setCategory(NotificationCompat.CATEGORY_TRANSPORT)
+                    .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
+                    .setStyle(new MediaStyle().setMediaSession(mediaSession.getSessionToken()))
+                    .addAction(createAction(R.drawable.ic_prev, PREV_SONG))
+                    .addAction(isPlaying() ? createAction(R.drawable.ic_pause, PAUSE_SONG)
+                            : createAction(R.drawable.ic_play, PLAY_SONG))
+                    .addAction(createAction(R.drawable.ic_next, NEXT_SONG))
+                    .addAction(createAction(R.drawable.ic_cancel, STOP_SERVICE));
+
+            startForeground(NOTIFY_ID, builder.build());
+        });
+    }
+
+    /**
+     * Notify with custom view
+     */
+    @SuppressWarnings("unused")
+    private void sendNotificationMusic2(SongModel song) {
         if (song == null) {
             return;
         }
         createNotificationChannel();
 
         GlideUtils.load(song.getImageUrl(), image -> {
-            if (image == null) {
-                image = BitmapFactory.decodeResource(getResources(), R.drawable.background_header_layout);
+            if (sMusicPlayback == null) {
+                return;
             }
-            Intent intent = new Intent(this, PlayMusicActivity.class).addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
+            if (image == null) {
+                image = BitmapFactory.decodeResource(getResources(), R.drawable.background_placeholder);
+            }
+            image = BitmapUtils.roundedCorner(image, 48);
 
-            PendingIntent pendingIntent = PendingIntent.getActivity(this, 1, intent, getFlag());
+            Intent intent = new Intent(this, PlayMusicActivity.class).addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
+            PendingIntent mainIntent = PendingIntent.getActivity(this, 1, intent, getFlag());
 
             RemoteViews remoteCollapsed = getRemoteViewCollapsed(song, isPlaying());
-
             RemoteViews remoteExpanded = getRemoteViewExpanded(song, isPlaying());
+            remoteCollapsed.setImageViewBitmap(R.id.img_song_notification, image);
+            remoteExpanded.setImageViewBitmap(R.id.img_song_notification, image);
 
             Notification notification = new NotificationCompat.Builder(this, CHANNEL_ID)
                     .setSilent(true)
                     .setOngoing(true)
                     .setAutoCancel(false)
-                    .setSmallIcon(R.drawable.ic_musical_note)
+                    .setContentIntent(mainIntent)
                     .setCustomContentView(remoteCollapsed)
                     .setCustomBigContentView(remoteExpanded)
-                    .setContentIntent(pendingIntent)
-                    .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-                    .setStyle(new NotificationCompat.DecoratedCustomViewStyle())
-                    .setSound(getSound(), AudioManager.STREAM_NOTIFICATION)
+                    .setSmallIcon(R.drawable.ic_musical_note)
+                    .setPriority(NotificationCompat.PRIORITY_HIGH)
                     .setCategory(NotificationCompat.CATEGORY_TRANSPORT)
+                    .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
+                    .setStyle(new NotificationCompat.DecoratedCustomViewStyle())
                     .build();
-            remoteCollapsed.setImageViewBitmap(R.id.img_song_notification, image);
-            remoteExpanded.setImageViewBitmap(R.id.img_song_notification, image);
-            NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-            notificationManager.notify(NOTIFY_ID, notification);
-            startForeground(NOTIFY_ID, notification);
+
+            startForeground(NOTIFY_ID_1, notification);
         });
     }
 
@@ -262,7 +335,6 @@ public class MusicService extends Service {
 
         return remoteViews;
     }
-    /*/
 
     @NonNull
     private NotificationCompat.Action createAction(int icon, @NonNull Action action) {
@@ -279,15 +351,15 @@ public class MusicService extends Service {
         return PendingIntent.getBroadcast(this, offsetRC + action.ordinal(), intent, getFlag());
     }
 
-    private int getFlag() {
-        return PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE;
-    }
-
     private Uri getSound() {
         return Uri.parse("android.resource://" + getPackageName() + "/" + R.raw.empty_sound);
     }
 
-    private static class MusicPlayback {
+    private int getFlag() {
+        return PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE;
+    }
+
+    private static class MusicPlayback extends MediaSessionCompat.Callback {
 
         private static final String TAG = "MusicPlayback";
         private WeakReference<MusicService> mService;
@@ -296,6 +368,7 @@ public class MusicService extends Service {
         private MediaBundle mb;
         private MediaState mMediaState;
         private MediaPlayer mMediaPlayer;
+        private MediaSessionCompat mMediaSession;
 
         private boolean mHasAudioFocus;
         private AudioManager mAudioManager;
@@ -307,6 +380,39 @@ public class MusicService extends Service {
             this.mb = MediaBundle.getInstance();
             this.mMediaState = MediaState.IDLE;
             this.mMediaPlayer = new MediaPlayer();
+            this.mMediaSession = new MediaSessionCompat(mService, CHANNEL_ID);
+        }
+
+        @Override
+        public void onSkipToPrevious() {
+            prevSong();
+        }
+
+        @Override
+        public void onPlay() {
+            playSong();
+        }
+
+        @Override
+        public void onPause() {
+            pauseSong();
+        }
+
+        @Override
+        public void onSkipToNext() {
+            nextSong(false);
+        }
+
+        @Override
+        public void onSeekTo(long pos) {
+            seekSong((int) pos);
+        }
+
+        @Override
+        public void onCustomAction(String action, Bundle extras) {
+            if (ACTION_CANCEL.equals(action)) {
+                stopService();
+            }
         }
 
         private int onStartCommand(Intent intent) {
@@ -366,6 +472,7 @@ public class MusicService extends Service {
         private void playListSongFromBundle(@NonNull Bundle bundle) {
             mb.mListSongOrigin = (List<SongModel>) bundle.getSerializable(KEY_LIST_SONG_OBJECT);
             mb.mListSongTemp = new ArrayList<>(mb.mListSongOrigin);
+            mb.getPreference().setLastListSong(mb.mListSongOrigin);
             if (!mb.mListSongOrigin.isEmpty()) {
                 int index;
                 // if the mode is shuffle => shuffle and play from index 0
@@ -394,8 +501,8 @@ public class MusicService extends Service {
             if (!mb.mListSongTemp.get(index).equals(mb.mSong)) {
                 mb.mSong = mb.mListSongTemp.get(index);
                 applyMediaState(MediaState.IDLE);
-                playSong();
             }
+            playSong();
         }
 
         private void playSong() {
@@ -507,6 +614,7 @@ public class MusicService extends Service {
                 applyMediaState(MediaState.PLAYING);
                 mMediaPlayer.seekTo(time);
                 mMediaPlayer.start();
+                updateNotification();
                 updateView();
             }
         }
@@ -610,6 +718,20 @@ public class MusicService extends Service {
             }
         }
 
+        @PlaybackStateCompat.State
+        private int getPlaybackState() {
+            switch (sMusicPlayback.mMediaState) {
+                case PREPARED:
+                    return PlaybackStateCompat.STATE_BUFFERING;
+                case PLAYING:
+                    return PlaybackStateCompat.STATE_PLAYING;
+                case PAUSED:
+                    return PlaybackStateCompat.STATE_PAUSED;
+                default:
+                    return PlaybackStateCompat.STATE_NONE;
+            }
+        }
+
         private int validateSongIndex(int index, int size) {
             return index >= 0 && index <= size ? index : size;
         }
@@ -618,12 +740,14 @@ public class MusicService extends Service {
             if (mToast != null) {
                 mToast.cancel();
             }
-            mToast = Toast.makeText(mService.get(), text, Toast.LENGTH_SHORT);
+            mToast = ToastUtils.makeInfoToast(mService.get(), Toast.LENGTH_SHORT, text, true);
             mToast.show();
         }
 
         public void release() {
             applyMediaState(MediaState.RELEASE);
+            mMediaSession.release();
+            mMediaSession = null;
             mMediaPlayer.release();
             mMediaPlayer = null;
             mb = null;

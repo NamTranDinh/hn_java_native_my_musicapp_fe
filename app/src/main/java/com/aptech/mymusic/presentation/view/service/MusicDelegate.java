@@ -1,5 +1,8 @@
 package com.aptech.mymusic.presentation.view.service;
 
+import static android.content.Context.MODE_PRIVATE;
+
+import android.content.SharedPreferences;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
@@ -8,9 +11,9 @@ import android.os.SystemClock;
 import androidx.annotation.NonNull;
 import androidx.core.util.Pair;
 
-import com.aptech.mymusic.di.DataInjection;
+import com.aptech.mymusic.application.App;
 import com.aptech.mymusic.domain.entity.SongModel;
-import com.aptech.mymusic.utils.MusicPreference;
+import com.aptech.mymusic.utils.JsonHelper;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -130,7 +133,7 @@ public class MusicDelegate {
         }
 
         MusicPreference getPreference() {
-            return DataInjection.provideMusicPreference();
+            return MusicPreference.getInstance();
         }
 
         private int validateSongIndex(int index, int size) {
@@ -201,4 +204,65 @@ public class MusicDelegate {
 
     }
 
+    public static class MusicPreference {
+
+        static final String KEY_LAST_MODE = "KEY_LAST_MODE";
+        static final String KEY_LAST_SONG = "KEY_LAST_SONG";
+        static final String KEY_LAST_LIST_SONG = "KEY_LAST_LIST_SONG";
+        static final String KEY_FAVORITE_SONG = "KEY_FAVORITE_SONG";
+        private static final String PREF_NAME = "music_service_pref";
+        private static MusicPreference instance;
+        private final SharedPreferences mPreferences;
+
+        private MusicPreference() {
+            mPreferences = App.getInstance().getSharedPreferences(PREF_NAME, MODE_PRIVATE);
+        }
+
+        static MusicPreference getInstance() {
+            if (instance == null) {
+                instance = new MusicPreference();
+            }
+            return instance;
+        }
+
+        private SharedPreferences.Editor editor() {
+            return mPreferences.edit();
+        }
+
+        Mode getLastMode() {
+            return Mode.valueOf(mPreferences.getString(KEY_LAST_MODE, Mode.NORMAL.name()));
+        }
+
+        void setLastMode(@NonNull Mode mode) {
+            editor().putString(KEY_LAST_MODE, mode.name()).apply();
+        }
+
+        SongModel getLastSong() {
+            return JsonHelper.jsonToObj(mPreferences.getString(KEY_LAST_SONG, ""), SongModel.class);
+        }
+
+        void setLastSong(SongModel song) {
+            editor().putString(KEY_LAST_SONG, JsonHelper.objToJson(song)).apply();
+        }
+
+        List<SongModel> getLastListSong() {
+            return JsonHelper.jsonToList(mPreferences.getString(KEY_LAST_LIST_SONG, "[]"), SongModel.class);
+        }
+
+        void setLastListSong(List<SongModel> songs) {
+            editor().putString(KEY_LAST_LIST_SONG, JsonHelper.objToJson(songs)).apply();
+        }
+
+        List<SongModel> getFavoriteSong() {
+            return JsonHelper.jsonToList(mPreferences.getString(KEY_FAVORITE_SONG, "[]"), SongModel.class);
+        }
+
+        void setFavoriteSong(List<SongModel> songs) {
+            editor().putString(KEY_FAVORITE_SONG, JsonHelper.objToJson(songs)).apply();
+        }
+
+        boolean isFavorite(SongModel song) {
+            return getFavoriteSong().contains(song);
+        }
+    }
 }

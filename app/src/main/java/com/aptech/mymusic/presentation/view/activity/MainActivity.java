@@ -124,13 +124,15 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
             imgPlayPause.setImageResource(R.drawable.ic_play);
             stopAnim();
         }
-        setShowControlLayout(true, 0);
         if (song != null) {
             tvSongName.setText(song.getName());
             tvSingerName.setText(song.getSingerName());
             tvSingerName.setVisibility(View.VISIBLE);
             GlideUtils.load(song.getImageUrl(), imgThumb);
             initSeekbar();
+        }
+        if (getCurrentFragment() instanceof MainFragment) {
+            setShowControlLayout(true);
         }
     }
 
@@ -193,14 +195,14 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
                 MusicServiceHelper.sendAction(NEXT_SONG);
                 break;
             case R.id.control_layout:
-                startActivity(new Intent(this, PlayMusicActivity.class));
+                PlayMusicActivity.start(this, MusicServiceHelper.getCurrentSong());
                 break;
         }
     }
 
     public void setOffsetStatusBars(boolean apply) {
         int pd = apply ? ScreenUtils.getStatusBarHeight(this) : 0;
-        AnimateUtils.animatePaddingTop(root, 200, root.getPaddingTop(), pd);
+        AnimateUtils.animatePaddingTop(root, 250, root.getPaddingTop(), pd);
     }
 
     public void setAppearanceLightStatusBars(boolean isLight) {
@@ -210,18 +212,24 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
     }
 
     public void setShowControlLayout(boolean isShow) {
-        setShowControlLayout(isShow, 200);
+        setShowControlLayout(isShow, 250);
     }
 
     public void setShowControlLayout(boolean isShow, int duration) {
+        if (isShow && controlLayout.getVisibility() == View.VISIBLE) {
+            return;
+        }
+        if (!isShow && controlLayout.getVisibility() == View.GONE) {
+            return;
+        }
         SongModel song = MusicServiceHelper.getCurrentSong();
         if (song != null) {
             if (isShow) {
-                AnimateUtils.animateHeightAndDisappear(controlLayout, duration, 0, ScreenUtils.dp2px(56));
+                AnimateUtils.animateHeight(controlLayout, duration, 0, ScreenUtils.dp2px(56));
                 return;
             }
         }
-        AnimateUtils.animateHeightAndDisappear(controlLayout, duration, controlLayout.getHeight(), 0);
+        AnimateUtils.animateHeight(controlLayout, duration, controlLayout.getHeight(), 0);
     }
 
     @Override
