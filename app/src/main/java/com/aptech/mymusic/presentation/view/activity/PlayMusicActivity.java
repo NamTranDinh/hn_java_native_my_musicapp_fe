@@ -18,9 +18,7 @@ import android.os.Bundle;
 import android.view.MotionEvent;
 import android.view.ViewGroup;
 import android.view.ViewGroup.MarginLayoutParams;
-import android.view.WindowManager;
 import android.widget.ImageView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.core.view.WindowCompat;
@@ -28,24 +26,22 @@ import androidx.core.view.WindowInsetsControllerCompat;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import com.aptech.mymusic.R;
-import com.aptech.mymusic.di.DataInjection;
-import com.aptech.mymusic.domain.entity.CardModel;
 import com.aptech.mymusic.domain.entity.SongModel;
-import com.aptech.mymusic.domain.entity.TopicModel;
 import com.aptech.mymusic.presentation.view.common.TextThumbSeekBar;
 import com.aptech.mymusic.presentation.view.fragment.musicplayer.MainPagerFragment;
-import com.aptech.mymusic.presentation.view.service.MusicDelegate;
 import com.aptech.mymusic.presentation.view.service.MusicServiceHelper;
 import com.aptech.mymusic.utils.BitmapUtils;
 import com.aptech.mymusic.utils.GlideUtils;
 import com.mct.components.baseui.BaseActivity;
 import com.mct.components.utils.ScreenUtils;
 
+import java.util.List;
+
 public class PlayMusicActivity extends BaseActivity {
 
     private static final String KEY_ARGS_MODEL = "args_model";
-    private ImageView mImgBackground;
-    private TextThumbSeekBar mSeekBar;
+    private ImageView imgBackground;
+    private TextThumbSeekBar seekBar;
     private ImageView imgShuffle;
     private ImageView imgRepeat;
     private ImageView imgPlayPause;
@@ -58,23 +54,23 @@ public class PlayMusicActivity extends BaseActivity {
         }
     };
 
-    public static void start(Context context, CardModel model) {
-        if (model instanceof TopicModel) {
-            Toast.makeText(context, "Un support Topic model for this action!", Toast.LENGTH_SHORT).show();
-            return;
-        }
-        if (model instanceof SongModel) {
-            MusicServiceHelper.playSong((SongModel) model);
-        }
+    public static void start(@NonNull Context context, SongModel song) {
+        MusicServiceHelper.playSong(song);
         context.startActivity(
-                new Intent(context, PlayMusicActivity.class).putExtra(KEY_ARGS_MODEL, model)
+                new Intent(context, PlayMusicActivity.class).putExtra(KEY_ARGS_MODEL, song)
+        );
+    }
+
+    public static void start(@NonNull Context context, List<SongModel> songs, int index) {
+        MusicServiceHelper.playListSong(songs, index);
+        context.startActivity(
+                new Intent(context, PlayMusicActivity.class).putExtra(KEY_ARGS_MODEL, songs.get(index))
         );
     }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        initWindow();
         setContentView(R.layout.activity_play_music);
         LocalBroadcastManager.getInstance(this).registerReceiver(receiverFromMusicService, new IntentFilter(ACTION_UPDATE_VIEW));
         initUi();
@@ -85,14 +81,14 @@ public class PlayMusicActivity extends BaseActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        mSeekBar.removeCallbacks(seekBarUpdateRunnable);
-        mSeekBar.post(seekBarUpdateRunnable);
+        seekBar.removeCallbacks(seekBarUpdateRunnable);
+        seekBar.post(seekBarUpdateRunnable);
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        mSeekBar.removeCallbacks(seekBarUpdateRunnable);
+        seekBar.removeCallbacks(seekBarUpdateRunnable);
     }
 
     @Override
@@ -101,16 +97,15 @@ public class PlayMusicActivity extends BaseActivity {
         LocalBroadcastManager.getInstance(this).unregisterReceiver(receiverFromMusicService);
     }
 
-    private void initWindow() {
-        getWindow().addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+    public void setAppearanceLightStatusBars(boolean isLight) {
         WindowInsetsControllerCompat windowInsetsController =
                 WindowCompat.getInsetsController(getWindow(), getWindow().getDecorView());
-        windowInsetsController.setAppearanceLightStatusBars(false);
+        windowInsetsController.setAppearanceLightStatusBars(isLight);
     }
 
     private void initUi() {
-        mImgBackground = findViewById(R.id.img_background);
-        mSeekBar = findViewById(R.id.seek_bar);
+        imgBackground = findViewById(R.id.img_background);
+        seekBar = findViewById(R.id.seek_bar);
 
         ImageView imgNext = findViewById(R.id.img_next);
         ImageView imgPrev = findViewById(R.id.img_prev);
@@ -134,6 +129,8 @@ public class PlayMusicActivity extends BaseActivity {
         MarginLayoutParams lp = (MarginLayoutParams) viewGroup.getLayoutParams();
         lp.topMargin = ScreenUtils.getStatusBarHeight(this);
         viewGroup.setLayoutParams(lp);
+
+        setAppearanceLightStatusBars(false);
     }
 
     private void initData() {
@@ -144,7 +141,7 @@ public class PlayMusicActivity extends BaseActivity {
                 if (image == null) {
                     image = BitmapFactory.decodeResource(getResources(), R.drawable.custom_overlay_black);
                 }
-                mImgBackground.setImageBitmap(BitmapUtils.blur(getApplicationContext(), image, 25, 1));
+                imgBackground.setImageBitmap(BitmapUtils.blur(getApplicationContext(), image, 25, 1));
             });
         }
         imgPlayPause.setImageResource(isPlaying ? R.drawable.ic_pause_circle : R.drawable.ic_play_circle);
@@ -153,11 +150,7 @@ public class PlayMusicActivity extends BaseActivity {
     }
 
     private void initMode() {
-        MusicDelegate.Mode mode = MusicServiceHelper.getCurrentMode();
-        if (mode == null) {
-            mode = DataInjection.provideMusicPreference().getLastMode();
-        }
-        switch (mode) {
+        switch (MusicServiceHelper.getCurrentMode()) {
             case NORMAL:
                 imgShuffle.setSelected(false);
                 imgRepeat.setSelected(false);
@@ -187,24 +180,24 @@ public class PlayMusicActivity extends BaseActivity {
 
     @SuppressLint("ClickableViewAccessibility")
     private void initSeekbar() {
-        mSeekBar.setMax(MusicServiceHelper.getDuration() == 0 ? 100 : MusicServiceHelper.getDuration());
-        mSeekBar.setProgress(MusicServiceHelper.getCurrentPosition());
-        mSeekBar.setOnTouchListener((view, motionEvent) -> {
+        seekBar.setMax(MusicServiceHelper.getDuration() == 0 ? 100 : MusicServiceHelper.getDuration());
+        seekBar.setProgress(MusicServiceHelper.getCurrentPosition());
+        seekBar.setOnTouchListener((view, motionEvent) -> {
             if (motionEvent.getAction() == MotionEvent.ACTION_UP) {
-                MusicServiceHelper.seekSong(mSeekBar.getProgress());
+                MusicServiceHelper.seekSong(seekBar.getProgress());
             }
             return false;
         });
         if (seekBarUpdateRunnable == null) {
             seekBarUpdateRunnable = () -> {
                 if (MusicServiceHelper.isPlaying()) {
-                    mSeekBar.setProgress(MusicServiceHelper.getCurrentPosition());
-                    mSeekBar.postDelayed(seekBarUpdateRunnable, 500);
+                    seekBar.setProgress(MusicServiceHelper.getCurrentPosition());
+                    seekBar.postDelayed(seekBarUpdateRunnable, 500);
                 }
             };
         }
-        mSeekBar.removeCallbacks(seekBarUpdateRunnable);
-        mSeekBar.post(seekBarUpdateRunnable);
+        seekBar.removeCallbacks(seekBarUpdateRunnable);
+        seekBar.post(seekBarUpdateRunnable);
     }
 
     @Override

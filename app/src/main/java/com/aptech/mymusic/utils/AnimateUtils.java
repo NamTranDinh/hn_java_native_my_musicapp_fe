@@ -7,7 +7,7 @@ import android.view.animation.AccelerateDecelerateInterpolator;
 
 public class AnimateUtils {
 
-    public static void animateHeightAndDisappear(View view, int duration, int fromHeight, int toHeight) {
+    public static void animateHeight(View view, int duration, int fromHeight, int toHeight) {
         // Create a value animator that gradually creases/decreases the height of the view
         ValueAnimator valueAnimator = ValueAnimator.ofInt(fromHeight, toHeight);
         valueAnimator.setDuration(duration);

@@ -36,6 +36,10 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.SongViewHolder
         this.mType = type;
     }
 
+    public List<SongModel> getListSong() {
+        return mListSong;
+    }
+
     @NonNull
     @Override
     public SongViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {

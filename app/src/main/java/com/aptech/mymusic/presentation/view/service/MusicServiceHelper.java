@@ -15,6 +15,8 @@ import android.os.Bundle;
 
 import com.aptech.mymusic.application.App;
 import com.aptech.mymusic.domain.entity.SongModel;
+import com.aptech.mymusic.presentation.view.service.MusicDelegate.MediaTimer;
+import com.aptech.mymusic.presentation.view.service.MusicDelegate.MusicPreference;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -89,8 +91,12 @@ public class MusicServiceHelper {
         MusicDelegate.MediaBundle.getInstance().swapSong(drag, target);
     }
 
-    public static MusicDelegate.MediaTimer getMediaTimer() {
-        return MusicDelegate.MediaTimer.getInstance();
+    public static MediaTimer getMediaTimer() {
+        return MediaTimer.getInstance();
+    }
+
+    public static MusicPreference getMusicPreference() {
+        return MusicPreference.getInstance();
     }
 
     private static void startService(Bundle bundle) {

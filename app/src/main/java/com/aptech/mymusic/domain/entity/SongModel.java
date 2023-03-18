@@ -145,22 +145,18 @@ public class SongModel implements CardModel {
 
         SongModel songModel = (SongModel) o;
 
-        if (!getId().equals(songModel.getId())) return false;
-        if (!getName().equals(songModel.getName())) return false;
-        if (getImage() != null ? !getImage().equals(songModel.getImage()) : songModel.getImage() != null)
+        if (getId() != null ? !getId().equals(songModel.getId()) : songModel.getId() != null)
             return false;
-        if (getSingerName() != null ? !getSingerName().equals(songModel.getSingerName()) : songModel.getSingerName() != null)
+        if (getName() != null ? !getName().equals(songModel.getName()) : songModel.getName() != null)
             return false;
-        return getAudio() != null ? getAudio().equals(songModel.getAudio()) : songModel.getAudio() == null;
+        return getSingerName() != null ? getSingerName().equals(songModel.getSingerName()) : songModel.getSingerName() == null;
     }
 
     @Override
     public int hashCode() {
-        int result = getId().hashCode();
-        result = 31 * result + getName().hashCode();
-        result = 31 * result + (getImage() != null ? getImage().hashCode() : 0);
+        int result = getId() != null ? getId().hashCode() : 0;
+        result = 31 * result + (getName() != null ? getName().hashCode() : 0);
         result = 31 * result + (getSingerName() != null ? getSingerName().hashCode() : 0);
-        result = 31 * result + (getAudio() != null ? getAudio().hashCode() : 0);
         return result;
     }
 
