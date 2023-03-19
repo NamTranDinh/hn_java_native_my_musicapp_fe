@@ -32,6 +32,9 @@ public class MainSongFragment extends BaseFragment {
     BroadcastReceiver receiverFromMusicService = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, @NonNull Intent intent) {
+            if (MusicServiceHelper.getCurrentSong() == null) {
+                return;
+            }
             initData();
         }
     };
@@ -64,13 +67,11 @@ public class MainSongFragment extends BaseFragment {
     private void initData() {
         SongModel song = MusicServiceHelper.getCurrentSong();
         boolean isPlaying = MusicServiceHelper.isPlaying();
-        if (song != null) {
-            if (!song.getId().equals(mSongId)) {
-                mSongId = song.getId();
-                imgSong.setRotation(0);
-            }
-            GlideUtils.load(song.getImageUrl(), imgSong);
+        if (!song.getId().equals(mSongId)) {
+            mSongId = song.getId();
+            imgSong.setRotation(0);
         }
+        GlideUtils.load(song.getImageUrl(), imgSong);
         if (isPlaying) {
             startAnim();
         } else {

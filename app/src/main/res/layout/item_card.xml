@@ -17,6 +17,7 @@
             android:id="@+id/img_thumb"
             android:layout_width="match_parent"
             android:layout_height="@dimen/item_card_width"
+            android:foreground="@drawable/ripple_transparent_rectangle"
             tools:ignore="ContentDescription"
             tools:src="@drawable/background_placeholder" />
     </androidx.cardview.widget.CardView>
@@ -27,8 +28,10 @@
         android:layout_height="48dp"
         android:layout_alignEnd="@id/card_view_ic"
         android:layout_alignBottom="@id/card_view_ic"
-        android:background="?attr/selectableItemBackgroundBorderless"
+        android:background="@drawable/ripple_transparent_oval"
         android:elevation="2dp"
+        android:padding="10dp"
+        android:scaleType="fitCenter"
         android:src="@drawable/ic_play_circle_fill"
         android:translationX="4dp"
         android:translationY="4dp"

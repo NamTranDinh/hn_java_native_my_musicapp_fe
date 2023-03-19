@@ -15,9 +15,7 @@
     <dimen name="item_topic_height">160dp</dimen>
 
     <!-- config media player   -->
-    <dimen name="media_player_pad">20dp</dimen>
-    <dimen name="shuffle_repeat_pad">@dimen/media_player_pad</dimen>
-    <dimen name="next_prev_pad">16dp</dimen>
+    <dimen name="media_player_pad">16dp</dimen>
 
     <!-- TextThumbSeekBar   -->
     <dimen name="custom_seekbar_height">2dp</dimen>

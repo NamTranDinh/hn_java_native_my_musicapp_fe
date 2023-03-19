@@ -5,6 +5,8 @@
     android:id="@+id/swr_layout"
     android:layout_width="match_parent"
     android:layout_height="64dp"
+    android:layout_marginHorizontal="8dp"
+    android:layout_marginVertical="1dp"
     app:dragEdge="right"
     app:mode="same_level"
     tools:background="#808080">
@@ -19,7 +21,7 @@
             android:layout_height="42dp"
             android:layout_gravity="center"
             android:layout_marginHorizontal="4dp"
-            android:background="?attr/selectableItemBackground"
+            android:background="@drawable/ripple_transparent_oval"
             android:padding="10dp"
             android:src="@drawable/ic_trash"
             app:tint="@android:color/holo_red_light"
@@ -31,16 +33,31 @@
         android:id="@+id/rl_item_song"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@drawable/selector_song_item"
+        android:background="@drawable/custom_background_song_item"
         android:paddingTop="6dp"
         android:paddingBottom="6dp">
+
+        <ImageButton
+            android:id="@+id/btn_check_box"
+            android:layout_width="16dp"
+            android:layout_height="16dp"
+            android:layout_alignParentStart="true"
+            android:layout_centerVertical="true"
+            android:layout_marginStart="12dp"
+            android:background="@drawable/ripple_transparent_oval"
+            android:scaleType="centerCrop"
+            android:src="@drawable/selector_custom_check_box"
+            android:visibility="gone"
+            app:tint="@color/white"
+            tools:ignore="ContentDescription"
+            tools:visibility="visible" />
 
         <androidx.cardview.widget.CardView
             android:id="@+id/card_view_ic"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentStart="true"
-            android:layout_marginStart="@dimen/space_view"
+            android:layout_marginStart="@dimen/half_space_view"
+            android:layout_toEndOf="@id/btn_check_box"
             app:cardCornerRadius="8dp">
 
             <ImageView
@@ -51,31 +68,19 @@
                 tools:src="@drawable/background_placeholder" />
         </androidx.cardview.widget.CardView>
 
-        <RelativeLayout
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
             android:layout_marginStart="@dimen/half_space_view"
             android:layout_toStartOf="@id/ll_layout"
-            android:layout_toEndOf="@id/card_view_ic">
-
-            <com.airbnb.lottie.LottieAnimationView
-                android:id="@+id/lottie_music_wave"
-                android:layout_width="16dp"
-                android:layout_height="0dp"
-                android:layout_alignTop="@id/tv_song_name"
-                android:layout_alignBottom="@id/tv_song_name"
-                android:padding="2dp"
-                android:visibility="gone"
-                app:lottie_loop="true"
-                app:lottie_rawRes="@raw/lottie_music_wave" />
+            android:layout_toEndOf="@id/card_view_ic"
+            android:orientation="vertical">
 
             <TextView
                 android:id="@+id/tv_song_name"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_toEndOf="@id/lottie_music_wave"
-                android:ellipsize="end"
                 android:maxLines="1"
                 android:text="@string/app_name"
                 android:textColor="@color/white"
@@ -85,14 +90,12 @@
                 android:id="@+id/tv_singer_name"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_below="@id/tv_song_name"
-                android:ellipsize="end"
                 android:maxLines="1"
                 android:text="@string/app_name"
                 android:textColor="@color/white_70"
-                android:textSize="15sp" />
+                android:textSize="14sp" />
 
-        </RelativeLayout>
+        </LinearLayout>
 
         <androidx.appcompat.widget.LinearLayoutCompat
             android:id="@+id/ll_layout"
@@ -102,17 +105,15 @@
             android:layout_centerVertical="true"
             android:gravity="center">
 
-            <ImageButton
-                android:id="@+id/btn_check_box"
+            <com.airbnb.lottie.LottieAnimationView
+                android:id="@+id/lottie_music_wave"
                 android:layout_width="42dp"
                 android:layout_height="42dp"
                 android:layout_marginEnd="4dp"
-                android:background="?attr/selectableItemBackground"
-                android:padding="10dp"
-                android:src="@drawable/selector_custom_check_box"
+                android:padding="12dp"
                 android:visibility="gone"
-                app:tint="@color/white"
-                tools:ignore="ContentDescription"
+                app:lottie_loop="true"
+                app:lottie_rawRes="@raw/lottie_music_wave"
                 tools:visibility="visible" />
 
             <ImageButton
@@ -120,7 +121,7 @@
                 android:layout_width="42dp"
                 android:layout_height="42dp"
                 android:layout_marginEnd="4dp"
-                android:background="?attr/selectableItemBackground"
+                android:background="@drawable/ripple_transparent_oval"
                 android:padding="10dp"
                 android:src="@drawable/ic_drag_vertical"
                 app:tint="@color/white"

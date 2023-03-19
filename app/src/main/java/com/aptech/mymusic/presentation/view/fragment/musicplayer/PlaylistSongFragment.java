@@ -39,11 +39,12 @@ public class PlaylistSongFragment extends BaseFragment implements BaseActivity.O
     private Toolbar toolbar;
     private SongSwipeDeleteAdapter adapter;
     BroadcastReceiver receiverFromMusicService = new BroadcastReceiver() {
-        @SuppressLint("ClickableViewAccessibility")
         @Override
         public void onReceive(Context context, @NonNull Intent intent) {
+            if (MusicServiceHelper.getCurrentSong() == null) {
+                return;
+            }
             initData();
-            initToolbar();
         }
     };
 
@@ -63,7 +64,15 @@ public class PlaylistSongFragment extends BaseFragment implements BaseActivity.O
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         toolbar = view.findViewById(R.id.toolbar);
-        toolbar.setNavigationOnClickListener(v -> onClickBack());
+        toolbar.setNavigationOnClickListener(v -> {
+            if (adapter.isSelectMode()) {
+                toolbar.setSelected(!toolbar.isSelected());
+                adapter.setSelectAll(toolbar.isSelected());
+                initToolbar();
+            } else {
+                popLastFragment();
+            }
+        });
         toolbar.setOnMenuItemClickListener(item -> {
             if (item.getItemId() == R.id.menu_delete) {
                 final int count = adapter.getSelectedItemCount();
@@ -83,11 +92,20 @@ public class PlaylistSongFragment extends BaseFragment implements BaseActivity.O
                     public void onClickOk(BaseOverlayDialog dialog) {
                         dialog.dismiss();
                         MusicServiceHelper.removeSongs(adapter.getSelectedSongs());
-                        adapter.notifyDataSetChanged();
-                        showToast(String.format("Deleted %s songs", count), ToastUtils.SUCCESS, true);
-                        onClickBack();
+                        if (MusicServiceHelper.getCurrentListSong().isEmpty()) {
+                            requireActivity().finish();
+                            return;
+                        }
+                        showToast(String.format("Deleted %s songs success", count), ToastUtils.INFO, true);
+                        adapter.setSelectMode(false);
+                        initToolbar();
                     }
                 }).create(null);
+                return true;
+            }
+            if (item.getItemId() == R.id.menu_cancel) {
+                adapter.setSelectMode(false);
+                initToolbar();
                 return true;
             }
             return false;
@@ -130,7 +148,7 @@ public class PlaylistSongFragment extends BaseFragment implements BaseActivity.O
             public void onChildDrawOver(@NonNull Canvas c, @NonNull RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, float dX, float dY, int actionState, boolean isCurrentlyActive) {
                 if (!isDrawing && isCurrentlyActive) {
                     isDrawing = true;
-                    viewHolder.itemView.setBackgroundColor(Color.parseColor("#66000000"));
+                    viewHolder.itemView.setBackgroundResource(R.drawable.custom_background_song_item_press);
                 }
                 if (isDrawing && !isCurrentlyActive) {
                     isDrawing = false;
@@ -162,39 +180,32 @@ public class PlaylistSongFragment extends BaseFragment implements BaseActivity.O
 
     private void initToolbar() {
         if (adapter.isSelectMode()) {
-            Drawable drawable = ContextCompat.getDrawable(requireContext(), R.drawable.ic_cancel);
+            Drawable drawable = ContextCompat.getDrawable(requireContext(), R.drawable.selector_custom_check_box);
             if (drawable != null) {
                 drawable.setTint(Color.WHITE);
             }
             toolbar.setNavigationIcon(drawable);
+            toolbar.setNavigationContentDescription(0);
             toolbar.getMenu().findItem(R.id.menu_delete).setVisible(true);
+            toolbar.getMenu().findItem(R.id.menu_cancel).setVisible(true);
             toolbar.setTitle(getString(R.string.text_play_music_selected_n, adapter.getSelectedItemCount()));
         } else {
             toolbar.setNavigationIcon(R.drawable.ic_back);
+            toolbar.setNavigationContentDescription(R.string.content_desc_back);
             toolbar.getMenu().findItem(R.id.menu_delete).setVisible(false);
+            toolbar.getMenu().findItem(R.id.menu_cancel).setVisible(false);
             toolbar.setTitle(getString(R.string.text_play_music_playlist_n, adapter.getItemCount()));
         }
     }
 
-    public void onClickBack() {
-        if (adapter.isSelectMode()) {
-            adapter.setSelectMode(false);
-            initToolbar();
-        } else {
-            popLastFragment();
-        }
-    }
 
     @Override
     public void onItemClicked(SongModel song, int position) {
         if (adapter.isSelectMode()) {
             song.setSelected(!song.isSelected());
             adapter.notifyItemChanged(position);
-            if (adapter.getSelectedItemCount() == 0) {
-                onClickBack();
-            } else {
-                initToolbar();
-            }
+            toolbar.setSelected(adapter.getSelectedItemCount() == adapter.getItemCount());
+            initToolbar();
         } else {
             MusicServiceHelper.playSong(song);
         }
@@ -203,10 +214,9 @@ public class PlaylistSongFragment extends BaseFragment implements BaseActivity.O
     @Override
     public void onItemLongClicked(SongModel song, int position) {
         if (!adapter.isSelectMode()) {
-            song.setSelected(true);
             adapter.setSelectMode(true);
-            initToolbar();
         }
+        onItemClicked(song, position);
     }
 
     @Override
@@ -220,7 +230,8 @@ public class PlaylistSongFragment extends BaseFragment implements BaseActivity.O
     @Override
     public boolean onBackPressed() {
         if (adapter.isSelectMode()) {
-            onClickBack();
+            adapter.setSelectMode(false);
+            initToolbar();
             return true;
         }
         return false;

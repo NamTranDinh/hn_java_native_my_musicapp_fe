@@ -59,9 +59,24 @@ public class MainFragment extends BaseFragment implements View.OnClickListener {
         mTopNavView = view.findViewById(R.id.top_nav);
         mViewPager2 = view.findViewById(R.id.view_pager2);
         view.findViewById(R.id.civ_avatar_user).setOnClickListener(this);
+
+        BarsUtils.offsetStatusBar(view.findViewById(R.id.toolbar));
     }
 
     private void initAction() {
+        mDrawerLayout.addDrawerListener(new DrawerLayout.SimpleDrawerListener() {
+            @Override
+            public void onDrawerOpened(View drawerView) {
+                super.onDrawerOpened(drawerView);
+                BarsUtils.setAppearanceLightStatusBars(getActivity(), false);
+            }
+
+            @Override
+            public void onDrawerClosed(View drawerView) {
+                super.onDrawerClosed(drawerView);
+                BarsUtils.setAppearanceLightStatusBars(getActivity(), true);
+            }
+        });
         mNavigationView.setNavigationItemSelectedListener(this::onItemSelected);
         mTopNavView.setOnItemSelectedListener(this::onItemSelected);
         mViewPager2.registerOnPageChangeCallback(new OnPageChangeCallback() {

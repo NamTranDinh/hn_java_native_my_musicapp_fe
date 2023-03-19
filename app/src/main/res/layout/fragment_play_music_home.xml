@@ -18,7 +18,8 @@
             android:layout_gravity="center"
             android:layout_margin="50dp"
             app:cardBackgroundColor="@android:color/transparent"
-            app:cardCornerRadius="300dp">
+            app:cardCornerRadius="300dp"
+            app:cardElevation="20dp">
 
             <com.aptech.mymusic.presentation.view.common.SquareImageView
                 android:id="@+id/img_song"
@@ -46,17 +47,20 @@
                 android:id="@+id/img_likes"
                 android:layout_width="64dp"
                 android:layout_height="match_parent"
+                android:background="@drawable/ripple_transparent_oval"
+                android:contentDescription="@string/text_play_music_favorite"
                 android:padding="@dimen/media_player_pad"
                 android:src="@drawable/ic_heart"
+                android:tooltipText="@string/text_play_music_favorite"
                 app:tint="@color/white"
-                tools:ignore="ContentDescription" />
+                tools:targetApi="o" />
         </FrameLayout>
 
         <TextView
             android:id="@+id/tv_playlist"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:background="?attr/selectableItemBackground"
+            android:background="@drawable/ripple_transparent_rectangle"
             android:drawablePadding="8dp"
             android:fontFamily="sans-serif-medium"
             android:gravity="center"

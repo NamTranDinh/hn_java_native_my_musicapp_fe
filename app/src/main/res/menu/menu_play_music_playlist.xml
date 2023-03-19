@@ -7,4 +7,12 @@
         android:title="@string/menu_delete"
         app:iconTint="@color/toolbar_color"
         app:showAsAction="always" />
+
+    <item
+        android:id="@+id/menu_cancel"
+        android:icon="@drawable/ic_cancel"
+        android:title="@string/menu_cancel"
+        app:iconTint="@color/toolbar_color"
+        app:showAsAction="ifRoom" />
+
 </menu>

@@ -116,6 +116,7 @@ public class MusicDelegate {
             mListSongOrigin.removeAll(songs);
             mListSongTemp.removeAll(songs);
             getPreference().setLastListSong(mListSongOrigin);
+            if (!mListSongOrigin.contains(mSong)) getPreference().setLastSong(mSong = null);
         }
 
 

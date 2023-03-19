@@ -11,7 +11,8 @@
         android:id="@+id/toolbar"
         style="@style/AppToolbar.NavBack"
         android:background="@android:color/transparent"
-        app:contentInsetStart="0dp"
+        android:paddingStart="0dp"
+        android:paddingEnd="@dimen/half_space_view"
         app:menu="@menu/menu_play_music_playlist"
         app:title="@string/text_play_music_playlist_n" />
 

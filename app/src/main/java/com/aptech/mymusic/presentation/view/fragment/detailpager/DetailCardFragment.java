@@ -1,6 +1,5 @@
 package com.aptech.mymusic.presentation.view.fragment.detailpager;
 
-import android.content.Context;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
@@ -44,6 +43,7 @@ import com.mct.components.utils.ToastUtils;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class DetailCardFragment extends BaseTabFragment implements SongAdapter.ItemClickedListener, Callback.GetDataAllSongCallBack, Callback.GetDataAllCategoryCallBack {
@@ -72,29 +72,17 @@ public class DetailCardFragment extends BaseTabFragment implements SongAdapter.I
     }
 
     @Override
-    public void onAttach(@NonNull Context context) {
-        super.onAttach(context);
-        Bundle bundle = requireArguments();
-        card = (CardModel) bundle.getSerializable(KEY_CARD_MODEL);
-        if (getActivity() instanceof MainActivity) {
-            if (card instanceof CategoryModel) {
-                return;
-            }
-            ((MainActivity) getActivity()).setOffsetStatusBars(false);
-            ((MainActivity) getActivity()).setShowControlLayout(false);
-        }
-    }
-
-    @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Bundle bundle = requireArguments();
+        card = (CardModel) bundle.getSerializable(KEY_CARD_MODEL);
         mHomePresenter = new HomePresenter(this);
     }
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_detail, container, false);
+        return inflater.inflate(R.layout.fragment_detail_card, container, false);
     }
 
     @Override
@@ -102,6 +90,7 @@ public class DetailCardFragment extends BaseTabFragment implements SongAdapter.I
         super.onViewCreated(view, savedInstanceState);
         initUi(view);
         initToolBarAnimation();
+        BarsUtils.offsetStatusBar(mToolbar);
 
         if (isTopic()) {
             mHomePresenter.getDataAllCategory(card.getId(), this);
@@ -132,18 +121,6 @@ public class DetailCardFragment extends BaseTabFragment implements SongAdapter.I
         super.onDestroy();
         mHomePresenter.release();
         mHomePresenter = null;
-    }
-
-    @Override
-    public void onDetach() {
-        super.onDetach();
-        if (getActivity() instanceof MainActivity) {
-            if (card instanceof CategoryModel) {
-                return;
-            }
-            ((MainActivity) getActivity()).setOffsetStatusBars(true);
-            ((MainActivity) getActivity()).setShowControlLayout(true);
-        }
     }
 
     private void initUi(@NonNull View view) {
@@ -180,13 +157,8 @@ public class DetailCardFragment extends BaseTabFragment implements SongAdapter.I
         Drawable drawable = ContextCompat.getDrawable(requireContext(), R.drawable.ic_back);
         mToolbar.setNavigationIcon(drawable);
 
-        final int statusBarHeight = ScreenUtils.getStatusBarHeight(requireContext());
-        ViewGroup.MarginLayoutParams lp = (ViewGroup.MarginLayoutParams) mToolbar.getLayoutParams();
-        lp.topMargin = statusBarHeight;
-        mToolbar.setLayoutParams(lp);
-
         mAppBarLayout.addOnOffsetChangedListener((appBarLayout, verticalOffset) -> {
-            int maxOffset = appBarLayout.getHeight() - mToolbar.getHeight() - statusBarHeight;
+            int maxOffset = appBarLayout.getHeight() - mToolbar.getHeight() - ScreenUtils.getStatusBarHeight(requireContext());
             float alpha = (float) Math.abs(verticalOffset) * 100 / maxOffset;
             if (rlDetailHeader.getAlpha() != alpha) {
                 rlDetailHeader.setAlpha(1 - (float) Math.abs(verticalOffset) / maxOffset);
@@ -197,18 +169,14 @@ public class DetailCardFragment extends BaseTabFragment implements SongAdapter.I
                 if (isTopic()) {
                     BarsUtils.setAppearanceLightStatusBars(getActivity(), false);
                     mToolbar.setTitleTextColor(Color.WHITE);
-                    if (drawable != null) {
-                        drawable.setTint(Color.WHITE);
-                    }
+                    Objects.requireNonNull(drawable).setTint(Color.WHITE);
                 }
             } else if (Math.abs(verticalOffset) == maxOffset && isExpanded.get()) {
                 isExpanded.set(false);
                 if (isTopic()) {
                     BarsUtils.setAppearanceLightStatusBars(getActivity(), true);
                     mToolbar.setTitleTextColor(Color.BLACK);
-                    if (drawable != null) {
-                        drawable.setTint(Color.BLACK);
-                    }
+                    Objects.requireNonNull(drawable).setTint(Color.BLACK);
                 }
             }
             if (Math.abs(verticalOffset) == maxOffset) {

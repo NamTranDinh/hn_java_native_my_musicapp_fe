@@ -2,7 +2,6 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/root"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical">
@@ -29,20 +28,26 @@
             android:progressDrawable="@drawable/seek_bar_style_main"
             android:thumb="@null" />
 
-        <RelativeLayout
+        <androidx.appcompat.widget.LinearLayoutCompat
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="?attr/selectableItemBackground">
+            android:background="?attr/selectableItemBackground"
+            android:gravity="center">
 
-            <de.hdodenhof.circleimageview.CircleImageView
-                android:id="@+id/img_thumb"
-                android:layout_width="56dp"
-                android:layout_height="56dp"
-                android:layout_alignParentStart="true"
-                android:layout_centerVertical="true"
-                android:layout_marginStart="8dp"
-                android:padding="8dp"
-                android:src="@drawable/background_placeholder" />
+            <androidx.cardview.widget.CardView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                app:cardCornerRadius="28dp">
+
+                <ImageView
+                    android:id="@+id/img_thumb"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:src="@drawable/background_placeholder"
+                    tools:ignore="ContentDescription" />
+
+            </androidx.cardview.widget.CardView>
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -51,6 +56,7 @@
                 android:layout_marginStart="6dp"
                 android:layout_toStartOf="@id/rl_box_control"
                 android:layout_toEndOf="@id/img_thumb"
+                android:layout_weight="1"
                 android:orientation="vertical">
 
                 <TextView
@@ -74,7 +80,7 @@
                     android:visibility="gone" />
             </LinearLayout>
 
-            <LinearLayout
+            <RelativeLayout
                 android:id="@+id/rl_box_control"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -83,36 +89,52 @@
                 android:layout_marginStart="12dp"
                 android:orientation="horizontal">
 
-                <ImageView
+                <ImageButton
                     android:id="@+id/img_likes"
-                    android:layout_width="50dp"
-                    android:layout_height="50dp"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:layout_marginEnd="-8dp"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:contentDescription="@string/text_play_music_favorite"
                     android:padding="12dp"
                     android:src="@drawable/ic_heart"
+                    android:tooltipText="@string/text_play_music_favorite"
                     app:tint="?attr/colorPrimary"
-                    tools:ignore="ContentDescription" />
+                    tools:targetApi="o" />
 
-                <ImageView
+                <com.airbnb.lottie.LottieAnimationView
                     android:id="@+id/img_play_pause"
-                    android:layout_width="50dp"
-                    android:layout_height="50dp"
-                    android:padding="12dp"
-                    android:src="@drawable/ic_play"
-                    app:tint="?attr/colorPrimary"
-                    tools:ignore="ContentDescription" />
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:layout_marginEnd="-8dp"
+                    android:layout_toEndOf="@id/img_likes"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:contentDescription="@string/text_play_music_play_or_pause"
+                    android:padding="2dp"
+                    android:scaleType="centerCrop"
+                    android:tooltipText="@string/text_play_music_play_or_pause"
+                    app:lottie_colorFilter="?attr/colorPrimary"
+                    app:lottie_rawRes="@raw/lottie_play_pause"
+                    app:lottie_speed="1.5"
+                    tools:targetApi="o" />
 
-                <ImageView
+                <ImageButton
                     android:id="@+id/img_next"
-                    android:layout_width="50dp"
-                    android:layout_height="50dp"
-                    android:padding="10dp"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:layout_toEndOf="@id/img_play_pause"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:contentDescription="@string/text_play_music_next"
+                    android:padding="12dp"
+                    android:scaleType="centerCrop"
                     android:src="@drawable/ic_next"
+                    android:tooltipText="@string/text_play_music_next"
                     app:tint="?attr/colorPrimary"
-                    tools:ignore="ContentDescription" />
+                    tools:targetApi="o" />
 
-            </LinearLayout>
+            </RelativeLayout>
 
-        </RelativeLayout>
+        </androidx.appcompat.widget.LinearLayoutCompat>
 
     </RelativeLayout>
 

@@ -10,6 +10,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
+import android.os.SystemClock;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
@@ -24,7 +25,9 @@ import androidx.annotation.NonNull;
 import androidx.core.view.WindowCompat;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
+import com.airbnb.lottie.LottieAnimationView;
 import com.aptech.mymusic.R;
+import com.aptech.mymusic.config.MusicConfig;
 import com.aptech.mymusic.domain.entity.SongModel;
 import com.aptech.mymusic.presentation.view.fragment.MainFragment;
 import com.aptech.mymusic.presentation.view.service.MusicDelegate;
@@ -37,14 +40,13 @@ import com.mct.components.utils.ScreenUtils;
 public class MainActivity extends BaseActivity implements View.OnClickListener {
     public static final int TWO_ITEM_CARD = 2;
 
-    private ViewGroup root;
     private ViewGroup controlLayout;
     private SeekBar seekBar;
     private ImageView imgThumb;
     private TextView tvSongName;
     private TextView tvSingerName;
     private ImageView imgLikes;
-    private ImageView imgPlayPause;
+    private LottieAnimationView imgPlayPause;
     private Runnable seekBarUpdateRunnable;
 
     BroadcastReceiver receiverFromMusicService = new BroadcastReceiver() {
@@ -93,7 +95,6 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
 
     @SuppressLint("ClickableViewAccessibility")
     private void initUi() {
-        root = findViewById(R.id.root);
         controlLayout = findViewById(R.id.control_layout);
         seekBar = findViewById(R.id.sb_music);
         seekBar.setOnTouchListener((v, event) -> true);
@@ -109,28 +110,26 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         imgPlayPause.setOnClickListener(this);
         findViewById(R.id.img_next).setOnClickListener(this);
 
-        setOffsetStatusBars(true);
     }
 
     private void initData() {
         SongModel song = MusicServiceHelper.getCurrentSong();
         boolean isPlaying = MusicServiceHelper.isPlaying();
         if (isPlaying) {
-            imgPlayPause.setImageResource(R.drawable.ic_pause);
             startAnim();
         } else {
-            imgPlayPause.setImageResource(R.drawable.ic_play);
             stopAnim();
         }
+        initPlayPauseBtn(isPlaying);
         if (song != null) {
             tvSongName.setText(song.getName());
             tvSingerName.setText(song.getSingerName());
             tvSingerName.setVisibility(View.VISIBLE);
             GlideUtils.load(song.getImageUrl(), imgThumb);
             initSeekbar();
-        }
-        if (getCurrentFragment() instanceof MainFragment) {
             setShowControlLayout(true);
+        } else {
+            setShowControlLayout(false);
         }
     }
 
@@ -147,6 +146,29 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         }
         seekBar.removeCallbacks(seekBarUpdateRunnable);
         seekBar.post(seekBarUpdateRunnable);
+    }
+
+    private void initPlayPauseBtn(boolean isPlay) {
+        float minProgress, maxProgress;
+        double progress = Math.floor(imgPlayPause.getProgress() * 10) / 10;
+        if (isPlay) {
+            minProgress = 0f;
+            maxProgress = 0.5f;
+        } else {
+            minProgress = 0.5f;
+            maxProgress = 1f;
+        }
+        if (progress >= minProgress && progress <= maxProgress) {
+            // If the progress is already within the desired range,
+            // continue animating from current progress
+            imgPlayPause.setMinAndMaxProgress((float) progress, maxProgress);
+        } else {
+            // If the progress is outside of the desired range,
+            // animate from the start of the range
+            imgPlayPause.setProgress(minProgress);
+            imgPlayPause.setMinAndMaxProgress(minProgress, maxProgress);
+        }
+        imgPlayPause.playAnimation();
     }
 
     private void startAnim() {
@@ -183,6 +205,12 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
 
                 break;
             case R.id.img_play_pause:
+                Long lastClick = (Long) v.getTag();
+                long current = SystemClock.elapsedRealtime();
+                if (lastClick != null && current - lastClick < MusicConfig.PLAY_PAUSE_CLICK_DELAY) {
+                    return;
+                }
+                v.setTag(current);
                 if (MusicServiceHelper.isPlaying()) {
                     MusicServiceHelper.sendAction(PAUSE_SONG);
                 } else {
@@ -198,30 +226,16 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         }
     }
 
-    public void setOffsetStatusBars(boolean apply) {
-        int pd = apply ? ScreenUtils.getStatusBarHeight(this) : 0;
-        AnimateUtils.animatePaddingTop(root, 250, root.getPaddingTop(), pd);
-    }
-
     public void setShowControlLayout(boolean isShow) {
         setShowControlLayout(isShow, 250);
     }
 
     public void setShowControlLayout(boolean isShow, int duration) {
-        if (isShow && controlLayout.getVisibility() == View.VISIBLE) {
-            return;
+        if (MusicServiceHelper.getCurrentSong() != null && isShow) {
+            AnimateUtils.animateHeight(controlLayout, duration, controlLayout.getHeight(), ScreenUtils.dp2px(56));
+        } else {
+            AnimateUtils.animateHeight(controlLayout, duration, controlLayout.getHeight(), 0);
         }
-        if (!isShow && controlLayout.getVisibility() == View.GONE) {
-            return;
-        }
-        SongModel song = MusicServiceHelper.getCurrentSong();
-        if (song != null) {
-            if (isShow) {
-                AnimateUtils.animateHeight(controlLayout, duration, 0, ScreenUtils.dp2px(56));
-                return;
-            }
-        }
-        AnimateUtils.animateHeight(controlLayout, duration, controlLayout.getHeight(), 0);
     }
 
     @Override

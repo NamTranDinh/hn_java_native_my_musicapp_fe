@@ -9,7 +9,6 @@
         <shape android:shape="rectangle">
             <!-- This color is needed to be set - doesn't affect anything -->
             <solid android:color="@color/white" />
-            <corners android:radius="8dp" />
         </shape>
     </item>
     <!-- This is the background for your button -->
@@ -17,8 +16,7 @@
         <!-- Use the shape you want here -->
         <shape android:shape="rectangle">
             <!-- Use the solid tag to define the background color you want -->
-            <solid android:color="@color/selector_color_song_item" />
-            <corners android:radius="8dp" />
+            <solid android:color="@android:color/transparent" />
         </shape>
     </item>
 </ripple>

@@ -39,6 +39,9 @@ public class MainPagerFragment extends BaseFragment {
     BroadcastReceiver receiverFromMusicService = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, @NonNull Intent intent) {
+            if (MusicServiceHelper.getCurrentSong() == null) {
+                return;
+            }
             initData();
         }
     };

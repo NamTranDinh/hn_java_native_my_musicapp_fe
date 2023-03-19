@@ -15,9 +15,8 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
+import android.os.SystemClock;
 import android.view.MotionEvent;
-import android.view.ViewGroup;
-import android.view.ViewGroup.MarginLayoutParams;
 import android.widget.ImageView;
 
 import androidx.annotation.NonNull;
@@ -25,7 +24,9 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.app.ActivityOptionsCompat;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
+import com.airbnb.lottie.LottieAnimationView;
 import com.aptech.mymusic.R;
+import com.aptech.mymusic.config.MusicConfig;
 import com.aptech.mymusic.domain.entity.SongModel;
 import com.aptech.mymusic.presentation.view.common.TextThumbSeekBar;
 import com.aptech.mymusic.presentation.view.fragment.musicplayer.MainPagerFragment;
@@ -34,7 +35,6 @@ import com.aptech.mymusic.utils.BarsUtils;
 import com.aptech.mymusic.utils.BitmapUtils;
 import com.aptech.mymusic.utils.GlideUtils;
 import com.mct.components.baseui.BaseActivity;
-import com.mct.components.utils.ScreenUtils;
 
 import java.util.List;
 
@@ -45,7 +45,7 @@ public class PlayMusicActivity extends BaseActivity {
     private TextThumbSeekBar seekBar;
     private ImageView imgShuffle;
     private ImageView imgRepeat;
-    private ImageView imgPlayPause;
+    private LottieAnimationView imgPlayPause;
     private Runnable seekBarUpdateRunnable;
 
     BroadcastReceiver receiverFromMusicService = new BroadcastReceiver() {
@@ -100,6 +100,12 @@ public class PlayMusicActivity extends BaseActivity {
         LocalBroadcastManager.getInstance(this).unregisterReceiver(receiverFromMusicService);
     }
 
+    @Override
+    public void finish() {
+        super.finish();
+        overridePendingTransition(R.anim.slide_in_top_10, R.anim.slide_out_bottom);
+    }
+
     private void initUi() {
         imgBackground = findViewById(R.id.img_background);
         seekBar = findViewById(R.id.seek_bar);
@@ -114,6 +120,12 @@ public class PlayMusicActivity extends BaseActivity {
         imgShuffle.setOnClickListener(view -> MusicServiceHelper.sendAction(SHUFFLE_SONG));
         imgRepeat.setOnClickListener(view -> MusicServiceHelper.sendAction(REPEAT_SONG));
         imgPlayPause.setOnClickListener(view -> {
+            Long lastClick = (Long) view.getTag();
+            long current = SystemClock.elapsedRealtime();
+            if (lastClick != null && current - lastClick < MusicConfig.PLAY_PAUSE_CLICK_DELAY) {
+                return;
+            }
+            view.setTag(current);
             if (MusicServiceHelper.isPlaying()) {
                 MusicServiceHelper.sendAction(PAUSE_SONG);
             } else {
@@ -121,12 +133,7 @@ public class PlayMusicActivity extends BaseActivity {
             }
         });
 
-        // update margin
-        ViewGroup viewGroup = findViewById(R.id.main_music_frame);
-        MarginLayoutParams lp = (MarginLayoutParams) viewGroup.getLayoutParams();
-        lp.topMargin = ScreenUtils.getStatusBarHeight(this);
-        viewGroup.setLayoutParams(lp);
-
+        BarsUtils.offsetStatusBar(findViewById(R.id.main_music_frame));
         BarsUtils.setAppearanceLightStatusBars(this, false);
     }
 
@@ -141,7 +148,7 @@ public class PlayMusicActivity extends BaseActivity {
                 imgBackground.setImageBitmap(BitmapUtils.blur(getApplicationContext(), image, 25, 1));
             });
         }
-        imgPlayPause.setImageResource(isPlaying ? R.drawable.ic_pause_circle : R.drawable.ic_play_circle);
+        initPlayPauseBtn(isPlaying);
         initSeekbar();
         initMode();
     }
@@ -197,6 +204,29 @@ public class PlayMusicActivity extends BaseActivity {
         seekBar.post(seekBarUpdateRunnable);
     }
 
+    private void initPlayPauseBtn(boolean isPlay) {
+        float minProgress, maxProgress;
+        double progress = Math.floor(imgPlayPause.getProgress() * 10) / 10;
+        if (isPlay) {
+            minProgress = 0f;
+            maxProgress = 0.5f;
+        } else {
+            minProgress = 0.5f;
+            maxProgress = 1f;
+        }
+        if (progress >= minProgress && progress <= maxProgress) {
+            // If the progress is already within the desired range,
+            // continue animating from current progress
+            imgPlayPause.setMinAndMaxProgress((float) progress, maxProgress);
+        } else {
+            // If the progress is outside of the desired range,
+            // animate from the start of the range
+            imgPlayPause.setProgress(minProgress);
+            imgPlayPause.setMinAndMaxProgress(minProgress, maxProgress);
+        }
+        imgPlayPause.playAnimation();
+    }
+
     @Override
     protected int getContainerId() {
         return R.id.main_music_frame;
@@ -204,13 +234,7 @@ public class PlayMusicActivity extends BaseActivity {
 
     @Override
     protected void showToastOnBackPressed() {
-    }
-
-    @Override
-    public void onBackPressed() {
-        super.onBackPressed();
-        super.onBackPressed();
-        overridePendingTransition(R.anim.slide_in_top_10, R.anim.slide_out_bottom);
+        finish();
     }
 
 }

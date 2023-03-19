@@ -1,8 +1,10 @@
 package com.aptech.mymusic.presentation.view.service;
 
+import static com.aptech.mymusic.presentation.view.service.MusicDelegate.Action.NEXT_SONG;
 import static com.aptech.mymusic.presentation.view.service.MusicDelegate.Action.PLAY_NEW_LIST_SONG;
 import static com.aptech.mymusic.presentation.view.service.MusicDelegate.Action.PLAY_NEW_SONG;
 import static com.aptech.mymusic.presentation.view.service.MusicDelegate.Action.SEEK_SONG;
+import static com.aptech.mymusic.presentation.view.service.MusicDelegate.Action.STOP_SERVICE;
 import static com.aptech.mymusic.presentation.view.service.MusicDelegate.KEY_LIST_SONG_OBJECT;
 import static com.aptech.mymusic.presentation.view.service.MusicDelegate.KEY_MUSIC_ACTION;
 import static com.aptech.mymusic.presentation.view.service.MusicDelegate.KEY_POSITION_NEW_SONG;
@@ -85,6 +87,9 @@ public class MusicServiceHelper {
 
     public static void removeSongs(List<SongModel> songs) {
         MusicDelegate.MediaBundle.getInstance().removeSongs(songs);
+        if (getCurrentSong() == null) {
+            sendAction(getCurrentListSong().isEmpty() ? STOP_SERVICE : NEXT_SONG);
+        }
     }
 
     public static void swapSong(int drag, int target) {

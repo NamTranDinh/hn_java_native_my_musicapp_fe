@@ -25,7 +25,7 @@
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:orientation="vertical"
-        android:paddingTop="@dimen/space_view">
+        android:paddingVertical="8dp">
 
         <com.aptech.mymusic.presentation.view.common.TextThumbSeekBar
             android:id="@+id/seek_bar"
@@ -40,8 +40,7 @@
 
         <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:paddingVertical="8dp">
+            android:layout_height="wrap_content">
 
             <ImageButton
                 android:id="@+id/img_shuffle"
@@ -49,9 +48,9 @@
                 android:layout_height="64dp"
                 android:layout_alignParentStart="true"
                 android:layout_centerVertical="true"
-                android:background="?attr/selectableItemBackground"
+                android:background="@drawable/ripple_transparent_oval"
                 android:contentDescription="@string/text_play_music_shuffle"
-                android:padding="@dimen/shuffle_repeat_pad"
+                android:padding="@dimen/media_player_pad"
                 android:src="@drawable/ic_shuffle"
                 android:tooltipText="@string/text_play_music_shuffle"
                 tools:targetApi="o" />
@@ -62,26 +61,28 @@
                 android:layout_height="64dp"
                 android:layout_centerVertical="true"
                 android:layout_toEndOf="@id/img_shuffle"
-                android:background="?attr/selectableItemBackground"
+                android:background="@drawable/ripple_transparent_oval"
                 android:contentDescription="@string/text_play_music_previous"
-                android:padding="@dimen/next_prev_pad"
+                android:padding="@dimen/media_player_pad"
                 android:scaleType="centerCrop"
                 android:src="@drawable/ic_prev"
                 android:tooltipText="@string/text_play_music_previous"
                 app:tint="@color/white"
                 tools:targetApi="o" />
 
-            <ImageButton
+            <com.airbnb.lottie.LottieAnimationView
                 android:id="@+id/img_play_pause"
-                android:layout_width="72dp"
-                android:layout_height="72dp"
+                android:layout_width="96dp"
+                android:layout_height="96dp"
                 android:layout_centerHorizontal="true"
-                android:background="?attr/selectableItemBackground"
+                android:background="@drawable/ripple_transparent_oval"
                 android:contentDescription="@string/text_play_music_play_or_pause"
+                android:padding="10dp"
                 android:scaleType="centerCrop"
-                android:src="@drawable/ic_play_circle"
                 android:tooltipText="@string/text_play_music_play_or_pause"
-                app:tint="@color/white"
+                app:lottie_colorFilter="@color/white"
+                app:lottie_rawRes="@raw/lottie_play_pause_circle"
+                app:lottie_speed="1.5"
                 tools:targetApi="o" />
 
             <ImageButton
@@ -90,9 +91,9 @@
                 android:layout_height="64dp"
                 android:layout_centerVertical="true"
                 android:layout_toStartOf="@id/img_repeat"
-                android:background="?attr/selectableItemBackground"
+                android:background="@drawable/ripple_transparent_oval"
                 android:contentDescription="@string/text_play_music_next"
-                android:padding="@dimen/next_prev_pad"
+                android:padding="@dimen/media_player_pad"
                 android:scaleType="centerCrop"
                 android:src="@drawable/ic_next"
                 android:tooltipText="@string/text_play_music_next"
@@ -105,9 +106,9 @@
                 android:layout_height="64dp"
                 android:layout_alignParentEnd="true"
                 android:layout_centerVertical="true"
-                android:background="?attr/selectableItemBackground"
+                android:background="@drawable/ripple_transparent_oval"
                 android:contentDescription="@string/text_play_music_repeat"
-                android:padding="@dimen/shuffle_repeat_pad"
+                android:padding="@dimen/media_player_pad"
                 android:src="@drawable/ic_repeat"
                 android:tooltipText="@string/text_play_music_repeat"
                 tools:targetApi="o" />

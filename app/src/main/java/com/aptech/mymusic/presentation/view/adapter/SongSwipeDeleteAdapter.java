@@ -25,7 +25,7 @@ import java.util.stream.Collectors;
 
 public class SongSwipeDeleteAdapter extends RecyclerView.Adapter<SongSwipeDeleteAdapter.SongViewHolder> {
 
-    private final ViewBinderHelper mBinderHelper = new ViewBinderHelper();
+    private final ViewBinderHelper mBinderHelper;
     private final IOnClickListener mIOnClickListener;
     private boolean mIsPlaying;
     private SongModel mCurrentSong;
@@ -36,6 +36,8 @@ public class SongSwipeDeleteAdapter extends RecyclerView.Adapter<SongSwipeDelete
 
     public SongSwipeDeleteAdapter(IOnClickListener mIOnClickListener) {
         this.mIOnClickListener = mIOnClickListener;
+        this.mBinderHelper = new ViewBinderHelper();
+        this.mBinderHelper.setOpenOnlyOne(true);
     }
 
     @SuppressLint("NotifyDataSetChanged")
@@ -43,7 +45,6 @@ public class SongSwipeDeleteAdapter extends RecyclerView.Adapter<SongSwipeDelete
         mIsPlaying = isPlaying;
         mCurrentSong = song;
         mListSong = songs;
-        mCurrentSong.setSelected(false);
         notifyDataSetChanged();
     }
 
@@ -62,8 +63,14 @@ public class SongSwipeDeleteAdapter extends RecyclerView.Adapter<SongSwipeDelete
             notifyDataSetChanged();
         }
         if (!mIsSelectMode) {
-            mListSong.forEach(s -> s.setSelected(false));
+            setSelectAll(false);
         }
+    }
+
+    @SuppressLint("NotifyDataSetChanged")
+    public void setSelectAll(boolean isSelect){
+        mListSong.forEach(s -> s.setSelected(isSelect));
+        notifyDataSetChanged();
     }
 
     public int getSelectedItemCount() {
@@ -104,24 +111,22 @@ public class SongSwipeDeleteAdapter extends RecyclerView.Adapter<SongSwipeDelete
                 holder.lottieMusicWave.pauseAnimation();
             }
             holder.lottieMusicWave.setVisibility(View.VISIBLE);
+            holder.btnMove.setVisibility(View.GONE);
             if (mIsSelectMode) {
-                holder.btnMove.setVisibility(View.GONE);
-                holder.btnCheckBox.setVisibility(View.GONE);
+                holder.btnCheckBox.setVisibility(View.VISIBLE);
             } else {
-                holder.btnMove.setVisibility(View.VISIBLE);
                 holder.btnCheckBox.setVisibility(View.GONE);
             }
         } else {
             holder.lottieMusicWave.pauseAnimation();
             holder.lottieMusicWave.setVisibility(View.GONE);
+            holder.btnMove.setVisibility(View.VISIBLE);
             if (mIsSelectMode) {
                 mBinderHelper.closeLayout(id);
                 mBinderHelper.lockSwipe(id);
-                holder.btnMove.setVisibility(View.GONE);
                 holder.btnCheckBox.setVisibility(View.VISIBLE);
             } else {
                 mBinderHelper.unlockSwipe(id);
-                holder.btnMove.setVisibility(View.VISIBLE);
                 holder.btnCheckBox.setVisibility(View.GONE);
             }
         }
@@ -131,13 +136,11 @@ public class SongSwipeDeleteAdapter extends RecyclerView.Adapter<SongSwipeDelete
         GlideUtils.load(song.getImageUrl(), holder.imgThumb.get());
 
         holder.rlItem.setOnClickListener(view -> {
-            if (holder.rlItem.isActivated()) return;
             if (mIOnClickListener != null) {
                 mIOnClickListener.onItemClicked(song, holder.getAdapterPosition());
             }
         });
         holder.rlItem.setOnLongClickListener(v -> {
-            if (holder.rlItem.isActivated()) return false;
             if (mIOnClickListener != null) {
                 mIOnClickListener.onItemLongClicked(song, holder.getAdapterPosition());
             }
@@ -151,7 +154,9 @@ public class SongSwipeDeleteAdapter extends RecyclerView.Adapter<SongSwipeDelete
         holder.btnCheckBox.setOnClickListener(view -> holder.rlItem.performClick());
         holder.btnMove.setOnTouchListener((v, event) -> {
             if (event.getAction() == MotionEvent.ACTION_DOWN) {
-                mDragListener.requestDrag(holder);
+                if (mDragListener != null) {
+                    mDragListener.requestDrag(holder);
+                }
             }
             return false;
         });
