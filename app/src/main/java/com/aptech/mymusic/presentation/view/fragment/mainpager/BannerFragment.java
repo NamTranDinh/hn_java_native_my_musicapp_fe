@@ -16,6 +16,7 @@ import com.aptech.mymusic.R;
 import com.aptech.mymusic.domain.entity.AdsModel;
 import com.aptech.mymusic.presentation.presenter.Callback;
 import com.aptech.mymusic.presentation.presenter.HomePresenter;
+import com.aptech.mymusic.presentation.view.activity.PlayMusicActivity;
 import com.aptech.mymusic.presentation.view.adapter.BannerAdapter;
 import com.mct.components.baseui.BaseFragment;
 import com.mct.components.utils.ToastUtils;
@@ -73,16 +74,37 @@ public class BannerFragment extends BaseFragment implements Callback.GetDataBann
     @SuppressLint("ClickableViewAccessibility")
     private void initUi(@NonNull View view) {
         mViewPager = view.findViewById(R.id.banner_view_pager);
-        mViewPager.setOnTouchListener((v, motionEvent) -> {
-            if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
-                v.getParent().requestDisallowInterceptTouchEvent(true);
-                stopRun();
+        mViewPager.setOnTouchListener(new View.OnTouchListener() {
+            long downtime;
+            float startX;
+
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                switch (event.getAction()) {
+                    case MotionEvent.ACTION_DOWN:
+                        downtime = event.getDownTime();
+                        startX = event.getX();
+                        v.getParent().requestDisallowInterceptTouchEvent(true);
+                        stopRun();
+                        break;
+                    case MotionEvent.ACTION_UP:
+                        long duration = event.getEventTime() - downtime;
+                        float endX = event.getX();
+                        float diffX = endX - startX;
+                        if (duration < 200 && Math.abs(diffX) < 10) {
+                            // click event
+                            if (mViewPager.getAdapter() instanceof BannerAdapter) {
+                                BannerAdapter adapter = (BannerAdapter) mViewPager.getAdapter();
+                                AdsModel ads = adapter.getAdsList().get(mViewPager.getCurrentItem());
+                                PlayMusicActivity.start(requireContext(), ads.getSong());
+                            }
+                        }
+                        v.getParent().requestDisallowInterceptTouchEvent(false);
+                        autoRun();
+                        break;
+                }
+                return false;
             }
-            if (motionEvent.getAction() == MotionEvent.ACTION_UP) {
-                v.getParent().requestDisallowInterceptTouchEvent(false);
-                autoRun();
-            }
-            return false;
         });
         mCircleIndicator = view.findViewById(R.id.circle_indicator);
     }

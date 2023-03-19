@@ -21,6 +21,8 @@ import android.view.ViewGroup.MarginLayoutParams;
 import android.widget.ImageView;
 
 import androidx.annotation.NonNull;
+import androidx.core.app.ActivityCompat;
+import androidx.core.app.ActivityOptionsCompat;
 import androidx.core.view.WindowCompat;
 import androidx.core.view.WindowInsetsControllerCompat;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
@@ -56,16 +58,18 @@ public class PlayMusicActivity extends BaseActivity {
 
     public static void start(@NonNull Context context, SongModel song) {
         MusicServiceHelper.playSong(song);
-        context.startActivity(
-                new Intent(context, PlayMusicActivity.class).putExtra(KEY_ARGS_MODEL, song)
-        );
+        ActivityOptionsCompat options = ActivityOptionsCompat.makeCustomAnimation(context,
+                R.anim.slide_in_bottom, R.anim.slide_out_top_10);
+        Intent intent = new Intent(context, PlayMusicActivity.class).putExtra(KEY_ARGS_MODEL, song);
+        ActivityCompat.startActivity(context, intent, options.toBundle());
     }
 
     public static void start(@NonNull Context context, List<SongModel> songs, int index) {
         MusicServiceHelper.playListSong(songs, index);
-        context.startActivity(
-                new Intent(context, PlayMusicActivity.class).putExtra(KEY_ARGS_MODEL, songs.get(index))
-        );
+        ActivityOptionsCompat options = ActivityOptionsCompat.makeCustomAnimation(context,
+                R.anim.slide_in_bottom, R.anim.slide_out_top_10);
+        Intent intent = new Intent(context, PlayMusicActivity.class).putExtra(KEY_ARGS_MODEL, songs.get(index));
+        ActivityCompat.startActivity(context, intent, options.toBundle());
     }
 
     @Override
@@ -207,7 +211,13 @@ public class PlayMusicActivity extends BaseActivity {
 
     @Override
     protected void showToastOnBackPressed() {
-        finish();
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        super.onBackPressed();
+        overridePendingTransition(R.anim.slide_in_top_10, R.anim.slide_out_bottom);
     }
 
 }

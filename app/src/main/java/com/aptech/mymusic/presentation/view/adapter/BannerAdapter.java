@@ -22,6 +22,10 @@ public class BannerAdapter extends PagerAdapter {
         this.mAdsModelList = mAdsModelList;
     }
 
+    public List<AdsModel> getAdsList() {
+        return mAdsModelList;
+    }
+
     @Override
     public int getCount() {
         if (mAdsModelList != null) {

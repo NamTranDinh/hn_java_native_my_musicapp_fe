@@ -110,6 +110,7 @@ public abstract class BaseTabFragment extends BaseFragment implements ICardListe
                     public void getDataSongFailure(String error) {
                         dialog.dismiss();
                         presenter.release();
+                        showToast("Please check your network!", ToastUtils.ERROR, true);
                     }
                 });
             }

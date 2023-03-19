@@ -17,7 +17,6 @@ import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
-import android.content.Context;
 import android.content.Intent;
 import android.graphics.BitmapFactory;
 import android.media.AudioAttributes;
@@ -58,16 +57,13 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 public class MusicService extends Service {
 
     private static final String CHANNEL_ID = "MY_MUSIC_APP";
     private static final int NOTIFY_ID = 111;
-    private static final int NOTIFY_ID_1 = 333;
-
-    private static final String ACTION_CANCEL = "_action_cancel";
+    private static final String ACTION_CANCEL = "action_cancel";
 
     ///////////////////////////////////////////////////////////////////////////
     // Start Helper
@@ -292,7 +288,7 @@ public class MusicService extends Service {
                     .setStyle(new NotificationCompat.DecoratedCustomViewStyle())
                     .build();
 
-            startForeground(NOTIFY_ID_1, notification);
+            startForeground(NOTIFY_ID, notification);
         });
     }
 
@@ -474,13 +470,12 @@ public class MusicService extends Service {
             mb.mListSongTemp = new ArrayList<>(mb.mListSongOrigin);
             mb.getPreference().setLastListSong(mb.mListSongOrigin);
             if (!mb.mListSongOrigin.isEmpty()) {
-                int index;
-                // if the mode is shuffle => shuffle and play from index 0
+                int index = validateSongIndex(bundle.getInt(KEY_POSITION_NEW_SONG, 0), mb.mListSongOrigin.size());
+                // if the mode is shuffle => get next song -> shuffle -> add to 0 -> play from index 0
                 if (mb.mMode == Mode.SHUFFLE) {
-                    index = 0;
-                    shuffleSong(mb.mListSongTemp);
-                } else {
-                    index = validateSongIndex(bundle.getInt(KEY_POSITION_NEW_SONG, 0), mb.mListSongOrigin.size());
+                    SongModel tmp = mb.mListSongTemp.remove(index);
+                    mb.shuffleTmpSong();
+                    mb.mListSongTemp.add(index = 0, tmp); // add to 0 and reset the index
                 }
                 playSong(index);
             }
@@ -581,7 +576,7 @@ public class MusicService extends Service {
                 showToast("Normal play mode");
             } else {
                 mb.mMode = Mode.SHUFFLE;
-                shuffleSong(mb.mListSongTemp);
+                mb.shuffleTmpSong();
                 mb.swapSong(0, mb.mListSongTemp.indexOf(mb.mSong));
                 showToast("Random play mode");
             }
@@ -621,7 +616,7 @@ public class MusicService extends Service {
 
         private boolean requestAudioFocus() {
             if (!mHasAudioFocus) {
-                mAudioManager = (AudioManager) mService.get().getSystemService(Context.AUDIO_SERVICE);
+                mAudioManager = mService.get().getSystemService(AudioManager.class);
                 mAudiofocusListener = focusChange -> {
                     switch (focusChange) {
                         case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT:
@@ -684,10 +679,6 @@ public class MusicService extends Service {
                     .build();
         }
 
-        private void shuffleSong(List<SongModel> songs) {
-            Collections.shuffle(songs);
-        }
-
         private void applyMediaState(MediaState state) {
             if (mMediaState == state) {
                 return;
@@ -733,7 +724,7 @@ public class MusicService extends Service {
         }
 
         private int validateSongIndex(int index, int size) {
-            return index >= 0 && index <= size ? index : size;
+            return index > -1 && index < size ? index : 0;
         }
 
         private void showToast(String text) {
@@ -758,6 +749,5 @@ public class MusicService extends Service {
             }
         }
     }
-
 
 }

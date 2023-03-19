@@ -132,6 +132,10 @@ public class MusicDelegate {
             }
         }
 
+        void shuffleTmpSong() {
+            Collections.shuffle(mListSongTemp);
+        }
+
         MusicPreference getPreference() {
             return MusicPreference.getInstance();
         }
