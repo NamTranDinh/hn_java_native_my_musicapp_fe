@@ -124,8 +124,6 @@
                 <androidx.appcompat.widget.Toolbar
                     android:id="@+id/toolbar"
                     style="@style/AppToolbar.NavBack"
-                    android:layout_width="match_parent"
-                    android:layout_height="@dimen/custom_action_bar_size"
                     android:background="@android:color/transparent"
                     app:layout_collapseMode="pin"
                     tools:title="@string/app_name" />

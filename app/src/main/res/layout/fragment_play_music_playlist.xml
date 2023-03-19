@@ -10,8 +10,6 @@
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/toolbar"
         style="@style/AppToolbar.NavBack"
-        android:layout_width="match_parent"
-        android:layout_height="@dimen/custom_action_bar_size"
         android:background="@android:color/transparent"
         app:contentInsetStart="0dp"
         app:menu="@menu/menu_play_music_playlist"

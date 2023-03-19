@@ -22,7 +22,6 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.core.view.WindowCompat;
-import androidx.core.view.WindowInsetsControllerCompat;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import com.aptech.mymusic.R;
@@ -111,7 +110,6 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         findViewById(R.id.img_next).setOnClickListener(this);
 
         setOffsetStatusBars(true);
-        setAppearanceLightStatusBars(true);
     }
 
     private void initData() {
@@ -203,12 +201,6 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
     public void setOffsetStatusBars(boolean apply) {
         int pd = apply ? ScreenUtils.getStatusBarHeight(this) : 0;
         AnimateUtils.animatePaddingTop(root, 250, root.getPaddingTop(), pd);
-    }
-
-    public void setAppearanceLightStatusBars(boolean isLight) {
-        WindowInsetsControllerCompat windowInsetsController =
-                WindowCompat.getInsetsController(getWindow(), getWindow().getDecorView());
-        windowInsetsController.setAppearanceLightStatusBars(isLight);
     }
 
     public void setShowControlLayout(boolean isShow) {

@@ -34,7 +34,7 @@ import com.aptech.mymusic.presentation.view.activity.PlayMusicActivity;
 import com.aptech.mymusic.presentation.view.adapter.CardAdapter;
 import com.aptech.mymusic.presentation.view.adapter.SongAdapter;
 import com.aptech.mymusic.presentation.view.fragment.mainpager.BaseTabFragment;
-import com.aptech.mymusic.utils.AnimateUtils;
+import com.aptech.mymusic.utils.BarsUtils;
 import com.aptech.mymusic.utils.BitmapUtils;
 import com.aptech.mymusic.utils.GlideUtils;
 import com.google.android.material.appbar.AppBarLayout;
@@ -77,10 +77,10 @@ public class DetailCardFragment extends BaseTabFragment implements SongAdapter.I
         Bundle bundle = requireArguments();
         card = (CardModel) bundle.getSerializable(KEY_CARD_MODEL);
         if (getActivity() instanceof MainActivity) {
-            if (!isTopic()) {
-                ((MainActivity) getActivity()).setOffsetStatusBars(false);
-                ((MainActivity) getActivity()).setAppearanceLightStatusBars(false);
+            if (card instanceof CategoryModel) {
+                return;
             }
+            ((MainActivity) getActivity()).setOffsetStatusBars(false);
             ((MainActivity) getActivity()).setShowControlLayout(false);
         }
     }
@@ -122,6 +122,12 @@ public class DetailCardFragment extends BaseTabFragment implements SongAdapter.I
     }
 
     @Override
+    public void onResume() {
+        super.onResume();
+        BarsUtils.setAppearanceLightStatusBars(getActivity(), false);
+    }
+
+    @Override
     public void onDestroy() {
         super.onDestroy();
         mHomePresenter.release();
@@ -132,10 +138,10 @@ public class DetailCardFragment extends BaseTabFragment implements SongAdapter.I
     public void onDetach() {
         super.onDetach();
         if (getActivity() instanceof MainActivity) {
-            if (!isTopic()) {
-                ((MainActivity) getActivity()).setOffsetStatusBars(true);
-                ((MainActivity) getActivity()).setAppearanceLightStatusBars(true);
+            if (card instanceof CategoryModel) {
+                return;
             }
+            ((MainActivity) getActivity()).setOffsetStatusBars(true);
             ((MainActivity) getActivity()).setShowControlLayout(true);
         }
     }
@@ -167,18 +173,20 @@ public class DetailCardFragment extends BaseTabFragment implements SongAdapter.I
             play(songs, 0);
         });
 
-        if (!isTopic()) {
-            int pd = ScreenUtils.getStatusBarHeight(requireContext());
-            AnimateUtils.animatePaddingTop(view.findViewById(R.id.coordinator), 200, 0, pd);
-        }
     }
 
     private void initToolBarAnimation() {
         AtomicBoolean isExpanded = new AtomicBoolean(false);
         Drawable drawable = ContextCompat.getDrawable(requireContext(), R.drawable.ic_back);
         mToolbar.setNavigationIcon(drawable);
+
+        final int statusBarHeight = ScreenUtils.getStatusBarHeight(requireContext());
+        ViewGroup.MarginLayoutParams lp = (ViewGroup.MarginLayoutParams) mToolbar.getLayoutParams();
+        lp.topMargin = statusBarHeight;
+        mToolbar.setLayoutParams(lp);
+
         mAppBarLayout.addOnOffsetChangedListener((appBarLayout, verticalOffset) -> {
-            int maxOffset = appBarLayout.getHeight() - (int) getResources().getDimension(R.dimen.custom_action_bar_size);
+            int maxOffset = appBarLayout.getHeight() - mToolbar.getHeight() - statusBarHeight;
             float alpha = (float) Math.abs(verticalOffset) * 100 / maxOffset;
             if (rlDetailHeader.getAlpha() != alpha) {
                 rlDetailHeader.setAlpha(1 - (float) Math.abs(verticalOffset) / maxOffset);
@@ -187,6 +195,7 @@ public class DetailCardFragment extends BaseTabFragment implements SongAdapter.I
                 // Expanded
                 isExpanded.set(true);
                 if (isTopic()) {
+                    BarsUtils.setAppearanceLightStatusBars(getActivity(), false);
                     mToolbar.setTitleTextColor(Color.WHITE);
                     if (drawable != null) {
                         drawable.setTint(Color.WHITE);
@@ -195,6 +204,7 @@ public class DetailCardFragment extends BaseTabFragment implements SongAdapter.I
             } else if (Math.abs(verticalOffset) == maxOffset && isExpanded.get()) {
                 isExpanded.set(false);
                 if (isTopic()) {
+                    BarsUtils.setAppearanceLightStatusBars(getActivity(), true);
                     mToolbar.setTitleTextColor(Color.BLACK);
                     if (drawable != null) {
                         drawable.setTint(Color.BLACK);

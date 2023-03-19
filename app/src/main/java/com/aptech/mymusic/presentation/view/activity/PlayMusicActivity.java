@@ -23,8 +23,6 @@ import android.widget.ImageView;
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import androidx.core.app.ActivityOptionsCompat;
-import androidx.core.view.WindowCompat;
-import androidx.core.view.WindowInsetsControllerCompat;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import com.aptech.mymusic.R;
@@ -32,6 +30,7 @@ import com.aptech.mymusic.domain.entity.SongModel;
 import com.aptech.mymusic.presentation.view.common.TextThumbSeekBar;
 import com.aptech.mymusic.presentation.view.fragment.musicplayer.MainPagerFragment;
 import com.aptech.mymusic.presentation.view.service.MusicServiceHelper;
+import com.aptech.mymusic.utils.BarsUtils;
 import com.aptech.mymusic.utils.BitmapUtils;
 import com.aptech.mymusic.utils.GlideUtils;
 import com.mct.components.baseui.BaseActivity;
@@ -101,12 +100,6 @@ public class PlayMusicActivity extends BaseActivity {
         LocalBroadcastManager.getInstance(this).unregisterReceiver(receiverFromMusicService);
     }
 
-    public void setAppearanceLightStatusBars(boolean isLight) {
-        WindowInsetsControllerCompat windowInsetsController =
-                WindowCompat.getInsetsController(getWindow(), getWindow().getDecorView());
-        windowInsetsController.setAppearanceLightStatusBars(isLight);
-    }
-
     private void initUi() {
         imgBackground = findViewById(R.id.img_background);
         seekBar = findViewById(R.id.seek_bar);
@@ -134,7 +127,7 @@ public class PlayMusicActivity extends BaseActivity {
         lp.topMargin = ScreenUtils.getStatusBarHeight(this);
         viewGroup.setLayoutParams(lp);
 
-        setAppearanceLightStatusBars(false);
+        BarsUtils.setAppearanceLightStatusBars(this, false);
     }
 
     private void initData() {

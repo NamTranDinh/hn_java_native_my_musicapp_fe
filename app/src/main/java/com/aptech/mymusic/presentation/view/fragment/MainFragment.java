@@ -16,6 +16,7 @@ import androidx.viewpager2.widget.ViewPager2.OnPageChangeCallback;
 
 import com.aptech.mymusic.R;
 import com.aptech.mymusic.presentation.view.adapter.MainViewPagerAdapter;
+import com.aptech.mymusic.utils.BarsUtils;
 import com.google.android.material.appbar.AppBarLayout;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationView;
@@ -43,6 +44,12 @@ public class MainFragment extends BaseFragment implements View.OnClickListener {
         initAction();
         mViewPager2.setAdapter(new MainViewPagerAdapter(requireActivity()));
         mNavigationView.getMenu().findItem(R.id.nav_home).setChecked(true);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        BarsUtils.setAppearanceLightStatusBars(getActivity(), true);
     }
 
     private void initUi(@NonNull View view) {
