@@ -1,13 +1,21 @@
 package com.aptech.mymusic.utils;
 
+import androidx.annotation.NonNull;
+
+import com.aptech.mymusic.utils.annotation.IgnoreField;
+import com.google.gson.ExclusionStrategy;
+import com.google.gson.FieldAttributes;
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 
 import java.util.List;
 
 public class JsonHelper {
 
-    private static final Gson sGson = new Gson();
+    private static final Gson sGson = new GsonBuilder()
+            .setExclusionStrategies(new IgnoreStrategy())
+            .create();
 
     public static String objToJson(Object o) {
         return sGson.toJson(o);
@@ -21,4 +29,15 @@ public class JsonHelper {
         return sGson.fromJson(strJson, TypeToken.getParameterized(List.class, clazz).getType());
     }
 
+    private static class IgnoreStrategy implements ExclusionStrategy {
+
+        public boolean shouldSkipField(@NonNull FieldAttributes f) {
+            return f.getAnnotation(IgnoreField.class) != null;
+        }
+
+        public boolean shouldSkipClass(Class<?> clazz) {
+            return false;
+        }
+
+    }
 }

@@ -2,7 +2,7 @@ package com.aptech.mymusic.domain.entity;
 
 import androidx.annotation.NonNull;
 
-import com.google.gson.annotations.Expose;
+import com.aptech.mymusic.utils.annotation.IgnoreField;
 import com.google.gson.annotations.SerializedName;
 
 public class SongModel implements CardModel {
@@ -31,7 +31,7 @@ public class SongModel implements CardModel {
     private String imageUrl;
     @SerializedName("audioUrl")
     private String audioUrl;
-    @Expose
+    @IgnoreField
     private boolean isSelected;
 
     public Integer getId() {
