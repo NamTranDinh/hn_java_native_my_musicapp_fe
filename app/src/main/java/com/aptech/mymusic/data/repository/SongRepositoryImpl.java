@@ -24,4 +24,9 @@ public class SongRepositoryImpl implements SongRepository {
     public Call<List<SongModel>> getSuggestSong(Long id, String listCurrentSongId, Integer limit) {
         return DataService.getInstance().getSuggestSong(id, listCurrentSongId, limit);
     }
+
+    @Override
+    public Call<List<SongModel>> searchSongByName(String nameSong) {
+        return DataService.getInstance().searchSongByName(nameSong);
+    }
 }

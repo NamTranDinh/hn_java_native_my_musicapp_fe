@@ -24,4 +24,10 @@
         <item name="navigationContentDescription">@string/content_desc_back</item>
     </style>
 
+    <style name="AppToolbar.NavBack.Black">
+        <item name="navigationIcon">@drawable/ic_back_black</item>
+        <item name="contentInsetStartWithNavigation">0dp</item>
+        <item name="navigationContentDescription">@string/content_desc_back</item>
+    </style>
+
 </resources>

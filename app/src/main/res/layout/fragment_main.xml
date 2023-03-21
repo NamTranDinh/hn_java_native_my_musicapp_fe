@@ -54,6 +54,7 @@
                         android:background="@drawable/custom_radius_10_black_thin"
                         android:drawableStart="@drawable/ic_search"
                         android:drawablePadding="8dp"
+                        android:focusable="false"
                         android:hint="@string/toolbar_txt_search_hint"
                         android:inputType="textAutoComplete"
                         android:paddingHorizontal="12dp"

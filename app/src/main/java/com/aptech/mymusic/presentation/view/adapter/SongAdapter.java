@@ -1,6 +1,7 @@
 package com.aptech.mymusic.presentation.view.adapter;
 
 
+import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -8,6 +9,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.aptech.mymusic.R;
@@ -21,6 +23,7 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.SongViewHolder
 
     public static final int TYPE_NORMAL = 0;
     public static final int TYPE_SUGGEST = 1;
+    public static final int TYPE_SEARCH = 2;
 
     private final List<SongModel> mListSong;
     private final int mType;
@@ -54,8 +57,15 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.SongViewHolder
             return;
         }
         GlideUtils.load(song.getImageUrl(), holder.imgThumb.get());
-        holder.tvSongName.setText(song.getName());
-        holder.tvSingerName.setText(song.getSingerName());
+        if (mType == TYPE_SEARCH){
+            holder.tvSongName.setText(song.getName());
+            holder.tvSongName.setTextColor(Color.BLACK);
+            holder.tvSingerName.setText(song.getSingerName());
+            holder.tvSingerName.setTextColor(Color.BLACK);
+        }else {
+            holder.tvSongName.setText(song.getName());
+            holder.tvSingerName.setText(song.getSingerName());
+        }
 
         holder.itemView.setOnClickListener(view -> {
             if (mItemClickedListener != null) {

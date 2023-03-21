@@ -117,6 +117,24 @@ public class HomePresenter extends BasePresenter {
         });
     }
 
+    public void getDataSongSearch(String nameSong, Callback.GetDataSongSearchCallBack callback) {
+        DataInjection.provideRepository().getSongRepository().searchSongByName(nameSong).enqueue(new retrofit2.Callback<List<SongModel>>() {
+            @Override
+            public void onResponse(@NonNull Call<List<SongModel>> call, @NonNull Response<List<SongModel>> response) {
+                getBaseView().showLoading();
+                if (response.body() != null) {
+                    callback.getDataSongSearchSuccess(response.body());
+                }
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<List<SongModel>> call, @NonNull Throwable t) {
+                getBaseView().hideLoading();
+                callback.getDataSongSearchFailure(t.getMessage());
+            }
+        });
+    }
+
     public void getDataNewReleasedMusic(Callback.GetDataNewReleaseMusicCallBack callBack) {
         DataInjection.provideRepository().getSongRepository().getNewlyReleasedMusic().enqueue(new retrofit2.Callback<List<SongModel>>() {
             @Override

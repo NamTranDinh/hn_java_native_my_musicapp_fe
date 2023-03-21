@@ -57,6 +57,12 @@ public abstract class Callback {
         void getDataSongFailure(String error);
     }
 
+    public interface GetDataSongSearchCallBack {
+        void getDataSongSearchSuccess(List<SongModel> data);
+
+        void getDataSongSearchFailure(String error);
+    }
+
     public interface GetDataAllCategoryCallBack {
         void getDataAllCategorySuccess(List<CategoryModel> data);
 

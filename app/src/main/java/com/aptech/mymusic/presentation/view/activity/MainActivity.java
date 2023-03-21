@@ -87,10 +87,10 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
     }
 
     private void initWindow() {
-        Window window = getWindow();
-        WindowCompat.setDecorFitsSystemWindows(window, false);
-        window.setFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS,
-                WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS);
+//        Window window = getWindow();
+//        WindowCompat.setDecorFitsSystemWindows(window, false);
+//        window.setFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS,
+//                WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS);
     }
 
     @SuppressLint("ClickableViewAccessibility")

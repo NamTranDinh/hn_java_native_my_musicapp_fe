@@ -94,4 +94,7 @@ public interface DataService {
                                          @Field("limit") Integer limit
     );
 
+    @GET("search_song/{name}")
+    Call<List<SongModel>> searchSongByName(@Path("name") String nameSong);
+
 }

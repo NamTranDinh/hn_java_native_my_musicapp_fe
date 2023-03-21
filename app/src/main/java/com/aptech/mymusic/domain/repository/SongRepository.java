@@ -19,4 +19,12 @@ public interface SongRepository {
      */
     Call<List<SongModel>> getSuggestSong(Long id, String listCurrentSongId, Integer limit);
 
+
+    /**
+     * @param nameSong name song
+     * @return List<SongModel>
+     */
+    Call<List<SongModel>> searchSongByName(String nameSong);
+
+
 }

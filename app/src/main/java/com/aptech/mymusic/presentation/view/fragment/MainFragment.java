@@ -6,21 +6,25 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.fragment.app.Fragment;
 import androidx.viewpager2.widget.ViewPager2;
 import androidx.viewpager2.widget.ViewPager2.OnPageChangeCallback;
 
 import com.aptech.mymusic.R;
 import com.aptech.mymusic.presentation.view.adapter.MainViewPagerAdapter;
+import com.aptech.mymusic.presentation.view.fragment.searchpager.SearchFragment;
 import com.aptech.mymusic.utils.BarsUtils;
 import com.google.android.material.appbar.AppBarLayout;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationView;
 import com.mct.components.baseui.BaseFragment;
+import com.mct.components.utils.ToastUtils;
 
 public class MainFragment extends BaseFragment implements View.OnClickListener {
 
@@ -29,6 +33,7 @@ public class MainFragment extends BaseFragment implements View.OnClickListener {
     private AppBarLayout mAppBarLayout;
     private BottomNavigationView mTopNavView;
     private ViewPager2 mViewPager2;
+    private EditText mEdtTbSearch;
 
 
     @Nullable
@@ -58,6 +63,7 @@ public class MainFragment extends BaseFragment implements View.OnClickListener {
         mNavigationView = view.findViewById(R.id.navigation_view);
         mTopNavView = view.findViewById(R.id.top_nav);
         mViewPager2 = view.findViewById(R.id.view_pager2);
+        mEdtTbSearch = view.findViewById(R.id.edt_tb_search);
         view.findViewById(R.id.civ_avatar_user).setOnClickListener(this);
 
         BarsUtils.offsetStatusBar(view.findViewById(R.id.toolbar));
@@ -79,6 +85,7 @@ public class MainFragment extends BaseFragment implements View.OnClickListener {
         });
         mNavigationView.setNavigationItemSelectedListener(this::onItemSelected);
         mTopNavView.setOnItemSelectedListener(this::onItemSelected);
+        mEdtTbSearch.setOnClickListener(this);
         mViewPager2.registerOnPageChangeCallback(new OnPageChangeCallback() {
             @Override
             public void onPageSelected(int position) {
@@ -111,6 +118,10 @@ public class MainFragment extends BaseFragment implements View.OnClickListener {
         int id = v.getId();
         if (id == R.id.civ_avatar_user) {
             mDrawerLayout.openDrawer(GravityCompat.START);
+        }
+        if (id == R.id.edt_tb_search){
+            Fragment searchFragment = new SearchFragment();
+            replaceFragment(searchFragment, true);
         }
     }
 
