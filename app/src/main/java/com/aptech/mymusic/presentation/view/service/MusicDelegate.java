@@ -258,15 +258,23 @@ public class MusicDelegate {
             editor().putString(KEY_LAST_LIST_SONG, JsonHelper.objToJson(songs)).apply();
         }
 
-        List<SongModel> getFavoriteSong() {
+        public void addFavoriteSong(SongModel song) {
+            List<SongModel> songs = getFavoriteSong();
+            if (!songs.contains(song)) {
+                songs.add(song);
+            }
+            setFavoriteSong(songs);
+        }
+
+        public List<SongModel> getFavoriteSong() {
             return JsonHelper.jsonToList(mPreferences.getString(KEY_FAVORITE_SONG, "[]"), SongModel.class);
         }
 
-        void setFavoriteSong(List<SongModel> songs) {
+        public void setFavoriteSong(List<SongModel> songs) {
             editor().putString(KEY_FAVORITE_SONG, JsonHelper.objToJson(songs)).apply();
         }
 
-        boolean isFavorite(SongModel song) {
+        public boolean isFavorite(SongModel song) {
             return getFavoriteSong().contains(song);
         }
     }
