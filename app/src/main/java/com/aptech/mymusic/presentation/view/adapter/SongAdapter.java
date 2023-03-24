@@ -62,6 +62,8 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.SongViewHolder
             holder.tvSongName.setTextColor(Color.BLACK);
             holder.tvSingerName.setText(song.getSingerName());
             holder.tvSingerName.setTextColor(Color.BLACK);
+            holder.imgAdd.setColorFilter(Color.BLACK);
+            holder.imgMenu.setColorFilter(Color.BLACK);
         }else {
             holder.tvSongName.setText(song.getName());
             holder.tvSingerName.setText(song.getSingerName());
