@@ -1,6 +1,5 @@
 package com.aptech.mymusic.presentation.view.fragment.detailpager;
 
-import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
@@ -208,10 +207,9 @@ public class DetailCardFragment extends BaseTabFragment implements SongAdapter.I
             if (getActivity() == null) {
                 return;
             }
-            if (image == null) {
-                image = BitmapFactory.decodeResource(getResources(), R.drawable.custom_overlay_black);
+            if (image != null) {
+                imgBackground.setImageBitmap(BitmapUtils.blur(getActivity(), image, 25, 1));
             }
-            imgBackground.setImageBitmap(BitmapUtils.blur(getContext(), image, 25, 1));
         });
         titleCard.setText(card.getName());
         if (card instanceof AlbumModel) {

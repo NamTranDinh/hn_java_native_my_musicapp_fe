@@ -45,7 +45,9 @@ public class PlayMusicPresenter extends BasePresenter {
 
                     @Override
                     public void onFailure(@NonNull Call<List<SongModel>> call, @NonNull Throwable t) {
-                        getBaseView().onFalse(t);
+                        if (getBaseView() != null) {
+                            getBaseView().onFalse(t);
+                        }
                     }
                 });
     }

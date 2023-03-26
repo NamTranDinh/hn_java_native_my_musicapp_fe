@@ -26,7 +26,7 @@ public class SongModel implements CardModel {
     @SerializedName("likes")
     private Integer likes;
     @SerializedName("status")
-    private Integer status;
+    private Enums.Status status;
     @SerializedName("imageUrl")
     private String imageUrl;
     @SerializedName("audioUrl")
@@ -106,11 +106,11 @@ public class SongModel implements CardModel {
         this.likes = likes;
     }
 
-    public Integer getStatus() {
+    public Enums.Status getStatus() {
         return status;
     }
 
-    public void setStatus(Integer status) {
+    public void setStatus(Enums.Status status) {
         this.status = status;
     }
 

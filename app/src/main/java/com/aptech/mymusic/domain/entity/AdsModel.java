@@ -15,7 +15,8 @@ public class AdsModel implements CardModel {
     @SerializedName("image")
     private String image;
     @SerializedName("status")
-    private Integer status;
+    private Enums.Status status;
+
     @SerializedName("imageUrl")
     private String imageUrl;
 
@@ -51,11 +52,11 @@ public class AdsModel implements CardModel {
         this.image = image;
     }
 
-    public Integer getStatus() {
+    public Enums.Status getStatus() {
         return status;
     }
 
-    public void setStatus(Integer status) {
+    public void setStatus(Enums.Status status) {
         this.status = status;
     }
 

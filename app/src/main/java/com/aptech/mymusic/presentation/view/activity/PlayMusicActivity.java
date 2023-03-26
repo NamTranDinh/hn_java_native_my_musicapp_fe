@@ -13,7 +13,6 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.os.SystemClock;
 import android.view.MotionEvent;
@@ -142,10 +141,9 @@ public class PlayMusicActivity extends BaseActivity {
         boolean isPlaying = MusicServiceHelper.isPlaying();
         if (song != null) {
             GlideUtils.load(song.getImageUrl(), image -> {
-                if (image == null) {
-                    image = BitmapFactory.decodeResource(getResources(), R.drawable.custom_overlay_black);
+                if (image != null) {
+                    imgBackground.setImageBitmap(BitmapUtils.blur(getApplicationContext(), image, 25, 1));
                 }
-                imgBackground.setImageBitmap(BitmapUtils.blur(getApplicationContext(), image, 25, 1));
             });
         }
         initPlayPauseBtn(isPlaying);
