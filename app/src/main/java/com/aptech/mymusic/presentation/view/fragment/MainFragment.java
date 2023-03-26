@@ -18,13 +18,12 @@ import androidx.viewpager2.widget.ViewPager2.OnPageChangeCallback;
 
 import com.aptech.mymusic.R;
 import com.aptech.mymusic.presentation.view.adapter.MainViewPagerAdapter;
-import com.aptech.mymusic.presentation.view.fragment.searchpager.SearchFragment;
+import com.aptech.mymusic.presentation.view.fragment.homepages.SearchFragment;
 import com.aptech.mymusic.utils.BarsUtils;
 import com.google.android.material.appbar.AppBarLayout;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationView;
 import com.mct.components.baseui.BaseFragment;
-import com.mct.components.utils.ToastUtils;
 
 public class MainFragment extends BaseFragment implements View.OnClickListener {
 

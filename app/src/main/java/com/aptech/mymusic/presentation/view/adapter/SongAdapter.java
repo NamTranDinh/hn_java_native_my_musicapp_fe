@@ -9,7 +9,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.aptech.mymusic.R;
@@ -57,14 +56,15 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.SongViewHolder
             return;
         }
         GlideUtils.load(song.getImageUrl(), holder.imgThumb.get());
-        if (mType == TYPE_SEARCH){
+        if (mType == TYPE_SEARCH) {
+            holder.itemView.setBackgroundResource(R.drawable.custom_background_song_item_dark);
             holder.tvSongName.setText(song.getName());
             holder.tvSongName.setTextColor(Color.BLACK);
             holder.tvSingerName.setText(song.getSingerName());
             holder.tvSingerName.setTextColor(Color.BLACK);
             holder.imgAdd.setColorFilter(Color.BLACK);
             holder.imgMenu.setColorFilter(Color.BLACK);
-        }else {
+        } else {
             holder.tvSongName.setText(song.getName());
             holder.tvSingerName.setText(song.getSingerName());
         }

@@ -1,4 +1,4 @@
-package com.aptech.mymusic.presentation.view.fragment.detailpager;
+package com.aptech.mymusic.presentation.view.fragment.homepages;
 
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;

@@ -20,7 +20,7 @@ import com.aptech.mymusic.presentation.view.activity.PlayMusicActivity;
 import com.aptech.mymusic.presentation.view.adapter.ICardListener;
 import com.aptech.mymusic.presentation.view.dialog.LoadingDialog;
 import com.aptech.mymusic.presentation.view.fragment.MainFragment;
-import com.aptech.mymusic.presentation.view.fragment.detailpager.DetailCardFragment;
+import com.aptech.mymusic.presentation.view.fragment.homepages.DetailCardFragment;
 import com.mct.components.baseui.BaseActivity;
 import com.mct.components.baseui.BaseFragment;
 import com.mct.components.utils.ToastUtils;
