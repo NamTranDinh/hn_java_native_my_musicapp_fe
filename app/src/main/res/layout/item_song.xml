@@ -32,7 +32,7 @@
         android:layout_height="wrap_content"
         android:layout_centerVertical="true"
         android:layout_marginStart="@dimen/half_space_view"
-        android:layout_toStartOf="@id/img_add_song"
+        android:layout_toStartOf="@id/ll_layout_action"
         android:layout_toEndOf="@id/card_view_ic"
         android:orientation="vertical">
 
@@ -56,30 +56,44 @@
 
     </LinearLayout>
 
-    <ImageButton
-        android:id="@+id/img_add_song"
-        android:layout_width="42dp"
-        android:layout_height="42dp"
+    <androidx.appcompat.widget.LinearLayoutCompat
+        android:id="@+id/ll_layout_action"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_centerVertical="true"
-        android:layout_toStartOf="@id/img_menu_song"
-        android:background="@drawable/ripple_transparent_oval"
-        android:padding="10dp"
-        android:src="@drawable/ic_add_song"
-        android:visibility="gone"
-        app:tint="@color/white"
-        tools:ignore="ContentDescription"
-        tools:visibility="visible" />
+        android:layout_alignParentEnd="true">
 
-    <ImageButton
-        android:id="@+id/img_menu_song"
-        android:layout_width="42dp"
-        android:layout_height="42dp"
-        android:layout_alignParentEnd="true"
-        android:layout_centerVertical="true"
-        android:background="@drawable/ripple_transparent_oval"
-        android:padding="10dp"
-        android:src="@drawable/ic_menu_dot"
-        app:tint="@color/white"
-        tools:ignore="ContentDescription" />
+        <ImageButton
+            android:id="@+id/img_add_song"
+            android:layout_width="42dp"
+            android:layout_height="42dp"
+            android:background="@drawable/ripple_transparent_oval"
+            android:padding="10dp"
+            android:src="@drawable/ic_add_song"
+            android:visibility="gone"
+            app:tint="@color/white"
+            tools:ignore="ContentDescription"
+            tools:visibility="visible" />
+
+        <ImageButton
+            android:id="@+id/img_like"
+            android:layout_width="42dp"
+            android:layout_height="42dp"
+            android:background="@drawable/ripple_transparent_oval"
+            android:padding="10dp"
+            android:src="@drawable/ic_heart"
+            app:tint="@color/white"
+            tools:ignore="ContentDescription" />
+
+        <ImageButton
+            android:id="@+id/img_menu_song"
+            android:layout_width="42dp"
+            android:layout_height="42dp"
+            android:background="@drawable/ripple_transparent_oval"
+            android:padding="10dp"
+            android:src="@drawable/ic_menu_dot"
+            app:tint="@color/white"
+            tools:ignore="ContentDescription" />
+    </androidx.appcompat.widget.LinearLayoutCompat>
 
 </RelativeLayout>

@@ -18,11 +18,13 @@ import androidx.viewpager2.widget.ViewPager2.OnPageChangeCallback;
 
 import com.aptech.mymusic.R;
 import com.aptech.mymusic.presentation.view.adapter.MainViewPagerAdapter;
+import com.aptech.mymusic.presentation.view.fragment.homepages.FavouriteFragment;
 import com.aptech.mymusic.presentation.view.fragment.homepages.SearchFragment;
 import com.aptech.mymusic.utils.BarsUtils;
 import com.google.android.material.appbar.AppBarLayout;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationView;
+import com.mct.components.baseui.BaseActivity;
 import com.mct.components.baseui.BaseFragment;
 
 public class MainFragment extends BaseFragment implements View.OnClickListener {
@@ -118,7 +120,7 @@ public class MainFragment extends BaseFragment implements View.OnClickListener {
         if (id == R.id.civ_avatar_user) {
             mDrawerLayout.openDrawer(GravityCompat.START);
         }
-        if (id == R.id.edt_tb_search){
+        if (id == R.id.edt_tb_search) {
             Fragment searchFragment = new SearchFragment();
             replaceFragment(searchFragment, true);
         }
@@ -143,6 +145,9 @@ public class MainFragment extends BaseFragment implements View.OnClickListener {
             case R.id.nav_topic:
             case R.id.top_topic:
                 mViewPager2.setCurrentItem(3);
+                break;
+            case R.id.nav_favorite:
+                replaceFragment(new FavouriteFragment(), true, BaseActivity.Anim.TRANSIT_FADE);
                 break;
         }
         if (mDrawerLayout.isDrawerOpen(GravityCompat.START)) {

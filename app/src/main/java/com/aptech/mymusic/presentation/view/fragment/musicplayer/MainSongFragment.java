@@ -19,15 +19,19 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import com.aptech.mymusic.R;
 import com.aptech.mymusic.domain.entity.SongModel;
+import com.aptech.mymusic.presentation.view.service.MusicDelegate;
 import com.aptech.mymusic.presentation.view.service.MusicServiceHelper;
 import com.aptech.mymusic.utils.GlideUtils;
 import com.mct.components.baseui.BaseActivity;
 import com.mct.components.baseui.BaseFragment;
+import com.mct.components.utils.ToastUtils;
 
 public class MainSongFragment extends BaseFragment {
 
+    private ImageView imgLike;
     private ImageView imgSong;
     private Integer mSongId;
+
 
     BroadcastReceiver receiverFromMusicService = new BroadcastReceiver() {
         @Override
@@ -55,8 +59,20 @@ public class MainSongFragment extends BaseFragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         imgSong = view.findViewById(R.id.img_song);
-        view.findViewById(R.id.img_likes).setOnClickListener(v -> {
-
+        imgLike = view.findViewById(R.id.img_likes);
+        imgLike.setOnClickListener(v -> {
+            SongModel songCurr = MusicServiceHelper.getCurrentSong();
+            if (songCurr != null) {
+                boolean isSongFavor = MusicServiceHelper.getMusicPreference().toggleFavorSong(songCurr);
+                if (isSongFavor) {
+                    imgLike.setImageResource(R.drawable.ic_heart_fill);
+                    showToast("Added to favorite", ToastUtils.INFO, true);
+                } else {
+                    imgLike.setImageResource(R.drawable.ic_heart);
+                    showToast("Removed from favorite", ToastUtils.INFO, true);
+                }
+                MusicServiceHelper.sendAction(MusicDelegate.Action.UPDATE_VIEW);
+            }
         });
         view.findViewById(R.id.tv_playlist).setOnClickListener(v ->
                 replaceFragment(new PlaylistSongFragment(), true, BaseActivity.Anim.TRANSIT_FADE)
@@ -70,6 +86,12 @@ public class MainSongFragment extends BaseFragment {
         if (!song.getId().equals(mSongId)) {
             mSongId = song.getId();
             imgSong.setRotation(0);
+        }
+        boolean isSongFavor = MusicServiceHelper.getMusicPreference().isFavorite(song);
+        if (isSongFavor) {
+            imgLike.setImageResource(R.drawable.ic_heart_fill);
+        } else {
+            imgLike.setImageResource(R.drawable.ic_heart);
         }
         GlideUtils.load(song.getImageUrl(), imgSong);
         if (isPlaying) {

@@ -27,5 +27,6 @@
 
     <!-- Search tool bar -->
     <dimen name="toolbar_search_height">32dp</dimen>
+    <dimen name="toolbar_default_height">54dp</dimen>
 
 </resources>

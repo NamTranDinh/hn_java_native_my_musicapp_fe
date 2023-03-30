@@ -53,4 +53,6 @@
     <string name="text_search_title_recommend">Recommend for you</string>
     <string name="text_search_title_result">Search Results</string>
     <string name="title_no_found_result">We\'re sorry, we couldn\'t find any results.</string>
+
+    <string name="text_title_song_favor">Favourite Songs</string>
 </resources>

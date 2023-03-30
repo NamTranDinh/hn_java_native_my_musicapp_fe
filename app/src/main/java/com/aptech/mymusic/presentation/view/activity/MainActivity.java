@@ -33,6 +33,7 @@ import com.aptech.mymusic.utils.AnimateUtils;
 import com.aptech.mymusic.utils.GlideUtils;
 import com.mct.components.baseui.BaseActivity;
 import com.mct.components.utils.ScreenUtils;
+import com.mct.components.utils.ToastUtils;
 
 public class MainActivity extends BaseActivity implements View.OnClickListener {
     public static final int TWO_ITEM_CARD = 2;
@@ -45,6 +46,8 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
     private ImageView imgLikes;
     private LottieAnimationView imgPlayPause;
     private Runnable seekBarUpdateRunnable;
+
+    private Toast mToast;
 
     BroadcastReceiver receiverFromMusicService = new BroadcastReceiver() {
         @Override
@@ -111,6 +114,12 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         }
         initPlayPauseBtn(isPlaying);
         if (song != null) {
+            boolean isSongFavor = MusicServiceHelper.getMusicPreference().isFavorite(song);
+            if (isSongFavor) {
+                imgLikes.setImageResource(R.drawable.ic_heart_fill);
+            } else {
+                imgLikes.setImageResource(R.drawable.ic_heart);
+            }
             tvSongName.setText(song.getName());
             tvSingerName.setText(song.getSingerName());
             tvSingerName.setVisibility(View.VISIBLE);
@@ -191,7 +200,17 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         }
         switch (v.getId()) {
             case R.id.img_likes:
-
+                SongModel songCurr = MusicServiceHelper.getCurrentSong();
+                if (songCurr != null) {
+                    boolean isSongFavor = MusicServiceHelper.getMusicPreference().toggleFavorSong(songCurr);
+                    if (isSongFavor) {
+                        imgLikes.setImageResource(R.drawable.ic_heart_fill);
+                        showToast("Added to favorite");
+                    } else {
+                        imgLikes.setImageResource(R.drawable.ic_heart);
+                        showToast("Removed from favorite");
+                    }
+                }
                 break;
             case R.id.img_play_pause:
                 Long lastClick = (Long) v.getTag();
@@ -225,6 +244,14 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         } else {
             AnimateUtils.animateHeight(controlLayout, duration, controlLayout.getHeight(), 0);
         }
+    }
+
+    void showToast(String mess) {
+        if (mToast != null) {
+            mToast.cancel();
+        }
+        mToast = ToastUtils.makeInfoToast(getApplicationContext(), Toast.LENGTH_SHORT, mess, true);
+        mToast.show();
     }
 
     @Override

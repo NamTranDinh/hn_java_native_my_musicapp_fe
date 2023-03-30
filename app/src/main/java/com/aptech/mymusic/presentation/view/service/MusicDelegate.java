@@ -13,11 +13,13 @@ import androidx.core.util.Pair;
 
 import com.aptech.mymusic.application.App;
 import com.aptech.mymusic.domain.entity.SongModel;
+import com.aptech.mymusic.presentation.view.adapter.SongAdapter;
 import com.aptech.mymusic.utils.JsonHelper;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 public class MusicDelegate {
 
@@ -258,19 +260,33 @@ public class MusicDelegate {
             editor().putString(KEY_LAST_LIST_SONG, JsonHelper.objToJson(songs)).apply();
         }
 
-        public void addFavoriteSong(SongModel song) {
-            List<SongModel> songs = getFavoriteSong();
-            if (!songs.contains(song)) {
-                songs.add(song);
+        public boolean toggleFavorSong(SongModel song) {
+            boolean isFavor = isFavorite(song);
+            if (isFavor) {
+                removeFavoriteSong(song);
+            } else {
+                addFavoriteSong(song);
             }
+            return !isFavor;
+        }
+
+        public void addFavoriteSong(SongModel song) {
+            Set<SongModel> songs = getFavoriteSong();
+            songs.add(song);
             setFavoriteSong(songs);
         }
 
-        public List<SongModel> getFavoriteSong() {
-            return JsonHelper.jsonToList(mPreferences.getString(KEY_FAVORITE_SONG, "[]"), SongModel.class);
+        public void removeFavoriteSong(SongModel song) {
+            Set<SongModel> songs = getFavoriteSong();
+            songs.remove(song);
+            setFavoriteSong(songs);
         }
 
-        public void setFavoriteSong(List<SongModel> songs) {
+        public Set<SongModel> getFavoriteSong() {
+            return JsonHelper.jsonToSet(mPreferences.getString(KEY_FAVORITE_SONG, "[]"), SongModel.class);
+        }
+
+        public void setFavoriteSong(Set<SongModel> songs) {
             editor().putString(KEY_FAVORITE_SONG, JsonHelper.objToJson(songs)).apply();
         }
 

@@ -10,6 +10,7 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 
 import java.util.List;
+import java.util.Set;
 
 public class JsonHelper {
 
@@ -27,6 +28,9 @@ public class JsonHelper {
 
     public static <T> List<T> jsonToList(String strJson, Class<T> clazz) {
         return sGson.fromJson(strJson, TypeToken.getParameterized(List.class, clazz).getType());
+    }
+    public static <T> Set<T> jsonToSet(String strJson, Class<T> clazz) {
+        return sGson.fromJson(strJson, TypeToken.getParameterized(Set.class, clazz).getType());
     }
 
     private static class IgnoreStrategy implements ExclusionStrategy {
