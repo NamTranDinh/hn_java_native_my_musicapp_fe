@@ -533,7 +533,14 @@ public class MusicService extends Service {
         }
 
         private void pauseSong() {
+            pauseSong(true);
+        }
+
+        private void pauseSong(boolean abandonFocus) {
             if (mMediaState == MediaState.PLAYING) {
+                if (abandonFocus) {
+                    abandonAudioFocus();
+                }
                 applyMediaState(MediaState.PAUSED);
                 mMediaPlayer.pause();
                 updateNotification();
@@ -622,7 +629,7 @@ public class MusicService extends Service {
                         case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT:
                             // Pause playback
                             Log.d(TAG, "AudioFocus Changed: AUDIOFOCUS_LOSS_TRANSIENT");
-                            pauseSong();
+                            pauseSong(false);
                             break;
                         case AudioManager.AUDIOFOCUS_GAIN:
                             // Resume playback
@@ -632,7 +639,6 @@ public class MusicService extends Service {
                         case AudioManager.AUDIOFOCUS_LOSS:
                             // Stop playback
                             Log.d(TAG, "AudioFocus Changed: AUDIOFOCUS_LOSS");
-                            abandonAudioFocus();
                             pauseSong();
                             break;
                     }
