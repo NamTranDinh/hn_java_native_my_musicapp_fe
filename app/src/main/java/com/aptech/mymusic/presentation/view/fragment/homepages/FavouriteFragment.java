@@ -13,8 +13,10 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.aptech.mymusic.R;
 import com.aptech.mymusic.domain.entity.SongModel;
+import com.aptech.mymusic.presentation.view.activity.PlayMusicActivity;
 import com.aptech.mymusic.presentation.view.adapter.SongAdapter;
 import com.aptech.mymusic.presentation.view.service.MusicServiceHelper;
+import com.aptech.mymusic.utils.BarsUtils;
 import com.mct.components.baseui.BaseFragment;
 
 import java.util.ArrayList;
@@ -22,9 +24,6 @@ import java.util.List;
 import java.util.Set;
 
 public class FavouriteFragment extends BaseFragment implements SongAdapter.ItemClickedListener {
-
-    private Toolbar tbFavorSong;
-    private RecyclerView rcvListSongFavor;
 
     @Nullable
     @Override
@@ -38,23 +37,28 @@ public class FavouriteFragment extends BaseFragment implements SongAdapter.ItemC
         initView(view);
     }
 
-    private void initView(View view) {
-        tbFavorSong = view.findViewById(R.id.tb_favor_song);
-        rcvListSongFavor = view.findViewById(R.id.rcv_list_song_favor);
+    @Override
+    public void onResume() {
+        super.onResume();
+        BarsUtils.setAppearanceLightStatusBars(getActivity(), true);
+    }
+
+    private void initView(@NonNull View view) {
+        Toolbar toolbar = view.findViewById(R.id.tb_favor_song);
+        toolbar.setNavigationOnClickListener(v -> popLastFragment());
+        RecyclerView rcvListSongFavor = view.findViewById(R.id.rcv_list_song_favor);
         Set<SongModel> listSong = MusicServiceHelper.getMusicPreference().getFavoriteSong();
         SongAdapter adapter = new SongAdapter(new ArrayList<>(listSong), this, SongAdapter.TYPE_FAVORITE);
         rcvListSongFavor.setAdapter(adapter);
         rcvListSongFavor.setLayoutManager(new LinearLayoutManager(requireContext()));
-        tbFavorSong.setNavigationOnClickListener(v -> popLastFragment());
     }
 
     @Override
     public void onClickedItem(List<SongModel> songs, SongModel song, int position) {
-
+        PlayMusicActivity.start(requireContext(), song);
     }
 
     @Override
     public void onClickedAdd(SongModel song, int position) {
-
     }
 }
