@@ -178,6 +178,8 @@ public class MusicService extends Service {
                     .addCustomAction(ACTION_CANCEL, ACTION_CANCEL, R.drawable.ic_cancel)
                     .setActions(PlaybackStateCompat.ACTION_SKIP_TO_PREVIOUS |
                             PlaybackStateCompat.ACTION_PLAY_PAUSE |
+                            PlaybackStateCompat.ACTION_PLAY |
+                            PlaybackStateCompat.ACTION_PAUSE |
                             PlaybackStateCompat.ACTION_SKIP_TO_NEXT |
                             PlaybackStateCompat.ACTION_SEEK_TO
                     ).build()
