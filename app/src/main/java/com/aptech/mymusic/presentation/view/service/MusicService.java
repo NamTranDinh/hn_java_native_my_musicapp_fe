@@ -564,11 +564,13 @@ public class MusicService extends Service {
                 case SHUFFLE:
                     if (index == mb.mListSongTemp.size() - 1 && isAutoNext) {
                         pauseSong();
+                        return;
                     }
                     break;
                 case REPEAT_ONE:
                     if (isAutoNext) {
                         seekSong(1);
+                        return;
                     }
                     break;
                 case REPEAT:
