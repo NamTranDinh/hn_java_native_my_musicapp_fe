@@ -2,6 +2,7 @@ package com.aptech.mymusic.presentation.view.adapter;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentActivity;
 import androidx.viewpager2.adapter.FragmentStateAdapter;
 
 import com.aptech.mymusic.presentation.view.fragment.musicplayer.MainSongFragment;
@@ -9,8 +10,8 @@ import com.aptech.mymusic.presentation.view.fragment.musicplayer.SuggestSongFrag
 
 public class PlayMusicViewPagerAdapter extends FragmentStateAdapter {
 
-    public PlayMusicViewPagerAdapter(@NonNull Fragment fragment) {
-        super(fragment);
+    public PlayMusicViewPagerAdapter(@NonNull FragmentActivity fragmentActivity) {
+        super(fragmentActivity);
     }
 
     @NonNull

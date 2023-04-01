@@ -72,7 +72,7 @@ public class MainPagerFragment extends BaseFragment {
         });
 
         mViewPager2 = view.findViewById(R.id.view_pager2);
-        mViewPager2.setAdapter(new PlayMusicViewPagerAdapter(this));
+        mViewPager2.setAdapter(new PlayMusicViewPagerAdapter(requireActivity()));
         mViewPager2.setPageTransformer(new ZoomOutPageTransformer());
         mViewPager2.setCurrentItem(1, false);
 

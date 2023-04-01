@@ -19,6 +19,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
+import com.airbnb.lottie.LottieAnimationView;
 import com.aptech.mymusic.R;
 import com.aptech.mymusic.domain.entity.SongModel;
 import com.aptech.mymusic.presentation.presenter.Callback;
@@ -34,6 +35,7 @@ import java.util.Random;
 public class SuggestSongFragment extends BaseFragment implements Callback.GetSuggestSongCallback, SongAdapter.ItemClickedListener {
 
     private SwipeRefreshLayout mSwipeRefreshLayout;
+    private LottieAnimationView mImgLoading;
     private RecyclerView mRcvListSuggestSong;
     private PlayMusicPresenter mPresenter;
     private Integer mSongId;
@@ -65,9 +67,11 @@ public class SuggestSongFragment extends BaseFragment implements Callback.GetSug
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         mSwipeRefreshLayout = view.findViewById(R.id.srl_refresh);
+        mImgLoading = view.findViewById(R.id.icon_loading);
         mRcvListSuggestSong = view.findViewById(R.id.rcv_list_suggest_song);
         mRcvListSuggestSong.setLayoutManager(new LinearLayoutManager(requireContext()));
-        mSwipeRefreshLayout.setOnRefreshListener(() -> mSwipeRefreshLayout.postDelayed(this::initData, 600));
+        mSwipeRefreshLayout.setOnRefreshListener(this::initData);
+
         initData();
     }
 
@@ -76,6 +80,11 @@ public class SuggestSongFragment extends BaseFragment implements Callback.GetSug
         List<SongModel> songs = MusicServiceHelper.getCurrentListSong();
         mSongId = song.getId();
         mPresenter.requestSuggestSong(song, songs, new Random().nextInt(8) + 3, this);
+
+        mSwipeRefreshLayout.setRefreshing(false);
+        mRcvListSuggestSong.setVisibility(View.GONE);
+        mImgLoading.setVisibility(View.VISIBLE);
+        mImgLoading.playAnimation();
     }
 
     @Override
@@ -88,7 +97,9 @@ public class SuggestSongFragment extends BaseFragment implements Callback.GetSug
 
     @Override
     public void onGot(List<SongModel> data) {
-        mSwipeRefreshLayout.setRefreshing(false);
+        mRcvListSuggestSong.setVisibility(View.VISIBLE);
+        mImgLoading.setVisibility(View.GONE);
+        mImgLoading.pauseAnimation();
         mRcvListSuggestSong.setAdapter(new SongAdapter(data, this, SongAdapter.TYPE_SUGGEST));
     }
 
