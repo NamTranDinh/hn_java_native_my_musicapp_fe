@@ -10,6 +10,7 @@ import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.airbnb.lottie.LottieAnimationView;
 import com.aptech.mymusic.R;
 import com.aptech.mymusic.domain.entity.AlbumModel;
 import com.aptech.mymusic.presentation.presenter.AlbumPresenter;
@@ -21,9 +22,10 @@ import com.aptech.mymusic.presentation.view.adapter.ICardListener;
 import java.util.ArrayList;
 import java.util.List;
 
-public class AlbumFragment extends BaseTabFragment implements Callback.GetDataAlbumCallBack, ICardListener {
-    private AlbumPresenter albumPresenter;
+public class AlbumTabFragment extends BaseTabFragment implements Callback.GetDataAlbumCallBack, ICardListener {
+    protected LottieAnimationView mImgLoading;
     private RecyclerView rcvCard;
+    private AlbumPresenter albumPresenter;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -34,13 +36,16 @@ public class AlbumFragment extends BaseTabFragment implements Callback.GetDataAl
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_album, container, false);
+        return inflater.inflate(R.layout.fragment_tab_album, container, false);
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        mImgLoading = view.findViewById(R.id.icon_loading);
         rcvCard = view.findViewById(R.id.rcv_card);
+
+        showLoading(mImgLoading);
         albumPresenter.getDataAlbum(this);
     }
 
@@ -51,14 +56,6 @@ public class AlbumFragment extends BaseTabFragment implements Callback.GetDataAl
         albumPresenter = null;
     }
 
-    private void setData(List<AlbumModel> list) {
-        CardAdapter adapter = new CardAdapter(new ArrayList<>(list), false, this);
-        rcvCard.setAdapter(adapter);
-
-        GridLayoutManager manager = new GridLayoutManager(getContext(), MainActivity.TWO_ITEM_CARD);
-        rcvCard.setLayoutManager(manager);
-    }
-
     @Override
     public void onDestroyView() {
         super.onDestroyView();
@@ -66,7 +63,9 @@ public class AlbumFragment extends BaseTabFragment implements Callback.GetDataAl
 
     @Override
     public void getDataAlbumSuccess(List<AlbumModel> data) {
-        setData(data);
+        hideLoading(mImgLoading);
+        rcvCard.setAdapter(new CardAdapter(new ArrayList<>(data), false, this));
+        rcvCard.setLayoutManager(new GridLayoutManager(getContext(), MainActivity.TWO_ITEM_CARD));
     }
 
     @Override

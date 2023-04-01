@@ -3,12 +3,14 @@ package com.aptech.mymusic.presentation.view.fragment.mainpager;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.SystemClock;
+import android.view.View;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.airbnb.lottie.LottieAnimationView;
 import com.aptech.mymusic.domain.entity.AlbumModel;
 import com.aptech.mymusic.domain.entity.CardModel;
 import com.aptech.mymusic.domain.entity.CategoryModel;
@@ -42,6 +44,18 @@ public abstract class BaseTabFragment extends BaseFragment implements ICardListe
 
     @NonNull
     protected abstract RecyclerView getScrollView();
+
+    protected void showLoading(@NonNull LottieAnimationView imgLoading) {
+        getScrollView().setVisibility(View.GONE);
+        imgLoading.setVisibility(View.VISIBLE);
+        imgLoading.playAnimation();
+    }
+
+    protected void hideLoading(@NonNull LottieAnimationView imgLoading) {
+        getScrollView().setVisibility(View.VISIBLE);
+        imgLoading.setVisibility(View.GONE);
+        imgLoading.pauseAnimation();
+    }
 
     @Nullable
     private MainFragment getMainParentFragment() {

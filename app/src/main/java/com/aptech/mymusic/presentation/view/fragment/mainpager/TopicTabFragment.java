@@ -10,6 +10,7 @@ import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.airbnb.lottie.LottieAnimationView;
 import com.aptech.mymusic.R;
 import com.aptech.mymusic.domain.entity.TopicModel;
 import com.aptech.mymusic.presentation.presenter.Callback;
@@ -18,8 +19,10 @@ import com.aptech.mymusic.presentation.view.adapter.TopicAdapter;
 
 import java.util.List;
 
-public class TopicFragment extends BaseTabFragment implements Callback.GetDataTopicCallBack {
-    private RecyclerView rcvTopic;
+public class TopicTabFragment extends BaseTabFragment implements Callback.GetDataTopicCallBack {
+
+    protected LottieAnimationView mImgLoading;
+    private RecyclerView rcvCard;
     private TopicPresenter topicPresenter;
 
     @Override
@@ -31,13 +34,16 @@ public class TopicFragment extends BaseTabFragment implements Callback.GetDataTo
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_topic, container, false);
+        return inflater.inflate(R.layout.fragment_tab_topic, container, false);
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        rcvTopic = view.findViewById(R.id.rcv_topic);
+        mImgLoading = view.findViewById(R.id.icon_loading);
+        rcvCard = view.findViewById(R.id.rcv_card);
+
+        showLoading(mImgLoading);
         topicPresenter.getDataTopic(this);
     }
 
@@ -49,9 +55,9 @@ public class TopicFragment extends BaseTabFragment implements Callback.GetDataTo
     }
 
     private void setDataTopic(List<TopicModel> data) {
-        TopicAdapter adapter = new TopicAdapter(data, this);
-        rcvTopic.setAdapter(adapter);
-        rcvTopic.setLayoutManager(new LinearLayoutManager(getContext()));
+        hideLoading(mImgLoading);
+        rcvCard.setAdapter(new TopicAdapter(data, this));
+        rcvCard.setLayoutManager(new LinearLayoutManager(getContext()));
     }
 
     @Override
@@ -67,6 +73,6 @@ public class TopicFragment extends BaseTabFragment implements Callback.GetDataTo
     @NonNull
     @Override
     protected RecyclerView getScrollView() {
-        return rcvTopic;
+        return rcvCard;
     }
 }

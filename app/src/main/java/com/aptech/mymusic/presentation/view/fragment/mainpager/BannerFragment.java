@@ -12,6 +12,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.viewpager.widget.ViewPager;
 
+import com.airbnb.lottie.LottieAnimationView;
 import com.aptech.mymusic.R;
 import com.aptech.mymusic.domain.entity.AdsModel;
 import com.aptech.mymusic.presentation.presenter.Callback;
@@ -28,6 +29,7 @@ import me.relex.circleindicator.CircleIndicator;
 public class BannerFragment extends BaseFragment implements Callback.GetDataBannerCallBack {
 
     private static final int TIME_SLIDE_CHANGE = 3000;
+    private LottieAnimationView mImgLoading;
     private ViewPager mViewPager;
     private CircleIndicator mCircleIndicator;
     private Runnable runnable;
@@ -73,6 +75,7 @@ public class BannerFragment extends BaseFragment implements Callback.GetDataBann
 
     @SuppressLint("ClickableViewAccessibility")
     private void initUi(@NonNull View view) {
+        mImgLoading = view.findViewById(R.id.icon_loading);
         mViewPager = view.findViewById(R.id.banner_view_pager);
         mViewPager.setOnTouchListener(new View.OnTouchListener() {
             long downtime;
@@ -107,6 +110,10 @@ public class BannerFragment extends BaseFragment implements Callback.GetDataBann
             }
         });
         mCircleIndicator = view.findViewById(R.id.circle_indicator);
+
+        mImgLoading.setVisibility(View.VISIBLE);
+        mImgLoading.playAnimation();
+        mViewPager.setVisibility(View.GONE);
     }
 
     private void autoRun() {
@@ -132,6 +139,9 @@ public class BannerFragment extends BaseFragment implements Callback.GetDataBann
 
     @Override
     public void getDataBannerSuccess(List<AdsModel> data) {
+        mImgLoading.setVisibility(View.GONE);
+        mImgLoading.pauseAnimation();
+        mViewPager.setVisibility(View.VISIBLE);
         mViewPager.setAdapter(new BannerAdapter(data));
         mCircleIndicator.setViewPager(mViewPager);
         autoRun();

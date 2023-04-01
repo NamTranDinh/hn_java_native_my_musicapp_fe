@@ -24,7 +24,7 @@ import com.aptech.mymusic.presentation.view.adapter.ICardListener;
 import java.util.ArrayList;
 import java.util.List;
 
-public class HomeFragment extends BaseTabFragment implements Callback.GetDataPlayListCallBack, Callback.GetDataNewReleaseMusicCallBack, Callback.GetDataAlbumCallBack, Callback.GetDataCategoryFavorCallBack, ICardListener {
+public class HomeTabFragment extends BaseTabFragment implements Callback.GetDataPlayListCallBack, Callback.GetDataNewReleaseMusicCallBack, Callback.GetDataAlbumCallBack, Callback.GetDataCategoryFavorCallBack, ICardListener {
 
     private RecyclerView rcvRowCard;
     private HomePageAdapter adapter;
@@ -39,7 +39,7 @@ public class HomeFragment extends BaseTabFragment implements Callback.GetDataPla
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_home, container, false);
+        return inflater.inflate(R.layout.fragment_tab_home, container, false);
     }
 
     @Override

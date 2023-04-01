@@ -55,10 +55,11 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public class DetailCardFragment extends BaseTabFragment implements SongAdapter.ItemClickedListener, Callback.GetDataAllSongCallBack, Callback.GetDataAllCategoryCallBack {
 
     private static final String KEY_CARD_MODEL = "KEY_CARD_MODEL";
+    private View view;
     private CardModel card;
     private ImageView imgBackground;
     private AppBarLayout mAppBarLayout;
-    private Toolbar mToolbar;
+    private Toolbar toolbar;
     private RelativeLayout rlDetailHeader;
     private ImageView imgCard;
     private TextView titleCard;
@@ -89,43 +90,13 @@ public class DetailCardFragment extends BaseTabFragment implements SongAdapter.I
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_detail_card, container, false);
-    }
-
-    @Override
-    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
-        initUi(view);
-        initToolBarAnimation();
-        initData();
-        BarsUtils.offsetStatusBar(mToolbar);
-
-        rcvSong.setVisibility(View.GONE);
-        imgLoading.setVisibility(View.VISIBLE);
-        imgLoading.playAnimation();
-
-        if (isTopic()) {
-            ColorStateList csl = ColorStateList.valueOf(Color.BLACK);
-            SimpleColorFilter filter = new SimpleColorFilter(csl.getDefaultColor());
-            KeyPath keyPath = new KeyPath("**");
-            LottieValueCallback<ColorFilter> callback = new LottieValueCallback<>(filter);
-            imgLoading.addValueCallback(keyPath, LottieProperty.COLOR_FILTER, callback);
-            imgLoading.invalidate();
-            mHomePresenter.getDataAllCategory(card.getId(), this);
-            return;
+        if (view == null) {
+            initUi(view = inflater.inflate(R.layout.fragment_detail_card, container, false));
+            initToolBarAnimation();
+            initData();
+            BarsUtils.offsetStatusBar(toolbar);
         }
-
-        String type = null;
-        if (card instanceof PlaylistModel) {
-            type = "playlist";
-        }
-        if (card instanceof AlbumModel) {
-            type = "album";
-        }
-        if (card instanceof CategoryModel) {
-            type = "category";
-        }
-        mHomePresenter.getDataAllSong(type, card.getId(), this);
+        return view;
     }
 
     @Override
@@ -144,8 +115,8 @@ public class DetailCardFragment extends BaseTabFragment implements SongAdapter.I
     private void initUi(@NonNull View view) {
         imgBackground = view.findViewById(R.id.img_background);
         mAppBarLayout = view.findViewById(R.id.app_bar_layout);
-        mToolbar = view.findViewById(R.id.toolbar);
-        mToolbar.setNavigationOnClickListener(v -> popLastFragment());
+        toolbar = view.findViewById(R.id.toolbar);
+        toolbar.setNavigationOnClickListener(v -> popLastFragment());
         if (isTopic()) {
             rlDetailHeader = view.findViewById(R.id.rl_detail_header_with_list_category);
             imgCard = view.findViewById(R.id.img_bg_topic);
@@ -175,10 +146,10 @@ public class DetailCardFragment extends BaseTabFragment implements SongAdapter.I
     private void initToolBarAnimation() {
         AtomicBoolean isExpanded = new AtomicBoolean(false);
         Drawable drawable = ContextCompat.getDrawable(requireContext(), R.drawable.ic_back);
-        mToolbar.setNavigationIcon(drawable);
+        toolbar.setNavigationIcon(drawable);
 
         mAppBarLayout.addOnOffsetChangedListener((appBarLayout, verticalOffset) -> {
-            int maxOffset = appBarLayout.getHeight() - mToolbar.getHeight() - ScreenUtils.getStatusBarHeight(requireContext());
+            int maxOffset = appBarLayout.getHeight() - toolbar.getHeight() - ScreenUtils.getStatusBarHeight(requireContext());
             float alpha = (float) Math.abs(verticalOffset) * 100 / maxOffset;
             if (rlDetailHeader.getAlpha() != alpha) {
                 rlDetailHeader.setAlpha(1 - (float) Math.abs(verticalOffset) / maxOffset);
@@ -188,47 +159,72 @@ public class DetailCardFragment extends BaseTabFragment implements SongAdapter.I
                 isExpanded.set(true);
                 if (isTopic()) {
                     BarsUtils.setAppearanceLightStatusBars(getActivity(), false);
-                    mToolbar.setTitleTextColor(Color.WHITE);
+                    toolbar.setTitleTextColor(Color.WHITE);
                     Objects.requireNonNull(drawable).setTint(Color.WHITE);
                 }
             } else if (Math.abs(verticalOffset) == maxOffset && isExpanded.get()) {
                 isExpanded.set(false);
                 if (isTopic()) {
                     BarsUtils.setAppearanceLightStatusBars(getActivity(), true);
-                    mToolbar.setTitleTextColor(Color.BLACK);
+                    toolbar.setTitleTextColor(Color.BLACK);
                     Objects.requireNonNull(drawable).setTint(Color.BLACK);
                 }
             }
             if (Math.abs(verticalOffset) == maxOffset) {
-                mToolbar.setTitle(card.getName());
+                toolbar.setTitle(card.getName());
             } else {
-                mToolbar.setTitle("");
+                toolbar.setTitle("");
             }
         });
     }
 
     private void initData() {
+        rcvSong.setVisibility(View.GONE);
+        imgLoading.setVisibility(View.VISIBLE);
+        imgLoading.playAnimation();
+
         if (isTopic()) {
             imgBackground.setForeground(null);
             GlideUtils.load(card.getImageUrl(), imgCard);
-            return;
-        }
-        imgBackground.setForeground(ContextCompat.getDrawable(requireContext(), R.drawable.custom_overlay_card_black));
-        GlideUtils.load(card.getImageUrl(), imgCard);
-        GlideUtils.load(card.getImageUrl(), image -> {
-            if (getActivity() == null) {
-                return;
-            }
-            if (image != null) {
-                imgBackground.setImageBitmap(BitmapUtils.blur(getActivity(), image, 25, 1));
-            }
-        });
-        titleCard.setText(card.getName());
-        if (card instanceof AlbumModel) {
-            subTitleCard.setText(((AlbumModel) card).getSingerName());
-            subTitleCard.setVisibility(View.VISIBLE);
+
+            ColorStateList csl = ColorStateList.valueOf(Color.BLACK);
+            SimpleColorFilter filter = new SimpleColorFilter(csl.getDefaultColor());
+            KeyPath keyPath = new KeyPath("**");
+            LottieValueCallback<ColorFilter> callback = new LottieValueCallback<>(filter);
+            imgLoading.addValueCallback(keyPath, LottieProperty.COLOR_FILTER, callback);
+            imgLoading.invalidate();
+
+            mHomePresenter.getDataAllCategory(card.getId(), this);
         } else {
-            subTitleCard.setVisibility(View.GONE);
+            imgBackground.setForeground(ContextCompat.getDrawable(requireContext(), R.drawable.custom_overlay_card_black));
+            GlideUtils.load(card.getImageUrl(), imgCard);
+            GlideUtils.load(card.getImageUrl(), image -> {
+                if (getActivity() == null) {
+                    return;
+                }
+                if (image != null) {
+                    imgBackground.setImageBitmap(BitmapUtils.blur(getActivity(), image, 25, 1));
+                }
+            });
+            titleCard.setText(card.getName());
+            if (card instanceof AlbumModel) {
+                subTitleCard.setText(((AlbumModel) card).getSingerName());
+                subTitleCard.setVisibility(View.VISIBLE);
+            } else {
+                subTitleCard.setVisibility(View.GONE);
+            }
+
+            String type = null;
+            if (card instanceof PlaylistModel) {
+                type = "playlist";
+            }
+            if (card instanceof AlbumModel) {
+                type = "album";
+            }
+            if (card instanceof CategoryModel) {
+                type = "category";
+            }
+            mHomePresenter.getDataAllSong(type, card.getId(), this);
         }
     }
 
@@ -238,10 +234,8 @@ public class DetailCardFragment extends BaseTabFragment implements SongAdapter.I
 
         ((ViewGroup.MarginLayoutParams) rcvSong.getLayoutParams()).leftMargin = (int) getResources().getDimension(R.dimen.space_view);
         ((ViewGroup.MarginLayoutParams) rcvSong.getLayoutParams()).bottomMargin = (int) getResources().getDimension(R.dimen.space_view);
-        CardAdapter adapter = new CardAdapter(new ArrayList<>(data), false, this);
-        rcvSong.setAdapter(adapter);
-        GridLayoutManager manager = new GridLayoutManager(getContext(), MainActivity.TWO_ITEM_CARD);
-        rcvSong.setLayoutManager(manager);
+        rcvSong.setAdapter(new CardAdapter(new ArrayList<>(data), false, this));
+        rcvSong.setLayoutManager(new GridLayoutManager(getContext(), MainActivity.TWO_ITEM_CARD));
     }
 
     private void setDataSong(List<SongModel> data) {
@@ -254,8 +248,7 @@ public class DetailCardFragment extends BaseTabFragment implements SongAdapter.I
         } else {
             tvNoHaveSong.setVisibility(View.GONE);
             rcvSong.setVisibility(View.VISIBLE);
-            SongAdapter adapter = new SongAdapter(data, this);
-            rcvSong.setAdapter(adapter);
+            rcvSong.setAdapter(new SongAdapter(data, this));
             rcvSong.setLayoutManager(new LinearLayoutManager(getContext()));
         }
     }

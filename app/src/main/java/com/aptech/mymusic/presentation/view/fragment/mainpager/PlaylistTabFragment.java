@@ -10,8 +10,8 @@ import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.airbnb.lottie.LottieAnimationView;
 import com.aptech.mymusic.R;
-import com.aptech.mymusic.domain.entity.CardModel;
 import com.aptech.mymusic.domain.entity.PlaylistModel;
 import com.aptech.mymusic.presentation.presenter.Callback;
 import com.aptech.mymusic.presentation.presenter.PlaylistPresenter;
@@ -22,8 +22,9 @@ import com.aptech.mymusic.presentation.view.adapter.ICardListener;
 import java.util.ArrayList;
 import java.util.List;
 
-public class PlaylistFragment extends BaseTabFragment implements Callback.GetDataPlayListCallBack, ICardListener {
+public class PlaylistTabFragment extends BaseTabFragment implements Callback.GetDataPlayListCallBack, ICardListener {
 
+    protected LottieAnimationView mImgLoading;
     private RecyclerView rcvCard;
     private PlaylistPresenter playlistPresenter;
 
@@ -36,21 +37,16 @@ public class PlaylistFragment extends BaseTabFragment implements Callback.GetDat
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_playlist, container, false);
-    }
-
-    private void setAdapter(List<CardModel> cardModelList) {
-        CardAdapter adapter = new CardAdapter(cardModelList, false, this);
-        rcvCard.setAdapter(adapter);
-
-        GridLayoutManager manager = new GridLayoutManager(getContext(), MainActivity.TWO_ITEM_CARD);
-        rcvCard.setLayoutManager(manager);
+        return inflater.inflate(R.layout.fragment_tab_playlist, container, false);
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        mImgLoading = view.findViewById(R.id.icon_loading);
         rcvCard = view.findViewById(R.id.rcv_card);
+
+        showLoading(mImgLoading);
         playlistPresenter.getDataAllPlaylist(this);
     }
 
@@ -63,7 +59,9 @@ public class PlaylistFragment extends BaseTabFragment implements Callback.GetDat
 
     @Override
     public void getDataPlaylistSuccess(List<PlaylistModel> data) {
-        setAdapter(new ArrayList<>(data));
+        hideLoading(mImgLoading);
+        rcvCard.setAdapter(new CardAdapter(new ArrayList<>(data), false, this));
+        rcvCard.setLayoutManager(new GridLayoutManager(getContext(), MainActivity.TWO_ITEM_CARD));
     }
 
     @Override
