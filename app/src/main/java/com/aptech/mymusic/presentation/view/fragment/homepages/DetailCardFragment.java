@@ -1,6 +1,8 @@
 package com.aptech.mymusic.presentation.view.fragment.homepages;
 
+import android.content.res.ColorStateList;
 import android.graphics.Color;
+import android.graphics.ColorFilter;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -18,6 +20,11 @@ import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.airbnb.lottie.LottieAnimationView;
+import com.airbnb.lottie.LottieProperty;
+import com.airbnb.lottie.SimpleColorFilter;
+import com.airbnb.lottie.model.KeyPath;
+import com.airbnb.lottie.value.LottieValueCallback;
 import com.aptech.mymusic.R;
 import com.aptech.mymusic.domain.entity.AlbumModel;
 import com.aptech.mymusic.domain.entity.CardModel;
@@ -56,8 +63,9 @@ public class DetailCardFragment extends BaseTabFragment implements SongAdapter.I
     private ImageView imgCard;
     private TextView titleCard;
     private TextView subTitleCard;
-    private RecyclerView rcvSong;
+    private LottieAnimationView imgLoading;
     private TextView tvNoHaveSong;
+    private RecyclerView rcvSong;
 
     private HomePresenter mHomePresenter;
 
@@ -89,9 +97,20 @@ public class DetailCardFragment extends BaseTabFragment implements SongAdapter.I
         super.onViewCreated(view, savedInstanceState);
         initUi(view);
         initToolBarAnimation();
+        initData();
         BarsUtils.offsetStatusBar(mToolbar);
 
+        rcvSong.setVisibility(View.GONE);
+        imgLoading.setVisibility(View.VISIBLE);
+        imgLoading.playAnimation();
+
         if (isTopic()) {
+            ColorStateList csl = ColorStateList.valueOf(Color.BLACK);
+            SimpleColorFilter filter = new SimpleColorFilter(csl.getDefaultColor());
+            KeyPath keyPath = new KeyPath("**");
+            LottieValueCallback<ColorFilter> callback = new LottieValueCallback<>(filter);
+            imgLoading.addValueCallback(keyPath, LottieProperty.COLOR_FILTER, callback);
+            imgLoading.invalidate();
             mHomePresenter.getDataAllCategory(card.getId(), this);
             return;
         }
@@ -134,10 +153,12 @@ public class DetailCardFragment extends BaseTabFragment implements SongAdapter.I
             rlDetailHeader = view.findViewById(R.id.rl_detail_header_with_list_song);
             imgCard = view.findViewById(R.id.img_thumb);
         }
+        rlDetailHeader.setVisibility(View.VISIBLE);
         titleCard = view.findViewById(R.id.tv_title_card);
         subTitleCard = view.findViewById(R.id.tv_sub_title_card);
-        rcvSong = view.findViewById(R.id.rcv_song);
+        imgLoading = view.findViewById(R.id.icon_loading);
         tvNoHaveSong = view.findViewById(R.id.tv_no_have_song);
+        rcvSong = view.findViewById(R.id.rcv_song);
         view.findViewById(R.id.btn_play_rand).setOnClickListener(v -> {
             List<SongModel> songs;
             if (rcvSong.getAdapter() instanceof SongAdapter) {
@@ -186,21 +207,12 @@ public class DetailCardFragment extends BaseTabFragment implements SongAdapter.I
         });
     }
 
-    private void setDataCategory(List<CategoryModel> data) {
-        imgBackground.setForeground(null);
-        rlDetailHeader.setVisibility(View.VISIBLE);
-        ((ViewGroup.MarginLayoutParams) rcvSong.getLayoutParams()).leftMargin = (int) getResources().getDimension(R.dimen.space_view);
-        ((ViewGroup.MarginLayoutParams) rcvSong.getLayoutParams()).bottomMargin = (int) getResources().getDimension(R.dimen.space_view);
-
-        GlideUtils.load(card.getImageUrl(), imgCard);
-        CardAdapter adapter = new CardAdapter(new ArrayList<>(data), false, this);
-        rcvSong.setAdapter(adapter);
-        GridLayoutManager manager = new GridLayoutManager(getContext(), MainActivity.TWO_ITEM_CARD);
-        rcvSong.setLayoutManager(manager);
-    }
-
-    private void setDataSong(List<SongModel> data) {
-        rlDetailHeader.setVisibility(View.VISIBLE);
+    private void initData() {
+        if (isTopic()) {
+            imgBackground.setForeground(null);
+            GlideUtils.load(card.getImageUrl(), imgCard);
+            return;
+        }
         imgBackground.setForeground(ContextCompat.getDrawable(requireContext(), R.drawable.custom_overlay_card_black));
         GlideUtils.load(card.getImageUrl(), imgCard);
         GlideUtils.load(card.getImageUrl(), image -> {
@@ -218,11 +230,30 @@ public class DetailCardFragment extends BaseTabFragment implements SongAdapter.I
         } else {
             subTitleCard.setVisibility(View.GONE);
         }
+    }
+
+    private void setDataCategory(List<CategoryModel> data) {
+        rcvSong.setVisibility(View.VISIBLE);
+        imgLoading.setVisibility(View.GONE);
+
+        ((ViewGroup.MarginLayoutParams) rcvSong.getLayoutParams()).leftMargin = (int) getResources().getDimension(R.dimen.space_view);
+        ((ViewGroup.MarginLayoutParams) rcvSong.getLayoutParams()).bottomMargin = (int) getResources().getDimension(R.dimen.space_view);
+        CardAdapter adapter = new CardAdapter(new ArrayList<>(data), false, this);
+        rcvSong.setAdapter(adapter);
+        GridLayoutManager manager = new GridLayoutManager(getContext(), MainActivity.TWO_ITEM_CARD);
+        rcvSong.setLayoutManager(manager);
+    }
+
+    private void setDataSong(List<SongModel> data) {
+        imgLoading.setVisibility(View.GONE);
+        imgLoading.pauseAnimation();
 
         if (data == null || data.isEmpty()) {
             tvNoHaveSong.setVisibility(View.VISIBLE);
+            rcvSong.setVisibility(View.GONE);
         } else {
             tvNoHaveSong.setVisibility(View.GONE);
+            rcvSong.setVisibility(View.VISIBLE);
             SongAdapter adapter = new SongAdapter(data, this);
             rcvSong.setAdapter(adapter);
             rcvSong.setLayoutManager(new LinearLayoutManager(getContext()));
