@@ -7,13 +7,13 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -95,6 +95,15 @@ public class SuggestSongFragment extends BaseFragment implements Callback.GetSug
         mPresenter = null;
     }
 
+    @Nullable
+    private MainPagerFragment getMainParentFragment() {
+        Fragment fragment = getParentFragmentManager().findFragmentByTag(MainPagerFragment.class.getName());
+        if (fragment instanceof MainPagerFragment) {
+            return (MainPagerFragment) fragment;
+        }
+        return null;
+    }
+
     @Override
     public void onGot(List<SongModel> data) {
         mRcvListSuggestSong.setVisibility(View.VISIBLE);
@@ -105,15 +114,15 @@ public class SuggestSongFragment extends BaseFragment implements Callback.GetSug
 
     @Override
     public void onFalse(Throwable t) {
-        Log.e("ddd", "onError: ", t);
         mSwipeRefreshLayout.setRefreshing(false);
     }
 
     @Override
     public void onClickedItem(List<SongModel> songs, SongModel song, int position) {
         MusicServiceHelper.playSong(song);
-        if (getParentFragment() instanceof MainPagerFragment) {
-            ((MainPagerFragment) getParentFragment()).jumpToPage(1, true);
+        MainPagerFragment fragment = getMainParentFragment();
+        if (fragment != null) {
+            fragment.jumpToPage(1, true);
         }
     }
 
