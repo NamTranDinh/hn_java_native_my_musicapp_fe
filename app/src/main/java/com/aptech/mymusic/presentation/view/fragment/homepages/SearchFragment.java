@@ -67,6 +67,7 @@ public class SearchFragment extends BaseFragment implements View.OnClickListener
     @Override
     public void onDestroy() {
         super.onDestroy();
+        searchHandler.removeCallbacks(searchRunnable);
         mHomePresenter.release();
         mHomePresenter = null;
     }

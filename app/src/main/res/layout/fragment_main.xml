@@ -26,8 +26,7 @@
 
                 <androidx.appcompat.widget.Toolbar
                     android:id="@+id/toolbar"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    style="@style/AppToolbar"
                     android:background="@color/white">
 
                     <androidx.cardview.widget.CardView
@@ -41,14 +40,14 @@
                             android:id="@+id/civ_avatar_user"
                             android:layout_width="40dp"
                             android:layout_height="40dp"
-                            android:src="@drawable/background_placeholder"
+                            android:src="@mipmap/app_launcher_foreground"
                             tools:ignore="ContentDescription" />
                     </androidx.cardview.widget.CardView>
 
                     <EditText
                         android:id="@+id/edt_tb_search"
                         android:layout_width="match_parent"
-                        android:layout_height="30dp"
+                        android:layout_height="32dp"
                         android:layout_marginEnd="16dp"
                         android:autofillHints=""
                         android:background="@drawable/custom_radius_10_black_thin"
@@ -58,7 +57,7 @@
                         android:hint="@string/toolbar_txt_search_hint"
                         android:inputType="textAutoComplete"
                         android:paddingHorizontal="12dp"
-                        android:textSize="12sp" />
+                        android:textSize="13sp" />
 
                 </androidx.appcompat.widget.Toolbar>
 
