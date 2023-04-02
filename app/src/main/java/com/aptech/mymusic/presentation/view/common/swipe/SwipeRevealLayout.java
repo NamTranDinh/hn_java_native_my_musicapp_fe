@@ -726,6 +726,7 @@ public class SwipeRevealLayout extends ViewGroup {
 
     private void init(Context context, AttributeSet attrs) {
         if (attrs != null && context != null) {
+            @SuppressWarnings("resource")
             TypedArray a = context.getTheme().obtainStyledAttributes(
                     attrs,
                     R.styleable.SwipeRevealLayout,
@@ -740,7 +741,7 @@ public class SwipeRevealLayout extends ViewGroup {
                     R.styleable.SwipeRevealLayout_minDistRequestDisallowParent,
                     dpToPx(DEFAULT_MIN_DIST_REQUEST_DISALLOW_PARENT)
             );
-            a.close();
+            a.recycle();
         }
 
         mDragHelper = ViewDragHelper.create(this, 1.0f, mDragHelperCallback);

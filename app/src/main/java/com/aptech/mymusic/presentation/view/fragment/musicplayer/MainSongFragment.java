@@ -15,6 +15,7 @@ import android.widget.ImageView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.cardview.widget.CardView;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import com.aptech.mymusic.R;
@@ -28,8 +29,9 @@ import com.mct.components.utils.ToastUtils;
 
 public class MainSongFragment extends BaseFragment {
 
-    private ImageView imgLike;
+    private CardView cvThumb;
     private ImageView imgSong;
+    private ImageView imgLike;
     private Integer mSongId;
 
 
@@ -58,6 +60,8 @@ public class MainSongFragment extends BaseFragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        cvThumb = view.findViewById(R.id.cv_thumb);
+        cvThumb.post(() -> cvThumb.setRadius(cvThumb.getMeasuredWidth() / 2f));
         imgSong = view.findViewById(R.id.img_song);
         imgLike = view.findViewById(R.id.img_likes);
         imgLike.setOnClickListener(v -> {

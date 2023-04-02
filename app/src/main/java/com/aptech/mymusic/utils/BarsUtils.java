@@ -1,6 +1,7 @@
 package com.aptech.mymusic.utils;
 
 import android.app.Activity;
+import android.os.Build;
 import android.view.ViewGroup;
 import android.view.Window;
 
@@ -27,9 +28,11 @@ public class BarsUtils {
         if (window == null) {
             return;
         }
-        WindowInsetsControllerCompat windowInsetsController =
-                WindowCompat.getInsetsController(window, window.getDecorView());
-        windowInsetsController.setAppearanceLightStatusBars(isLight);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            WindowInsetsControllerCompat windowInsetsController =
+                    WindowCompat.getInsetsController(window, window.getDecorView());
+            windowInsetsController.setAppearanceLightStatusBars(isLight);
+        }
     }
 
     public static void offsetStatusBar(@NonNull ViewGroup v) {
