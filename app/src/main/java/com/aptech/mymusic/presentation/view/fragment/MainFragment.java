@@ -27,7 +27,7 @@ import com.google.android.material.navigation.NavigationView;
 import com.mct.components.baseui.BaseActivity;
 import com.mct.components.baseui.BaseFragment;
 
-public class MainFragment extends BaseFragment implements View.OnClickListener {
+public class MainFragment extends BaseFragment implements BaseActivity.OnBackPressed, View.OnClickListener {
 
     private DrawerLayout mDrawerLayout;
     private NavigationView mNavigationView;
@@ -111,6 +111,15 @@ public class MainFragment extends BaseFragment implements View.OnClickListener {
                 }
             }
         });
+    }
+
+    @Override
+    public boolean onBackPressed() {
+        if (mViewPager2.getCurrentItem() != 0) {
+            mViewPager2.setCurrentItem(0);
+            return true;
+        }
+        return false;
     }
 
     @SuppressLint("NonConstantResourceId")
