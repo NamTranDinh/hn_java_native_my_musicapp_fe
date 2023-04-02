@@ -524,7 +524,6 @@ public class MusicService extends Service {
                 updateView();
             }
             if (mMediaState == MediaState.PREPARED || mMediaState == MediaState.PAUSED) {
-                // requestAudioFocus();
                 if (requestAudioFocus()) {
                     applyMediaState(MediaState.PLAYING);
                     mMediaPlayer.start();
@@ -617,11 +616,13 @@ public class MusicService extends Service {
 
         private void seekSong(int time) {
             if (mMediaState == MediaState.PLAYING || mMediaState == MediaState.PAUSED) {
-                applyMediaState(MediaState.PLAYING);
-                mMediaPlayer.seekTo(time);
-                mMediaPlayer.start();
-                updateNotification();
-                updateView();
+                if (requestAudioFocus()) {
+                    applyMediaState(MediaState.PLAYING);
+                    mMediaPlayer.seekTo(time);
+                    mMediaPlayer.start();
+                    updateNotification();
+                    updateView();
+                }
             }
         }
 
@@ -747,6 +748,7 @@ public class MusicService extends Service {
 
         public void release() {
             applyMediaState(MediaState.RELEASE);
+            abandonAudioFocus();
             mMediaSession.release();
             mMediaSession = null;
             mMediaPlayer.release();
