@@ -42,6 +42,9 @@ public class MainPagerFragment extends BaseFragment {
             if (MusicServiceHelper.getCurrentSong() == null) {
                 return;
             }
+            if (mToolbar == null) {
+                return;
+            }
             initData();
         }
     };
